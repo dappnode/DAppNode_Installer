@@ -1,0 +1,105 @@
+version: '3.4'
+
+volumes:
+    dnp_bind_data: {}
+    dnp_vpn_data: {}
+    dnp_ipfs_export: {}
+    dnp_ipfs_ipfs: {}
+    dnp_provisioning_data: {}
+    dnp_ethchain_data: {}
+
+networks:
+    network:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 10.17.0.0/16
+services:
+    dnp_bind:
+        image: dnp_bind:dev
+        container_name: dncore-dnp_bind
+        restart: always
+        volumes:
+            - dnp_bind_data:/etc/bind
+        networks:
+            network:
+                ipv4_address: 10.17.0.2
+    dnp_ethforward:
+        image: dnp_ethforward:dev
+        container_name: dncore-dnp_ethforward
+        restart: always
+        dns: 10.17.0.2
+        networks:
+            network:
+                ipv4_address: 10.17.0.3
+    dnp_vpn:
+        image: dnp_vpn:dev
+        container_name: dncore-dnp_vpn
+        restart: always
+        privileged: true
+        volumes:
+            - /lib/modules:/lib/modules:ro
+            - dnp_provisioning_data:/usr/share/nginx/html
+            - dnp_vpn_data:/opt/src
+        ports:
+            - 4500:4500/udp
+            - 500:500/udp
+        environment:
+            - VPN_DNS_SRV1=10.17.0.2
+            - VPN_DNS_SRV2=8.8.8.8
+        dns: 10.17.0.2
+        networks:
+            network:
+                ipv4_address: 10.17.0.4
+    dnp_ipfs:
+        image: dnp_ipfs:dev
+        container_name: dncore-dnp_ipfs
+        restart: always
+        ports:
+            - "4001:4001"
+        volumes:
+            - dnp_ipfs_export:/export
+            - dnp_ipfs_ipfs:/data/ipfs
+        dns: 10.17.0.2
+        networks:
+            network:
+                ipv4_address: 10.17.0.5
+    dnp_provisioning:
+        image: dnp_provisioning:dev
+        container_name: dncore-dnp_provisioning
+        restart: always
+        ports:
+            - 80:80
+        volumes:
+            - dnp_provisioning_data:/usr/share/nginx/html
+            - ${HTPASSWD_DIR:-/usr/src/dappnode}/htpasswd:/etc/nginx/htpasswd
+        dns: 10.17.0.2
+        networks:
+            network:
+                ipv4_address: 10.17.0.6
+    dnp_ethchain:
+        image: dnp_ethchain:dev
+        container_name: dncore-dnp_ethchain
+        restart: always
+        volumes:
+            - dnp_ethchain_data:/root/.local/share/io.parity.ethereum/
+        ports:
+            - "30303:30303"
+            - "30303:30303/udp"
+        command:
+            --jsonrpc-port 8545 --jsonrpc-interface all --jsonrpc-hosts all --jsonrpc-cors '*' --ws-interface 0.0.0.0 --ws-port 8546 --ws-origins '*' --ws-hosts all --cache-size 1024 --ui-interface "0.0.0.0" --ui-hosts all --ui-no-validation 
+        dns: 10.17.0.2
+        networks:
+            network:
+                ipv4_address: 10.17.0.7
+    dnp_installer:
+        image: dnp_installer:dev
+        container_name: dncore-dnp_installer
+        restart: always
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        dns: 10.17.0.2
+        networks:
+            network:
+                ipv4_address: 10.17.0.8
+
