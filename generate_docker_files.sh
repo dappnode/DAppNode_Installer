@@ -35,13 +35,13 @@ echo "Creating necessary dirs"
 mkdir images
 
 docker save \
-dnp_bind:dev \
-dnp_ethforward:dev  \
-dnp_vpn:dev \
-dnp_ipfs:dev \
-dnp_provisioning:dev \
-dnp_ethchain:dev \
-dnp_installer:dev | \
+dnp_bind \
+dnp_ethforward  \
+dnp_vpn \
+dnp_ipfs \
+dnp_provisioning \
+dnp_ethchain \
+dnp_installer | \
 xz > images/dappnode_all_docker_images.tar.xz
 
 echo "Coping dappnode_all_docker_images.tar.xz to DPS dir..."

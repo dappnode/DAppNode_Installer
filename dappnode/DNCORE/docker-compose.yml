@@ -16,7 +16,7 @@ networks:
                 - subnet: 10.17.0.0/16
 services:
     dnp_bind:
-        image: dnp_bind:dev
+        image: dnp_bind 
         container_name: dncore-dnp_bind
         restart: always
         volumes:
@@ -25,7 +25,7 @@ services:
             network:
                 ipv4_address: 10.17.0.2
     dnp_ethforward:
-        image: dnp_ethforward:dev
+        image: dnp_ethforward
         container_name: dncore-dnp_ethforward
         restart: always
         dns: 10.17.0.2
@@ -33,7 +33,7 @@ services:
             network:
                 ipv4_address: 10.17.0.3
     dnp_vpn:
-        image: dnp_vpn:dev
+        image: dnp_vpn
         container_name: dncore-dnp_vpn
         restart: always
         privileged: true
@@ -52,7 +52,7 @@ services:
             network:
                 ipv4_address: 10.17.0.4
     dnp_ipfs:
-        image: dnp_ipfs:dev
+        image: dnp_ipfs
         container_name: dncore-dnp_ipfs
         restart: always
         ports:
@@ -65,7 +65,7 @@ services:
             network:
                 ipv4_address: 10.17.0.5
     dnp_provisioning:
-        image: dnp_provisioning:dev
+        image: dnp_provisioning
         container_name: dncore-dnp_provisioning
         restart: always
         ports:
@@ -78,7 +78,7 @@ services:
             network:
                 ipv4_address: 10.17.0.6
     dnp_ethchain:
-        image: dnp_ethchain:dev
+        image: dnp_ethchain
         container_name: dncore-dnp_ethchain
         restart: always
         volumes:
@@ -93,7 +93,7 @@ services:
             network:
                 ipv4_address: 10.17.0.7
     dnp_installer:
-        image: dnp_installer:dev
+        image: dnp_installer
         container_name: dncore-dnp_installer
         restart: always
         volumes:
