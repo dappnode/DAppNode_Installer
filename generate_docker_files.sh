@@ -44,7 +44,7 @@ dnp_ethchain \
 dnp_installer | \
 xz > images/dappnode_all_docker_images.tar.xz
 
-echo "Coping dappnode_all_docker_images.tar.xz to DPS dir..."
+echo "Coping dappnode_all_docker_images.tar.xz to dappnode dir..."
 cp images/dappnode_all_docker_images.tar.xz dappnode/dappnode_all_docker_images.tar.xz
 
 echo "Finished!"
