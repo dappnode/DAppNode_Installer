@@ -2,7 +2,7 @@
 
 # adding dependencies for docker.
 sudo dnf -y install dnf-plugins-core
-
+sudo dnf -y install xorriso
 # adding docker repository for fedora
 sudo dnf config-manager \
 	--add-repo \

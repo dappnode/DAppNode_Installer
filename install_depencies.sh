@@ -6,10 +6,10 @@
 
    DETECTOS=`dappnode/scripts/sherlock`
 
-echo "Detected OS: '$DETECTOS' "
+detect () {
 
 # runs the different isntall scripts for each supported OS
-if [ "$DETECTOS" ="centos" ] ; then
+if [ "$DETECTOS" = "centos" ] ; then
 	sh dappnode/scripts/depend_install/linux/redhat_docker_installer.sh
 	sh dappnode/scripts/depend_install/linux/linux_docker_compose_installer.sh
 elif [ "$DETECTOS" = "darwin" ] ; then
@@ -18,12 +18,17 @@ elif [ "$DETECTOS" = "darwin" ] ; then
 elif [ "$DETECTOS" = "fedora" ] ; then
         sh dappnode/scripts/depend_install/linux/fedora_docker_installer.sh
         sh dappnode/scripts/depend_install/linux/linux_docker_compose_installer.sh	
-elif [ "$DETECTOS" ="ubuntu" ] ; then
+elif [ "$DETECTOS" = "Ubuntu" ] ; then
         cp -r dappnode /usr/src/dappnode
 	sh dappnode/scripts/depend_install/linux/debian_docker_installer.sh
 	sh dappnode/scripts/depend_install/linux/linux_docker_compose_installer.sh
         rm -rf /usr/src/dappnode
-elif [ "$DETECTOS" ="debian" ] ; then
+elif [ "$DETECTOS" = "debian" ] ; then
         sh dappnode/scripts/depend_install/linux/debian_docker_installer.sh
 	sh dappnode/scripts/depend_install/linux/linux_docker_compose_installer.sh
 fi
+}
+
+echo "Detected OS: '$DETECTOS' "
+
+detect

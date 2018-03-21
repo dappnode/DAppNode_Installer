@@ -31,10 +31,10 @@ in-target mkdir -p /usr/src/dappnode ; \
 cp -ar /cdrom/dappnode/* /target/usr/src/dappnode/ ; \
 cp -a /cdrom/dappnode/scripts/dappnode_cron_task /target/etc/cron.d/ ;\
 cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/bin/docker-compose ; \
-in-target chmod +x /usr/src/dappnode/scripts/depend_install/linux/debian_docker_installer.sh ; \
+in-target chmod +x /usr/src/dappnode/scripts/depend_install/linux/dn_docker_installer.sh ; \
 in-target chmod +x /usr/src/dappnode/scripts/load_docker_images.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
-in-target /usr/src/dappnode/scripts/depend_install/debian_docker_installer.sh" | sudo tee -a preseed/hwe-ubuntu-server-minimal.seed
+in-target /usr/src/dappnode/scripts/depend_install/linux/dn_docker_installer.sh" | sudo tee -a preseed/hwe-ubuntu-server-minimal.seed
 
 echo "Appending the Ubuntu Server preseed files with DappNode" 
 echo "d-i preseed/late_command string \
@@ -45,12 +45,12 @@ cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/b
 in-target chmod +x /usr/src/dappnode/scripts/depend_install/linux/debian_docker_installer.sh ; \
 in-target chmod +x /usr/src/dappnode/scripts/load_docker_images.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
-in-target /usr/src/dappnode/scripts/depend_install/debian_docker_installer.sh" | sudo tee -a preseed/ubuntu-server.seed
+in-target /usr/src/dappnode/scripts/depend_install/linux/debian_docker_installer.sh" | sudo tee -a preseed/ubuntu-server.seed
 
 
 echo "Configuring the Ubuntu boot menu for DappNode"
-sudo rm -f ./boot/grub/grub.cfg
-sudo cp ../boot/grub.cfg ./boot/grub/grub.cfg
+sudo rm -f boot/grub/grub.cfg
+sudo cp ../boot/grub.cfg boot/grub/grub.cfg
 
 echo "Generating new iso..."
 xorriso -as mkisofs -isohybrid-mbr isolinux/isohdpfx.bin \
