@@ -1,0 +1,9 @@
+#!/bin/bash
+
+   DETECTBREW=`which brew`
+
+detect_brew () {
+
+if [ "$DETECTBREW" = "/usr/local/bin/brew" ] ; then
+    echo "homebrew is installed, now attempting to install docker and docker-compose"
+    brew install docker docker-compose
