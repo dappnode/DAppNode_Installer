@@ -1,0 +1,17 @@
+#!/bin/bash
+
+   DETECTBREW=`which brew`
+
+detect_brew () {
+
+if [ "$DETECTBREW" = "/usr/local/bin/brew" ] ; then
+    echo "homebrew is installed, now attempting to install docker and docker-compose"
+    brew install docker docker-compose xorriso xz
+else [ "$DETECTBREW" != "/usr/local/bin/brew" ] ; then
+    echo "homebrew is not installed, installing homebrew. You must first install the Xcode command-line tools, before homebrew. The Xcode CLI install dialog box will pop up momentarily."
+    xcode-select --install
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    brew install docker docker-compose xorriso xz
+fi
+}
+detect_brew
