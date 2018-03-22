@@ -6,7 +6,7 @@
 
    DETECTOS=`dappnode/scripts/sherlock`
 
-detect () {
+distro_depend () {
 
 # runs the different isntall scripts for each supported OS
 if [ "$DETECTOS" = "centos" ] ; then
@@ -30,4 +30,4 @@ fi
 
 echo "Detected OS: '$DETECTOS' "
 
-detect
+distro_depend
