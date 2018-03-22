@@ -5,6 +5,8 @@
 #. ./dappnode/scripts/sherlock
 
    DETECTOS=`dappnode/scripts/sherlock`
+   
+   echo "Detected OS: '$DETECTOS' "
 
 distro_depend () {
 
@@ -28,6 +30,6 @@ elif [ "$DETECTOS" = "debian" ] ; then
 fi
 }
 
-echo "Detected OS: '$DETECTOS' "
+echo "The dependencies for '$DETECTOS' have been installed. Please log out of your user and sign back in before building!."
 
 distro_depend
