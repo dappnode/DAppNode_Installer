@@ -22,7 +22,6 @@ elif [ "$DETECTOS" = "Ubuntu" ] ; then
         cp -r dappnode /usr/src/dappnode
 	sh dappnode/scripts/depend_install/linux/debian_docker_installer.sh
 	sh dappnode/scripts/depend_install/linux/linux_docker_compose_installer.sh
-        rm -rf /usr/src/dappnode
 elif [ "$DETECTOS" = "debian" ] ; then
         sh dappnode/scripts/depend_install/linux/debian_docker_installer.sh
 	sh dappnode/scripts/depend_install/linux/linux_docker_compose_installer.sh
