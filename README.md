@@ -9,7 +9,7 @@ Repo for providing the instrucctions to generate a new ISO of DappNode
 
 [xorriso MacOS X](http://macappstore.org/xorriso/)
 
-[xorriso Ubuntu]((https://packages.ubuntu.com/xenial/xorriso)
+[xorriso Ubuntu](https://packages.ubuntu.com/xenial/xorriso)
 
 [xz MacOS X](http://macappstore.org/xz/)
 
