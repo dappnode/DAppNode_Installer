@@ -7,3 +7,9 @@ detect_brew () {
 if [ "$DETECTBREW" = "/usr/local/bin/brew" ] ; then
     echo "homebrew is installed, now attempting to install docker and docker-compose"
     brew install docker docker-compose
+elif [ "$DETECTBREW" != "/usr/local/bin/brew" ] ; then
+    echo "homebrew is not installed, installing homebrew"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+fi
+}
+detect_brew
