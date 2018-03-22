@@ -63,6 +63,26 @@ $ sudo sh ./install_depend.sh
 
 # Generation of ISO image
 
+# Prerequisites
+
+[docker](https://docs.docker.com/engine/installation)
+
+[brew](https://brew.sh/index_es.html) (MacOS X)
+
+[xorriso MacOS X](http://macappstore.org/xorriso/)
+
+[xorriso Ubuntu](https://packages.ubuntu.com/xenial/xorriso)
+
+[xz MacOS X](http://macappstore.org/xz/)
+
+[xz Ubuntu](https://packages.ubuntu.com/xenial/xz-utils)
+
+# Installation
 ```
-$ ./generate_ISO.sh
+git clone --recurse-submodules https://github.com/dappnode/DN_ISO_Generator.git
+```
+
+# Generation of ISO image
+```
+./generate_ISO.sh
 ```
