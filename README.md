@@ -20,7 +20,7 @@ This repository generates the .iso file for installing DappNode to a server. Bel
 # Generation of ISO image
 
 ```
-$ git clone --recursive https://github.com/dappnode/DN_ISO_Generator.git
+$ git clone -b develop --recursive https://github.com/dappnode/DN_ISO_Generator.git
 $ cd DN_ISO_Generator
 $ docker-compose up
 ```
@@ -28,8 +28,21 @@ $ docker-compose up
 When the execution of the Docker-compose finishes you can find the iso image of DAppNode in the images folder:
 ```
 $ ls -lrt images/DappNode-ubuntu-16.04.3-server-amd64.iso
--rw-r--r--  1 edu  staff  916455424 26 mar 13:19 images/DappNode-ubuntu-16.04.3-server-amd64.iso
+-rw-r--r--  1 edu  staff  916455424 20 mar 13:19 images/DAppNode-ubuntu-16.04.3-server-amd64.iso
 ```
+
+Now you can burn the ISO to a DVD or create a bootable USB.
+
+How to create a bootable USB:
+
+* [MacOS](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-macos)
+* [Windows](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows)
+* [Ubuntu](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-ubuntu)
+
+For the installation you can follow the steps of a standard ubuntu server distribution.
+
+[tutorial install ubuntu server](https://tutorials.ubuntu.com/tutorial/tutorial-install-ubuntu-server)
+
 
 ## Contributing
 
