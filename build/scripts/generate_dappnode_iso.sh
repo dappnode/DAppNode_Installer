@@ -1,29 +1,29 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "Downloading ubuntu ISO image: ubuntu-16.04.3-server-amd64.iso..."
-if [ ! -f images/ubuntu-16.04.3-server-amd64.iso ]; then
+if [ ! -f /images/ubuntu-16.04.3-server-amd64.iso ]; then
     wget http://releases.ubuntu.com/16.04.3/ubuntu-16.04.3-server-amd64.iso \
-    -O images/ubuntu-16.04.3-server-amd64.iso
+    -O /images/ubuntu-16.04.3-server-amd64.iso
 fi
 echo "Done!"
 
 echo "Clean old files..."
-sudo rm -rf dappnode-iso
-sudo rm DappNode-ubuntu-*
+rm -rf dappnode-iso
+rm DappNode-ubuntu-*
 
 echo "Extracting the iso..."
-sudo xorriso -osirrox on -indev images/ubuntu-16.04.3-server-amd64.iso \
+xorriso -osirrox on -indev /images/ubuntu-16.04.3-server-amd64.iso \
  -extract / dappnode-iso
 
 echo "Obtaining the isohdpfx.bin for hybrid ISO..."
-sudo dd if=images/ubuntu-16.04.3-server-amd64.iso bs=512 count=1 \
+dd if=/images/ubuntu-16.04.3-server-amd64.iso bs=512 count=1 \
 of=dappnode-iso/isolinux/isohdpfx.bin
 
 cd dappnode-iso
 
 echo "Creating necessary directories and copying files"
-sudo mkdir dappnode
-sudo cp -r ../dappnode/* dappnode/
+mkdir dappnode
+cp -r ../dappnode/* dappnode/
 
 echo "Appending the Ubuntu Server minimal preseed files with DappNode"
 echo "d-i preseed/late_command string \
@@ -34,7 +34,7 @@ cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/b
 in-target chmod +x /usr/src/dappnode/scripts/depend_install/linux/dn_docker_installer.sh ; \
 in-target chmod +x /usr/src/dappnode/scripts/load_docker_images.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
-in-target /usr/src/dappnode/scripts/depend_install/linux/dn_docker_installer.sh" | sudo tee -a preseed/hwe-ubuntu-server-minimal.seed
+in-target /usr/src/dappnode/scripts/depend_install/linux/dn_docker_installer.sh" | tee -a preseed/hwe-ubuntu-server-minimal.seed
 
 echo "Appending the Ubuntu Server preseed files with DappNode" 
 echo "d-i preseed/late_command string \
@@ -45,15 +45,15 @@ cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/b
 in-target chmod +x /usr/src/dappnode/scripts/depend_install/linux/debian_docker_installer.sh ; \
 in-target chmod +x /usr/src/dappnode/scripts/load_docker_images.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
-in-target /usr/src/dappnode/scripts/depend_install/linux/debian_docker_installer.sh" | sudo tee -a preseed/ubuntu-server.seed
+in-target /usr/src/dappnode/scripts/depend_install/linux/debian_docker_installer.sh" | tee -a preseed/ubuntu-server.seed
 
 
 echo "Configuring the Ubuntu boot menu for DappNode"
-sudo rm -f boot/grub/grub.cfg
-sudo cp ../boot/grub.cfg boot/grub/grub.cfg
+#rm -f boot/grub/grub.cfg
+#cp ../boot/grub.cfg boot/grub/grub.cfg
 
 echo "Generating new iso..."
 xorriso -as mkisofs -isohybrid-mbr isolinux/isohdpfx.bin \
 -c isolinux/boot.cat -b isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 \
 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
--isohybrid-gpt-basdat -o ../images/DappNode-ubuntu-16.04.3-server-amd64.iso .
+-isohybrid-gpt-basdat -o /images/DappNode-ubuntu-16.04.3-server-amd64.iso .

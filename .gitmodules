@@ -1,3 +1,3 @@
-[submodule "dappnode/DNCORE"]
-	path = dappnode/DNCORE
+[submodule "build/dappnode/DNCORE"]
+	path = build/dappnode/DNCORE
 	url = https://github.com/dappnode/DNCORE.git

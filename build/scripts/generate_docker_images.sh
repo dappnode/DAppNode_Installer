@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "Cleaning previous files"
 rm -rf ./DNP_*
@@ -31,9 +31,7 @@ echo "Cloning & building DNP_BIND..."
 git clone https://github.com/dappnode/DNP_BIND
 docker-compose -f ./DNP_BIND/docker-compose.yml build 
 
-echo "Creating necessary dirs"
-mkdir images
-
+echo "Saving images... (it takes some time)"
 docker save \
 dappnode/dnp_bind \
 dappnode/dnp_ethforward  \
@@ -42,9 +40,9 @@ dappnode/dnp_ipfs \
 dappnode/dnp_provisioning \
 dappnode/dnp_ethchain \
 dappnode/dnp_installer | \
-xz > images/dappnode_all_docker_images.tar.xz
+xz > /images/dappnode_all_docker_images.tar.xz
 
 echo "Coping dappnode_all_docker_images.tar.xz to dappnode dir..."
-cp images/dappnode_all_docker_images.tar.xz dappnode/dappnode_all_docker_images.tar.xz
+cp /images/dappnode_all_docker_images.tar.xz dappnode/dappnode_all_docker_images.tar.xz
 
 echo "Finished!"

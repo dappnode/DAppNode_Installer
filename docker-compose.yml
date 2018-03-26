@@ -1,0 +1,9 @@
+version: '3.4'
+  
+services:
+  dn_iso_generator:
+    build: build
+    privileged: true
+    volumes:
+      - ./images:/images
+
