@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 # FOR PRODUCTION: Replace links with IPFS
@@ -72,10 +72,11 @@ fi
 
 # STEP 3: Start DAppNode
 # ----------------------------------------
-docker-compose -f ${$CORE_PATH} up -d
+cd $DAPPNODE_DIR
+docker-compose up -d
 
 # Testing result
-if docker-compose -f ${$CORE_PATH} ps | grep -q "dncore-dnp_ethchain"; then
+if docker-compose ps | grep -q "dncore-dnp_ethchain"; then
     echo -e "${GREEN}\n\nVerified dappnode installation \n\n -------${NC}"
 else
     echo -e "${RED}\n\nERROR:\n  docker-compose ps, does not return the expected packages \n\n -------${NC}"
