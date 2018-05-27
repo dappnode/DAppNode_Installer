@@ -43,10 +43,10 @@ chmod +x $DCMP_PATH
 
 # STEP 2: Install packages
 # ----------------------------------------
-dpkg -i $DCKR_PATH
 dpkg -i $LIB1_PATH
 dpkg -i $LIB2_PATH
 dpkg -i $LIB3_PATH
+dpkg -i $DCKR_PATH
 
 # Define color coding
 RED="\033[0;31m"
