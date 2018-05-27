@@ -61,6 +61,14 @@ else
     exit 1
 fi
 
+# ##### THIS WILL FAIL WITHOUT INTERNET CONNECTION
+if docker run hello-world | grep -q "Hello from Docker!"; then
+    echo -e "${GREEN}\n\nVerified docker with hello-world image \n\n -------${NC}"
+else
+    echo -e "ERROR  docker, could not run hello-world image"
+    exit 1
+fi
+
 # Validate the installation of docker-compose
 if docker-compose -v; then
     echo -e "${GREEN}\n\nVerified docker-compose installation \n\n -------${NC}"
