@@ -50,32 +50,27 @@ dpkg -i $LIB2_PATH
 dpkg -i $LIB3_PATH
 dpkg -i $DCKR_PATH
 
-# Define color coding
-RED="\033[0;31m"
-GREEN="\033[0;32m"
-NC="\033[0m" # No Color
-
 # Validate the installation of docker
 if docker -v; then
-    echo -e "${GREEN}\n\nVerified docker installation \n\n -------${NC}"
+    echo -e "\e[32m \n\n Verified docker installation \n\n \e[0m"
 else
-    echo -e "${RED}\n\nERROR:\n  docker is not installed \n\n Please re-install it \n\n -------${NC}"
+    echo -e "\e[31m \n\n ERROR: docker is not installed \n\n Please re-install it \n\n \e[0m"
     exit 1
 fi
 
 # ##### THIS WILL FAIL WITHOUT INTERNET CONNECTION
 if docker run hello-world | grep -q "Hello from Docker!"; then
-    echo -e "${GREEN}\n\nVerified docker with hello-world image \n\n -------${NC}"
+    echo -e "\e[32m \n\n Verified docker with hello-world image \n\n \e[0m"
 else
-    echo -e "ERROR  docker, could not run hello-world image"
+    echo -e "\e[31m \n\n ERROR: docker, could not run hello-world image \n\n \e[0m"
     exit 1
 fi
 
 # Validate the installation of docker-compose
 if docker-compose -v; then
-    echo -e "${GREEN}\n\nVerified docker-compose installation \n\n -------${NC}"
+    echo -e "\e[32m \n\n Verified docker-compose installation \n\n \e[0m"
 else
-    echo -e "${RED}\n\nERROR:\n  docker-compose is not installed \n\n Please re-install it \n\n -------${NC}"
+    echo -e "\e[31m \n\n ERROR: docker-compose is not installed \n\n Please re-install it \n\n \e[0m"
     exit 1
 fi
 
@@ -86,9 +81,9 @@ docker-compose -f ${CORE_PATH} up -d
 
 # Testing result
 if docker-compose -f ${CORE_PATH} ps | grep -q "dncore-dnp_ethchain"; then
-    echo -e "${GREEN}\n\nVerified dappnode installation \n\n -------${NC}"
+    echo -e "\e[32m \n\n Verified dappnode installation \n\n \e[0m"
 else
-    echo -e "${RED}\n\nERROR:\n  docker-compose ps, does not return the expected packages \n\n -------${NC}"
+    echo -e "\e[31m \n\n ERROR: docker-compose ps, does not return the expected packages \n\n \e[0m"
     exit 1
 fi
 
