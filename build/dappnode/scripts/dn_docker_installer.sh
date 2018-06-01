@@ -9,7 +9,6 @@ dpkg -i /usr/src/dappnode/libs/linux/debian/libltdl7_2.4.6-0.1_amd64.deb
 #Install docker
 dpkg -i /usr/src/dappnode/bin/docker/docker-ce_17.12.0~ce-0~ubuntu_amd64.deb
 
-HOSTNAME=$(cat /etc/hostname)
+
 USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
 usermod -aG docker $USER
-printf "$USER:$(openssl passwd -1 -salt AlHYrEQp $USER@$HOSTNAME)\n" > /usr/src/dappnode/htpasswd
