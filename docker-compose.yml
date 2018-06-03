@@ -4,6 +4,8 @@ services:
   dn_iso_generator:
     build: build
     privileged: true
+    environment: 
+      - BUILD=false
     volumes:
       - ./images:/images
 
