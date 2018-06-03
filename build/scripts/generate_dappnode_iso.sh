@@ -19,7 +19,6 @@ echo "Obtaining the isohdpfx.bin for hybrid ISO..."
 dd if=/images/ubuntu-16.04.3-server-amd64.iso bs=512 count=1 \
 of=dappnode-iso/isolinux/isohdpfx.bin
 
-
 cd dappnode-iso
 
 echo "Creating necessary directories and copying files"
