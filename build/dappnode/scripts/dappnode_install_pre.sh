@@ -37,9 +37,9 @@ install_docker()
   ##############################################
 
   # Ensure paths exist
-  mkdir -p $DAPPNODE_DIR 2>&1 | tee -a $LOG_FILE
-  mkdir -p $(dirname "$DCKR_PATH") 2>&1 | tee -a $LOG_FILE
-  mkdir -p $LIB_DIR 2>&1 | tee -a $LOG_FILE
+  mkdir -p $DAPPNODE_DIR
+  mkdir -p $(dirname "$DCKR_PATH")
+  mkdir -p $LIB_DIR
 
   # STEP 1: Download files from a decentralized source
   # ----------------------------------------
