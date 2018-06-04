@@ -20,7 +20,7 @@ This repository generates the .iso file for installing DappNode to a server. Bel
 # Generation of ISO image
 
 ```
-$ git clone --recursive https://github.com/dappnode/DN_ISO_Generator.git
+$ git clone https://github.com/dappnode/DN_ISO_Generator.git
 $ cd DN_ISO_Generator
 $ docker-compose build
 $ docker-compose up
