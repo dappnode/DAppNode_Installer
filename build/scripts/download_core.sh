@@ -67,6 +67,8 @@ dappnode_core_download()
 echo -e "\e[32mDownloading DAppNode Core...\e[0m"
 dappnode_core_download
 
+mkdir -p dappnode/DNCORE
+
 echo -e "\e[32mCopying files...\e[0m"
 cp /images/*.tar.xz dappnode/DNCORE
 cp /images/*.yml dappnode/DNCORE
