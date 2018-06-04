@@ -36,13 +36,6 @@ install_docker()
   ##############################################
   ##############################################
 
-  # Ensure paths exist
-  mkdir -p $DAPPNODE_DIR
-  mkdir -p $(dirname "$DCKR_PATH")
-  mkdir -p $LIB_DIR
-
-  touch $LOG_FILE
-
   # STEP 1: Download files from a decentralized source
   # ----------------------------------------
   [ -f $DCKR_PATH ] || wget -q --show-progress -O $DCKR_PATH $DCKR_URL 2>&1 | tee -a $LOG_FILE
@@ -112,6 +105,13 @@ install_docker_compose()
 ##############################################
 
 detect_installation_type
+
+# Ensure paths exist
+mkdir -p $DAPPNODE_DIR
+mkdir -p $(dirname "$DCKR_PATH")
+mkdir -p $LIB_DIR
+
+touch $LOG_FILE
 
 # Only install docker if needed
 if docker -v >/dev/null 2>&1 ; then
