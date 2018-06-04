@@ -4,8 +4,8 @@ DAPPNODE_DIR="/usr/src/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 
-mkdir -p $DAPPNODE_DIR 2>&1 | tee -a $LOG_DIR
-mkdir -p $DAPPNODE_CORE_DIR 2>&1 | tee -a $LOG_DIR
+mkdir -p $DAPPNODE_DIR
+mkdir -p $DAPPNODE_CORE_DIR
 
 VERSION_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/scripts/versions.sh"
 VERSION_FILE="${DAPPNODE_CORE_DIR}scripts/versions.sh" 
