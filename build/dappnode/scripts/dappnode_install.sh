@@ -7,7 +7,11 @@ LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 mkdir -p $DAPPNODE_DIR 2>&1 | tee -a $LOG_DIR
 mkdir -p $DAPPNODE_CORE_DIR 2>&1 | tee -a $LOG_DIR
 
-source "${DAPPNODE_DIR}scripts/versions.sh"
+VERSION_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/scripts/versions.sh"
+VERSION_FILE="${DAPPNODE_CORE_DIR}scripts/versions.sh" 
+[ -f $VERSION_FILE ] || wget -q --show-progress -O $VERSION_FILE $VERSION_URL 2>&1 | tee -a $LOG_DIR
+
+source "${VERSION_FILE}"
 
 ###### When incorporating the images from IPFS:
 # echo $URL_LIST | xargs -n 1 -P 8 wget -q --show-progress -q
