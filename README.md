@@ -1,4 +1,4 @@
-# DN_ISO_Generator
+# DAppNode_Installer 
 This repository generates the .iso file for installing DappNode to a server. Below are the instructions that you will need to make your own DappNode ISO.
 
 # Prerequisites
