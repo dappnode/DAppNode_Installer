@@ -98,18 +98,6 @@ dappnode_core_load()
     # Delete dappnode_install.sh execution from rc.local
     sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
 
-    # Show credentials to the user on login
-    USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
-    [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile    
-
-    echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> $PROFILE
-    echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE
-    echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE
-
-    docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials
-    echo -e "\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m"
-    echo -e "\nhttp://my.admin.dnp.dappnode.eth/\n"
-
 }
 
 ##############################################
@@ -135,3 +123,15 @@ echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOG_DIR
 echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
 docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE up -d 2>&1 | tee -a $LOG_DIR
 echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
+
+ # Show credentials to the user on login
+USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
+[ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile    
+
+echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> $PROFILE
+echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE
+echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE
+
+docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials
+echo -e "\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m"
+echo -e "\nhttp://my.admin.dnp.dappnode.eth/\n"
