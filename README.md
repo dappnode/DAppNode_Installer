@@ -3,7 +3,8 @@ This repository generates the .iso file for installing DappNode to a server. Bel
 
 Follow this link if you want to know how to install DAppNode: [DappNode-Installation-Guide](https://github.com/dappnode/Dappnode/wiki/DappNode-Installation-Guide)
 
-# Prerequisites
+# How to generate a DAppNode's ISO
+## Prerequisites
 Make sure the following sotfware is installed
 
 ### 1. git
@@ -29,7 +30,7 @@ If you don't see a valid version, install [docker-compose](https://docs.docker.c
    
 **Note**: Make sure you can run `git`, `docker ps`, `docker-compose` without any issue and without sudo command.
 
-# How to Generate the ISO image
+# Generate the ISO image
 
 ### 1. Generate DAppNode's ISO
 Run the following commands in your terminal. Make sure you have at least 2 GB of disk space available.
