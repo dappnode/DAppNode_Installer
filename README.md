@@ -7,21 +7,21 @@ Make sure the following sotfware is installed
 ### 1. git
 Run this command to verify the git:
 ```
-git --version
+$ git --version
 ```
 If you don't see a valid version, install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) commandline tool.
 
 ### 2. docker
 Run this command to verify the git:
 ```
-docker -v
+$ docker -v
 ```
 If you don't see a valid version, install [docker](https://docs.docker.com/engine/installation). The community edition (docker-ce) will work. In Linux make sure you grant permissions to the current user to use docker by adding current user to docker group, `sudo usermod -aG docker $USER`. Once you update the users group, exit from the current terminal and open a new one to make effect.
 
 ### 3. docker-compose
 Run this command to verify the git:
 ```
-docker-compose -v
+$ docker-compose -v
 ```
 If you don't see a valid version, install [docker-compose](https://docs.docker.com/compose/install)
    
