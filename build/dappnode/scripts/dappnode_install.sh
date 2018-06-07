@@ -100,9 +100,15 @@ dappnode_core_load()
 
     # Show credentials to the user on login
     USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
-    echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> /home/$USER/.profile
-    echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> /home/$USER/.profile
-    echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> /home/$USER/.profile
+    [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile    
+
+    echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> $PROFILE
+    echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE
+    echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE
+
+    docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials
+    echo -e "\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m"
+    echo -e "\nhttp://my.admin.dnp.dappnode.eth/\n"
 
 }
 
@@ -112,7 +118,7 @@ dappnode_core_load()
 ##############################################
 ##############################################
 
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32m\n##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
 echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
 echo -e "\e[32m####          DAPPNODE INSTALLER          ####\e[0m" 2>&1 | tee -a $LOG_DIR
 echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
