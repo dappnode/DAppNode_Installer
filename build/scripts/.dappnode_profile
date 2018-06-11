@@ -25,6 +25,3 @@ alias dappnode_status='docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ET
 alias dappnode_stop='docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE stop && docker stop $(docker container ls -a -q -f name=DAppNode*)'
 alias dappnode_start='docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE up -d && docker start $(docker container ls -a -q -f name=DAppNode*)'
 
-docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials
-echo -e "\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m"
-echo -e "http://my.admin.dnp.dappnode.eth/"
