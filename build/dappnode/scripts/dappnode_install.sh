@@ -65,8 +65,8 @@ dappnode_core_download()
     [ -f $ETHFORWARD_FILE ] || wget -q --show-progress -O $ETHFORWARD_FILE $ETHFORWARD_URL
     [ -f $VPN_FILE ] || wget -q --show-progress -O $VPN_FILE $VPN_URL
     [ -f $WAMP_FILE ] || wget -q --show-progress -O $WAMP_FILE $WAMP_URL
-    [ -f $DAPPMANAGER_FILE ] || wget -O $DAPPMANAGER_FILE $DAPPMANAGER_URL
-    [ -f $ADMIN_FILE ] || wget -O $ADMIN_FILE $ADMIN_URL
+    [ -f $DAPPMANAGER_FILE ] || wget -q --show-progress -O $DAPPMANAGER_FILE $DAPPMANAGER_URL
+    [ -f $ADMIN_FILE ] || wget -q --show-progress -O $ADMIN_FILE $ADMIN_URL
 
     # Download DAppNode Core docker-compose yml files if it is need it
     [ -f $BIND_YML_FILE ] || wget -q --show-progress -O $BIND_YML_FILE $BIND_YML
@@ -75,8 +75,8 @@ dappnode_core_download()
     [ -f $ETHFORWARD_YML_FILE ] || wget -q --show-progress -O $ETHFORWARD_YML_FILE $ETHFORWARD_YML
     [ -f $VPN_YML_FILE ] || wget -q --show-progress -O $VPN_YML_FILE $VPN_YML
     [ -f $WAMP_YML_FILE ] || wget -q --show-progress -O $WAMP_YML_FILE $WAMP_YML
-    [ -f $DAPPMANAGER_YML_FILE ] || wget -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML
-    [ -f $ADMIN_YML_FILE ] || wget -O $ADMIN_YML_FILE $ADMIN_YML
+    [ -f $DAPPMANAGER_YML_FILE ] || wget -q --show-progress -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML
+    [ -f $ADMIN_YML_FILE ] || wget -q --show-progress -O $ADMIN_YML_FILE $ADMIN_YML
 
 }
 
@@ -132,7 +132,7 @@ USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
 echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
 echo "source ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile" >> $PROFILE
 
-echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
+echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
 echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
 echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
 
