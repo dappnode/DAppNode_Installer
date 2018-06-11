@@ -12,11 +12,11 @@ DCMP_PATH="/usr/local/bin/docker-compose"
 # echo $URL_LIST | xargs -n 1 -P 8 wget -q
 # ref: https://stackoverflow.com/questions/7577615/parallel-wget-in-bash
 
-DCKR_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/dappnode/bin/docker/docker-ce_17.12.0~ce-0~ubuntu_amd64.deb"
-LIB1_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/dappnode/libs/linux/debian/aufs-tools_1%253a3.2%2B20130722-1.1ubuntu1_amd64.deb"
-LIB2_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/dappnode/libs/linux/debian/cgroupfs-mount_1.2_all.deb"
-LIB3_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/dappnode/libs/linux/debian/libltdl7_2.4.6-0.1_amd64.deb"
-DCMP_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/dappnode/bin/docker/docker-compose-Linux-x86_64"
+DCKR_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/dappnode/bin/docker/docker-ce_17.12.0~ce-0~ubuntu_amd64.deb"
+LIB1_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/dappnode/libs/linux/debian/aufs-tools_1%253a3.2%2B20130722-1.1ubuntu1_amd64.deb"
+LIB2_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/dappnode/libs/linux/debian/cgroupfs-mount_1.2_all.deb"
+LIB3_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/dappnode/libs/linux/debian/libltdl7_2.4.6-0.1_amd64.deb"
+DCMP_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/dappnode/bin/docker/docker-compose-Linux-x86_64"
 
 detect_installation_type(){
     if [ -f "${DAPPNODE_DIR}iso_install.log" ]; then
