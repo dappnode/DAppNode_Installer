@@ -42,8 +42,8 @@ If you don't see a valid version, install [docker-compose](https://docs.docker.c
 ### 1. Generate DAppNode's ISO
 Run the following commands in your terminal. Make sure you have at least 2 GB of disk space available.
 ```
-$ git clone https://github.com/dappnode/DN_ISO_Generator.git
-$ cd DN_ISO_Generator
+$ git clone https://github.com/dappnode/DAppNode_Installer.git
+$ cd DAppNode_Installer
 $ docker-compose build
 $ docker-compose up
 ```
