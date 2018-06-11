@@ -11,7 +11,7 @@ mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}scripts/.dappnode_profile"
 
-[ -f $PROFILE_FILE ] || wget -q --show-progress -O $PROFILE_FILE $PROFILE_URL 2>&1 | tee -a $LOG_DIR
+[ -f $PROFILE_FILE ] || wget -q --show-progress -O $PROFILE_FILE $PROFILE_URL
 
 source "${PROFILE_FILE}"
 
@@ -59,24 +59,24 @@ ADMIN_FILE="${DAPPNODE_CORE_DIR}admin.dnp.dappnode.eth_${ADMIN_VERSION}.tar.xz"
 dappnode_core_download()
 {
     # Download DAppNode Core Images if it is need it
-    [ -f $BIND_FILE ] || wget -q --show-progress -O $BIND_FILE $BIND_URL 2>&1 | tee -a $LOG_DIR
-    [ -f $IPFS_FILE ] || wget -q --show-progress -O $IPFS_FILE $IPFS_URL 2>&1 | tee -a $LOG_DIR
-    [ -f $ETHCHAIN_FILE ] || wget -q --show-progress -O $ETHCHAIN_FILE $ETHCHAIN_URL 2>&1 | tee -a $LOG_DIR
-    [ -f $ETHFORWARD_FILE ] || wget -q --show-progress -O $ETHFORWARD_FILE $ETHFORWARD_URL 2>&1 | tee -a $LOG_DIR
-    [ -f $VPN_FILE ] || wget -q --show-progress -O $VPN_FILE $VPN_URL 2>&1 | tee -a $LOG_DIR
-    [ -f $WAMP_FILE ] || wget -q --show-progress -O $WAMP_FILE $WAMP_URL 2>&1 | tee -a $LOG_DIR
-    [ -f $DAPPMANAGER_FILE ] || wget -O $DAPPMANAGER_FILE $DAPPMANAGER_URL 2>&1 | tee -a $LOG_DIR
-    [ -f $ADMIN_FILE ] || wget -O $ADMIN_FILE $ADMIN_URL 2>&1 | tee -a $LOG_DIR
+    [ -f $BIND_FILE ] || wget -q --show-progress -O $BIND_FILE $BIND_URL
+    [ -f $IPFS_FILE ] || wget -q --show-progress -O $IPFS_FILE $IPFS_URL
+    [ -f $ETHCHAIN_FILE ] || wget -q --show-progress -O $ETHCHAIN_FILE $ETHCHAIN_URL
+    [ -f $ETHFORWARD_FILE ] || wget -q --show-progress -O $ETHFORWARD_FILE $ETHFORWARD_URL
+    [ -f $VPN_FILE ] || wget -q --show-progress -O $VPN_FILE $VPN_URL
+    [ -f $WAMP_FILE ] || wget -q --show-progress -O $WAMP_FILE $WAMP_URL
+    [ -f $DAPPMANAGER_FILE ] || wget -O $DAPPMANAGER_FILE $DAPPMANAGER_URL
+    [ -f $ADMIN_FILE ] || wget -O $ADMIN_FILE $ADMIN_URL
 
     # Download DAppNode Core docker-compose yml files if it is need it
-    [ -f $BIND_YML_FILE ] || wget -q --show-progress -O $BIND_YML_FILE $BIND_YML 2>&1 | tee -a $LOG_DIR
-    [ -f $IPFS_YML_FILE ] || wget -q --show-progress -O $IPFS_YML_FILE $IPFS_YML 2>&1 | tee -a $LOG_DIR
-    [ -f $ETHCHAIN_YML_FILE ] || wget -q --show-progress -O $ETHCHAIN_YML_FILE $ETHCHAIN_YML 2>&1 | tee -a $LOG_DIR
-    [ -f $ETHFORWARD_YML_FILE ] || wget -q --show-progress -O $ETHFORWARD_YML_FILE $ETHFORWARD_YML 2>&1 | tee -a $LOG_DIR
-    [ -f $VPN_YML_FILE ] || wget -q --show-progress -O $VPN_YML_FILE $VPN_YML 2>&1 | tee -a $LOG_DIR
-    [ -f $WAMP_YML_FILE ] || wget -q --show-progress -O $WAMP_YML_FILE $WAMP_YML 2>&1 | tee -a $LOG_DIR
-    [ -f $DAPPMANAGER_YML_FILE ] || wget -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML 2>&1 | tee -a $LOG_DIR
-    [ -f $ADMIN_YML_FILE ] || wget -O $ADMIN_YML_FILE $ADMIN_YML 2>&1 | tee -a $LOG_DIR
+    [ -f $BIND_YML_FILE ] || wget -q --show-progress -O $BIND_YML_FILE $BIND_YML
+    [ -f $IPFS_YML_FILE ] || wget -q --show-progress -O $IPFS_YML_FILE $IPFS_YML
+    [ -f $ETHCHAIN_YML_FILE ] || wget -q --show-progress -O $ETHCHAIN_YML_FILE $ETHCHAIN_YML
+    [ -f $ETHFORWARD_YML_FILE ] || wget -q --show-progress -O $ETHFORWARD_YML_FILE $ETHFORWARD_YML
+    [ -f $VPN_YML_FILE ] || wget -q --show-progress -O $VPN_YML_FILE $VPN_YML
+    [ -f $WAMP_YML_FILE ] || wget -q --show-progress -O $WAMP_YML_FILE $WAMP_YML
+    [ -f $DAPPMANAGER_YML_FILE ] || wget -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML
+    [ -f $ADMIN_YML_FILE ] || wget -O $ADMIN_YML_FILE $ADMIN_YML
 
 }
 
