@@ -11,9 +11,9 @@ mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}scripts/.dappnode_profile"
 
-[ -f $VERSION_FILE ] || wget -q --show-progress -O $VERSION_FILE $VERSION_URL 2>&1 | tee -a $LOG_DIR
+[ -f $PROFILE_FILE ] || wget -q --show-progress -O $PROFILE_FILE $PROFILE_URL 2>&1 | tee -a $LOG_DIR
 
-source "${VERSION_FILE}"
+source "${PROFILE_FILE}"
 
 ###### When incorporating the images from IPFS:
 # echo $URL_LIST | xargs -n 1 -P 8 wget -q --show-progress -q
