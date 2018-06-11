@@ -132,7 +132,7 @@ USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
 echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
 echo "source ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile" >> $PROFILE
 
-echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
+echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
 echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
 echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
 
