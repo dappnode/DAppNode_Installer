@@ -8,7 +8,7 @@ mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 
-PROFILE_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/scripts/.dappnode_profile"
+PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}scripts/.dappnode_profile"
 
 [ -f $PROFILE_FILE ] || wget -q --show-progress -O $PROFILE_FILE $PROFILE_URL 2>&1 | tee -a $LOG_DIR
@@ -131,6 +131,10 @@ USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
 
 echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
 echo "source ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile" >> $PROFILE
+
+echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
+echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
+echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
 
 source $PROFILE
 
