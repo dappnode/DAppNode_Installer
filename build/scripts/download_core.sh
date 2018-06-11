@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./versions.sh
+source ./.dappnode_profile
 
 DAPPNODE_DIR="/images/"
 
@@ -72,4 +72,4 @@ mkdir -p dappnode/DNCORE
 echo -e "\e[32mCopying files...\e[0m"
 cp /images/*.tar.xz dappnode/DNCORE
 cp /images/*.yml dappnode/DNCORE
-cp ./versions.sh dappnode/scripts
+cp ./.dappnode_profile dappnode/scripts

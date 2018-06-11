@@ -8,12 +8,12 @@ mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 
-VERSION_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/scripts/versions.sh"
-VERSION_FILE="${DAPPNODE_CORE_DIR}scripts/versions.sh"
+PROFILE_URL="https://raw.githubusercontent.com/dappnode/DN_ISO_Generator/master/build/scripts/.dappnode_profile"
+PROFILE_FILE="${DAPPNODE_CORE_DIR}scripts/.dappnode_profile"
 
-[ -f $VERSION_FILE ] || wget -q --show-progress -O $VERSION_FILE $VERSION_URL 2>&1 | tee -a $LOG_DIR
+[ -f $PROFILE_FILE ] || wget -q --show-progress -O $PROFILE_FILE $PROFILE_URL 2>&1 | tee -a $LOG_DIR
 
-source "${VERSION_FILE}"
+source "${PROFILE_FILE}"
 
 ###### When incorporating the images from IPFS:
 # echo $URL_LIST | xargs -n 1 -P 8 wget -q --show-progress -q
@@ -95,9 +95,10 @@ dappnode_core_load()
     # Delete build line frome yml
     sed -i '/build: \.\/build/d' $DAPPNODE_CORE_DIR/*.yml 2>&1 | tee -a $LOG_DIR
    
-    # Delete dappnode_install.sh execution from rc.local
-    sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
-
+    # Delete dappnode_install.sh execution from rc.local if exists
+    if [ -f "/etc/rc.local" ];then
+        sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
+    fi
 }
 
 ##############################################
@@ -128,10 +129,8 @@ echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
 USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
 [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile    
 
-echo "docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> $PROFILE
-echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE
-echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE
+echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
+echo "source ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile" >> $PROFILE
 
-docker exec -it DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials
-echo -e "\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m"
-echo -e "\nhttp://my.admin.dnp.dappnode.eth/\n"
+source $PROFILE
+

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./versions.sh
+source ./.dappnode_profile
 
 echo "Cleaning previous files"
 rm -rf ./DNP_*
