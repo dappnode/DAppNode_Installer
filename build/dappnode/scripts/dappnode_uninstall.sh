@@ -31,3 +31,5 @@ USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
 [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile  
 sed -i '/########          DAPPNODE PROFILE          ########/g' $PROFILE
 sed -i '/.*dappnode_profile/g' $PROFILE
+
+echo "DAppNode uninstalled!"
