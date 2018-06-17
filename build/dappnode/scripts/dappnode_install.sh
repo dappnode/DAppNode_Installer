@@ -166,7 +166,7 @@ dappnode_core_load
 echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_start
 
-[ -z "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
+[ ! -f "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
 
 exit 0
 
