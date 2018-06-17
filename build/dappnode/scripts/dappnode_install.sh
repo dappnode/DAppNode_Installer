@@ -131,7 +131,7 @@ dappnode_start()
     echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
 
     sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
-    echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials &" >> $PROFILE_FILE
+    echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> $PROFILE_FILE
     echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
     echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE_FILE
     echo -e "return\n" >> $PROFILE_FILE

@@ -38,10 +38,10 @@ install_docker()
 
   # STEP 1: Download files from a decentralized source
   # ----------------------------------------
-  [ -f $DCKR_PATH ] || wget -q --show-progress -O $DCKR_PATH $DCKR_URL 2>&1 | tee -a $LOG_FILE
-  [ -f $LIB1_PATH ] || wget -q --show-progress -O $LIB1_PATH $LIB1_URL 2>&1 | tee -a $LOG_FILE
-  [ -f $LIB2_PATH ] || wget -q --show-progress -O $LIB2_PATH $LIB2_URL 2>&1 | tee -a $LOG_FILE
-  [ -f $LIB3_PATH ] || wget -q --show-progress -O $LIB3_PATH $LIB3_URL 2>&1 | tee -a $LOG_FILE
+  [ -f $DCKR_PATH ] || wget -q --show-progress -O $DCKR_PATH $DCKR_URL 2>&1
+  [ -f $LIB1_PATH ] || wget -q --show-progress -O $LIB1_PATH $LIB1_URL 2>&1
+  [ -f $LIB2_PATH ] || wget -q --show-progress -O $LIB2_PATH $LIB2_URL 2>&1
+  [ -f $LIB3_PATH ] || wget -q --show-progress -O $LIB3_PATH $LIB3_URL 2>&1
 
 
   # STEP 2: Install packages
@@ -82,7 +82,7 @@ install_docker_compose()
 
   # STEP 1: Download files from a decentralized source
   # ----------------------------------------
-  [ -f $DCMP_PATH ] || wget -q --show-progress -O $DCMP_PATH $DCMP_URL 2>&1 | tee -a $LOG_FILE
+  [ -f $DCMP_PATH ] || wget -q --show-progress -O $DCMP_PATH $DCMP_URL 2>&1
   # Give permissions
   chmod +x $DCMP_PATH 2>&1 | tee -a $LOG_FILE
 
