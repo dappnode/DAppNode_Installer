@@ -9,7 +9,7 @@ mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
-PROFILE_FILE="${DAPPNODE_CORE_DIR}scripts/.dappnode_profile"
+PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 
 [ -f $PROFILE_FILE ] || wget -q --show-progress -O $PROFILE_FILE $PROFILE_URL
 
@@ -94,11 +94,6 @@ dappnode_core_load()
 
     # Delete build line frome yml
     sed -i '/build: \.\/build/d' $DAPPNODE_CORE_DIR/*.yml 2>&1 | tee -a $LOG_DIR
-   
-    # Delete dappnode_install.sh execution from rc.local if exists
-    if [ -f "/etc/rc.local" ];then
-        sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
-    fi
 }
 
 addSwap()
@@ -122,6 +117,30 @@ addSwap()
     fi
 }
 
+dappnode_start()
+{
+    echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
+    docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE up -d 2>&1 | tee -a $LOG_DIR
+    echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
+
+    # Show credentials to the user on login
+    USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
+    [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
+
+    echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
+    echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
+
+    sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
+    echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials &" >> $PROFILE_FILE
+    echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
+    echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE_FILE
+    echo -e "return\n" >> $PROFILE_FILE
+
+    # Delete dappnode_install.sh execution from rc.local if exists
+    if [ -f "/etc/rc.local" ];then
+        sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
+    fi
+}
 
 ##############################################
 ##############################################
@@ -141,25 +160,13 @@ addSwap
 echo -e "\e[32mDownloading DAppNode Core...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_download
 
-echo -e "\e[32mLoading DAppNode Core...\e[0m" 2>&1 | tee -a $LOG_DIR    
+echo -e "\e[32mLoading DAppNode Core...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_load
 
 echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOG_DIR
+dappnode_start
 
-echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
-docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE up -d 2>&1 | tee -a $LOG_DIR
-echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
+[ -z "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
 
- # Show credentials to the user on login
-USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
-[ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile    
-
-echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
-echo "source ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile" >> $PROFILE
-
-echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
-echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
-echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> ${DAPPNODE_CORE_DIR}scripts/.dappnode_profile
-
-source $PROFILE
+exit 0
 
