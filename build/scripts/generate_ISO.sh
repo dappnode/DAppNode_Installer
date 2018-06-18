@@ -10,4 +10,9 @@ fi
 
 #file generated to detectd ISO installation
 touch dappnode/iso_install.log
-/usr/src/app/generate_dappnode_iso.sh
+
+if [ "$UBUNTU" = "18.04" ]; then
+    /usr/src/app/generate_dappnode_iso.18.04.sh
+else
+    /usr/src/app/generate_dappnode_iso.16.04.sh
+fi
