@@ -53,14 +53,14 @@ dappnode_core_download()
     [ -f $ADMIN_FILE ] || wget -O $ADMIN_FILE $ADMIN_URL
 
     # Download DAppNode Core docker-compose yml files 
-    [ -f $BIND_YML_FILE ] || wget -O $BIND_YML_FILE $BIND_YML
-    [ -f $IPFS_YML_FILE ] || wget -O $IPFS_YML_FILE $IPFS_YML
-    [ -f $ETHCHAIN_YML_FILE ] || wget -O $ETHCHAIN_YML_FILE $ETHCHAIN_YML
-    [ -f $ETHFORWARD_YML_FILE ] || wget -O $ETHFORWARD_YML_FILE $ETHFORWARD_YML
-    [ -f $VPN_YML_FILE ] || wget -O $VPN_YML_FILE $VPN_YML
-    [ -f $WAMP_YML_FILE ] || wget -O $WAMP_YML_FILE $WAMP_YML
-    [ -f $DAPPMANAGER_YML_FILE ] || wget -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML
-    [ -f $ADMIN_YML_FILE ] || wget -O $ADMIN_YML_FILE $ADMIN_YML
+    wget -O $BIND_YML_FILE $BIND_YML
+    wget -O $IPFS_YML_FILE $IPFS_YML
+    wget -O $ETHCHAIN_YML_FILE $ETHCHAIN_YML
+    wget -O $ETHFORWARD_YML_FILE $ETHFORWARD_YML
+    wget -O $VPN_YML_FILE $VPN_YML
+    wget -O $WAMP_YML_FILE $WAMP_YML
+    wget -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML
+    wget -O $ADMIN_YML_FILE $ADMIN_YML
 
 }
 
