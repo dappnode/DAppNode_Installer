@@ -51,8 +51,8 @@ $ docker-compose up
 ### 2. Verify image generation
 When the execution of the Docker-compose finishes, run the following command to verify the image existance:
 ```
-$ ls -lrt images/DappNode-ubuntu-16.04.3-server-amd64.iso
--rw-r--r--  1 edu  staff  916455424 20 mar 13:19 images/DAppNode-ubuntu-16.04.3-server-amd64.iso
+$ ls -lrt images/DappNode-ubuntu-*
+-rw-r--r--  1 edu  staff  916455424 20 mar 13:19 images/DAppNode-ubuntu-18.04-server-amd64.iso
 ```
 
 ### 3. Burn the ISO into a USB
