@@ -11,12 +11,20 @@ mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 
-[ -f $PROFILE_FILE ] || wget -q --show-progress -O $PROFILE_FILE $PROFILE_URL
+source /etc/os-release
+
+if [ "$NAME" = "Ubuntu" ];then
+    WGET='wget -q --show-progress '
+else
+    WGET='wget '
+fi
+
+[ -f $PROFILE_FILE ] || $WGET -O $PROFILE_FILE $PROFILE_URL
 
 source "${PROFILE_FILE}"
 
 ###### When incorporating the images from IPFS:
-# echo $URL_LIST | xargs -n 1 -P 8 wget -q --show-progress -q
+# echo $URL_LIST | xargs -n 1 -P 8 $WGET -q
 # ref: https://stackoverflow.com/questions/7577615/parallel-wget-in-bash
 
 BIND_URL="https://github.com/dappnode/DNP_BIND/releases/download/v${BIND_VERSION}/bind.dnp.dappnode.eth_${BIND_VERSION}.tar.xz"
@@ -59,24 +67,24 @@ ADMIN_FILE="${DAPPNODE_CORE_DIR}admin.dnp.dappnode.eth_${ADMIN_VERSION}.tar.xz"
 dappnode_core_download()
 {
     # Download DAppNode Core Images if it is need it
-    [ -f $BIND_FILE ] || wget -q --show-progress -O $BIND_FILE $BIND_URL
-    [ -f $IPFS_FILE ] || wget -q --show-progress -O $IPFS_FILE $IPFS_URL
-    [ -f $ETHCHAIN_FILE ] || wget -q --show-progress -O $ETHCHAIN_FILE $ETHCHAIN_URL
-    [ -f $ETHFORWARD_FILE ] || wget -q --show-progress -O $ETHFORWARD_FILE $ETHFORWARD_URL
-    [ -f $VPN_FILE ] || wget -q --show-progress -O $VPN_FILE $VPN_URL
-    [ -f $WAMP_FILE ] || wget -q --show-progress -O $WAMP_FILE $WAMP_URL
-    [ -f $DAPPMANAGER_FILE ] || wget -q --show-progress -O $DAPPMANAGER_FILE $DAPPMANAGER_URL
-    [ -f $ADMIN_FILE ] || wget -q --show-progress -O $ADMIN_FILE $ADMIN_URL
+    [ -f $BIND_FILE ] || $WGET -O $BIND_FILE $BIND_URL
+    [ -f $IPFS_FILE ] || $WGET -O $IPFS_FILE $IPFS_URL
+    [ -f $ETHCHAIN_FILE ] || $WGET -O $ETHCHAIN_FILE $ETHCHAIN_URL
+    [ -f $ETHFORWARD_FILE ] || $WGET -O $ETHFORWARD_FILE $ETHFORWARD_URL
+    [ -f $VPN_FILE ] || $WGET -O $VPN_FILE $VPN_URL
+    [ -f $WAMP_FILE ] || $WGET -O $WAMP_FILE $WAMP_URL
+    [ -f $DAPPMANAGER_FILE ] || $WGET -O $DAPPMANAGER_FILE $DAPPMANAGER_URL
+    [ -f $ADMIN_FILE ] || $WGET -O $ADMIN_FILE $ADMIN_URL
 
     # Download DAppNode Core docker-compose yml files if it is need it
-    [ -f $BIND_YML_FILE ] || wget -q --show-progress -O $BIND_YML_FILE $BIND_YML
-    [ -f $IPFS_YML_FILE ] || wget -q --show-progress -O $IPFS_YML_FILE $IPFS_YML
-    [ -f $ETHCHAIN_YML_FILE ] || wget -q --show-progress -O $ETHCHAIN_YML_FILE $ETHCHAIN_YML
-    [ -f $ETHFORWARD_YML_FILE ] || wget -q --show-progress -O $ETHFORWARD_YML_FILE $ETHFORWARD_YML
-    [ -f $VPN_YML_FILE ] || wget -q --show-progress -O $VPN_YML_FILE $VPN_YML
-    [ -f $WAMP_YML_FILE ] || wget -q --show-progress -O $WAMP_YML_FILE $WAMP_YML
-    [ -f $DAPPMANAGER_YML_FILE ] || wget -q --show-progress -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML
-    [ -f $ADMIN_YML_FILE ] || wget -q --show-progress -O $ADMIN_YML_FILE $ADMIN_YML
+    [ -f $BIND_YML_FILE ] || $WGET -O $BIND_YML_FILE $BIND_YML
+    [ -f $IPFS_YML_FILE ] || $WGET -O $IPFS_YML_FILE $IPFS_YML
+    [ -f $ETHCHAIN_YML_FILE ] || $WGET -O $ETHCHAIN_YML_FILE $ETHCHAIN_YML
+    [ -f $ETHFORWARD_YML_FILE ] || $WGET -O $ETHFORWARD_YML_FILE $ETHFORWARD_YML
+    [ -f $VPN_YML_FILE ] || $WGET -O $VPN_YML_FILE $VPN_YML
+    [ -f $WAMP_YML_FILE ] || $WGET -O $WAMP_YML_FILE $WAMP_YML
+    [ -f $DAPPMANAGER_YML_FILE ] || $WGET -O $DAPPMANAGER_YML_FILE $DAPPMANAGER_YML
+    [ -f $ADMIN_YML_FILE ] || $WGET -O $ADMIN_YML_FILE $ADMIN_YML
 
 }
 
@@ -127,8 +135,10 @@ dappnode_start()
     USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
     [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
-    echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
-    echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
+    if [ ! "$(grep ".dappnode_profile" $PROFILE)" ];then
+        echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
+        echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
+    fi
 
     sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
     echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth node getAdminCredentials" >> $PROFILE_FILE
