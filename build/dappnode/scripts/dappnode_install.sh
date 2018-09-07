@@ -29,29 +29,53 @@ source "${PROFILE_FILE}"
 
 components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN)
 
+# The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
+# If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
 for comp in "${components[@]}"; do
     ver="${comp}_VERSION"
     eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}.tar.xz\""
     eval "${comp}_YML=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/docker-compose-${comp,,}.yml\""
     eval "${comp}_YML_FILE=\"${DAPPNODE_CORE_DIR}docker-compose-${comp,,}.yml\""
-    eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}${comp,,}.dnp.dappnode.eth_${!ver}.tar.xz\""
+    eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}${comp,,}.dnp.dappnode.eth_${!ver##*:}.tar.xz\""
 done
+
+dappnode_core_build()
+{
+    for comp in "${components[@]}"; do
+        ver="${comp}_VERSION"
+        file="${comp}_FILE"
+        if [[ ${!ver} == dev:* ]]; then
+            echo "Cloning & building DNP_${comp}..."
+            pushd $DAPPNODE_CORE_DIR
+            git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_${comp}
+            # Change version in YAML to the custom one
+            sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose-${comp,,}.yml
+            docker-compose -f ./DNP_${comp}/docker-compose-${comp,,}.yml build
+            docker save ${comp,,}.dnp.dappnode.eth:"${!ver##*:}" | xz -e9vT0 > ${!file}
+            cp ./DNP_${comp}/docker-compose-${comp,,}.yml $DAPPNODE_CORE_DIR
+            rm -r ./DNP_${comp}
+            popd
+        fi
+    done
+}
 
 dappnode_core_download()
 {
     for comp in "${components[@]}"; do
-        # Download DAppNode Core Images if it's needed
-        eval "[ -f \$${comp}_FILE ] || $WGET -O \$${comp}_FILE \$${comp}_URL"
-        # Download DAppNode Core docker-compose yml files if it's needed
-        eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
+        ver="${comp}_VERSION"
+        if [[ ${!ver} != dev:* ]]; then
+            # Download DAppNode Core Images if it's needed
+            eval "[ -f \$${comp}_FILE ] || $WGET -O \$${comp}_FILE \$${comp}_URL"
+            # Download DAppNode Core docker-compose yml files if it's needed
+            eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
+        fi
     done
 }
 
 dappnode_core_load()
 {
     for comp in "${components[@]}"; do
-        ver="${comp}_VERSION"
-        eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+        eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
     done
 
     # Delete build line from yml
@@ -120,6 +144,9 @@ echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -
 
 echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOG_DIR
 addSwap
+
+echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
+dappnode_core_build
 
 echo -e "\e[32mDownloading DAppNode Core...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_download
