@@ -2,7 +2,7 @@
 
 echo "Downloading ubuntu ISO image: ubuntu-18.04-server-amd64.iso..."
 if [ ! -f /images/ubuntu-18.04-server-amd64.iso ]; then
-    wget http://cdimage.ubuntu.com/ubuntu/releases/bionic/release/ubuntu-18.04-server-amd64.iso \
+    wget http://old-releases.ubuntu.com/releases/bionic/ubuntu-18.04-server-amd64.iso \
     -O /images/ubuntu-18.04-server-amd64.iso
 fi
 echo "Done!"
