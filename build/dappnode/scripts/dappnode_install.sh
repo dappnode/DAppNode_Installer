@@ -85,11 +85,11 @@ dappnode_core_load()
 
 addSwap()
 {
-    # does the swap file already exist?
-    grep -q "swapfile" /etc/fstab
+    # Is swap enabled?
+    IS_SWAP=$(swapon --show | wc -l)
 
     # if not then create it
-    if [ $? -ne 0 ]; then
+    if [ $IS_SWAP -eq 0 ]; then
         echo 'swapfile not found. Adding swapfile.'
         #RAM=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
         #SWAP=$(($RAM * 2))
