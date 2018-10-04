@@ -51,7 +51,6 @@ dappnode_core_build()
             # Change version in YAML to the custom one
             sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose-${comp,,}.yml
             docker-compose -f ./DNP_${comp}/docker-compose-${comp,,}.yml build
-            docker save ${comp,,}.dnp.dappnode.eth:"${!ver##*:}" | xz -e9vT0 > ${!file}
             cp ./DNP_${comp}/docker-compose-${comp,,}.yml $DAPPNODE_CORE_DIR
             rm -r ./DNP_${comp}
             popd
@@ -75,7 +74,9 @@ dappnode_core_download()
 dappnode_core_load()
 {
     for comp in "${components[@]}"; do
-        eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+        if [[ ${!ver} != dev:* ]]; then
+            eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+        fi
     done
 
     # Delete build line from yml
