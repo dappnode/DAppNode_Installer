@@ -21,33 +21,35 @@ of=dappnode-iso/isolinux/isohdpfx.bin
 
 cd dappnode-iso
 
-echo "Creating necessary directories and copying files"
+echo "Creating necessary directories and copying files..."
 mkdir dappnode
 cp -r ../dappnode/* dappnode/
 
-echo "Appending the Ubuntu Server minimal preseed files with DappNode"
+echo "Appending the Ubuntu Server minimal preseed files with DappNode..."
 echo "d-i preseed/late_command string \
 in-target mkdir -p /usr/src/dappnode ; \
 cp -ar /cdrom/dappnode/* /target/usr/src/dappnode/ ; \
 cp -a /cdrom/dappnode/scripts/rc.local /target/etc/rc.local ;\
 cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/bin/docker-compose ; \
 in-target chmod +x /usr/src/dappnode/scripts/dappnode_install_pre.sh ; \
-in-target chmod +x /usr/src/dappnode/scripts/load_docker_images.sh ; \
+in-target chmod +x /usr/src/dappnode/scripts/static_ip.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
 in-target /usr/src/dappnode/scripts/dappnode_install_pre.sh" | tee -a preseed/hwe-ubuntu-server.seed
+# /usr/src/dappnode/scripts/static_ip.sh
 
-echo "Appending the Ubuntu Server preseed files with DappNode" 
+echo "Appending the Ubuntu Server preseed files with DappNode..."
 echo "d-i preseed/late_command string \
 in-target mkdir -p /usr/src/dappnode ; \
 cp -ar /cdrom/dappnode/* /target/usr/src/dappnode/ ; \
 cp -a /cdrom/dappnode/scripts/rc.local /target/etc/rc.local ;\
 cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/bin/docker-compose ; \
 in-target chmod +x /usr/src/dappnode/scripts/dappnode_install_pre.sh; \
-in-target chmod +x /usr/src/dappnode/scripts/load_docker_images.sh ; \
+in-target chmod +x /usr/src/dappnode/scripts/static_ip.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
 in-target /usr/src/dappnode/scripts/dappnode_install_pre.sh" | tee -a preseed/ubuntu-server.seed
+# /usr/src/dappnode/scripts/static_ip.sh
 
-echo "Configuring the Ubuntu boot menu for DappNode"
+echo "Configuring the Ubuntu boot menu for DappNode..."
 rm -f boot/grub/grub.cfg
 cp ../boot/grub.cfg boot/grub/grub.cfg
 cd isolinux
@@ -55,6 +57,7 @@ cpio -id init < bootlogo
 cat bootlogo | cpio -t > /tmp/list
 cp ../../boot/txt.cfg txt.cfg
 cp ../../boot/splash.pcx splash.pcx
+cp ../../boot/gfxboot.cfg gfxboot.cfg
 cpio -o < /tmp/list > bootlogo
 cd ..
 
