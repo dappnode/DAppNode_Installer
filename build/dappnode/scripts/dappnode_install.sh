@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 DAPPNODE_DIR="/usr/src/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
@@ -14,18 +15,14 @@ PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 source /etc/os-release
 
 if [ "$NAME" = "Ubuntu" ];then
-    WGET='wget -q --show-progress '
+    WGET="wget -q --show-progress "
 else
-    WGET='wget '
+    WGET="wget "
 fi
 
-[ -f $PROFILE_FILE ] || $WGET -O $PROFILE_FILE $PROFILE_URL
+[ -f $PROFILE_FILE ] || ${WGET} -O ${PROFILE_FILE} ${PROFILE_URL}
 
 source "${PROFILE_FILE}"
-
-###### When incorporating the images from IPFS:
-# echo $URL_LIST | xargs -n 1 -P 8 $WGET -q
-# ref: https://stackoverflow.com/questions/7577615/parallel-wget-in-bash
 
 components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN)
 
@@ -51,7 +48,6 @@ dappnode_core_build()
             # Change version in YAML to the custom one
             sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose-${comp,,}.yml
             docker-compose -f ./DNP_${comp}/docker-compose-${comp,,}.yml build
-            docker save ${comp,,}.dnp.dappnode.eth:"${!ver##*:}" | xz -e9vT0 > ${!file}
             cp ./DNP_${comp}/docker-compose-${comp,,}.yml $DAPPNODE_CORE_DIR
             rm -r ./DNP_${comp}
             popd
@@ -75,7 +71,10 @@ dappnode_core_download()
 dappnode_core_load()
 {
     for comp in "${components[@]}"; do
-        eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+        ver="${comp}_VERSION"
+        if [[ ${!ver} != dev:* ]]; then
+            eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+        fi
     done
 
     # Delete build line from yml
@@ -84,12 +83,12 @@ dappnode_core_load()
 
 addSwap()
 {
-    # does the swap file already exist?
-    grep -q "swapfile" /etc/fstab
+    # Is swap enabled?
+    IS_SWAP=$(swapon --show | wc -l)
 
     # if not then create it
-    if [ $? -ne 0 ]; then
-        echo 'swapfile not found. Adding swapfile.'
+    if [ $IS_SWAP -eq 0 ]; then
+        echo 'Swap not found. Adding swapfile.'
         #RAM=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
         #SWAP=$(($RAM * 2))
         SWAP=8388608
