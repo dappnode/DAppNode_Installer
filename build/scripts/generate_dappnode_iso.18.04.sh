@@ -26,6 +26,12 @@ mkdir dappnode
 cp -r ../dappnode/* dappnode/
 
 echo "Appending the Ubuntu Server minimal preseed files with DappNode..."
+echo "d-i netcfg/hostname string dappnode" | tee -a preseed/hwe-ubuntu-server.seed
+echo "d-i netcfg/hostname seen false" | tee -a preseed/hwe-ubuntu-server.seed
+echo "d-i passwd/username string dappnode" | tee -a preseed/hwe-ubuntu-server.seed
+echo "d-i passwd/username seen false" | tee -a preseed/hwe-ubuntu-server.seed
+echo "tasksel tasksel/first multiselect standard" | tee -a preseed/hwe-ubuntu-server.seed
+echo "d-i pkgsel/include string openssh-server" | tee -a preseed/hwe-ubuntu-server.seed
 echo "d-i preseed/late_command string \
 in-target mkdir -p /usr/src/dappnode ; \
 cp -ar /cdrom/dappnode/* /target/usr/src/dappnode/ ; \
@@ -38,6 +44,12 @@ in-target chmod +x /usr/local/bin/docker-compose ; \
 in-target /usr/src/dappnode/scripts/dappnode_install_pre.sh" | tee -a preseed/hwe-ubuntu-server.seed
 
 echo "Appending the Ubuntu Server preseed files with DappNode..."
+echo "d-i netcfg/hostname string dappnode" | tee -a preseed/ubuntu-server.seed
+echo "d-i netcfg/hostname seen false" | tee -a preseed/ubuntu-server.seed
+echo "d-i passwd/username string dappnode" | tee -a preseed/ubuntu-server.seed
+echo "d-i passwd/username seen false" | tee -a preseed/ubuntu-server.seed
+echo "tasksel tasksel/first multiselect standard" | tee -a preseed/ubuntu-server.seed
+echo "d-i pkgsel/include string openssh-server" | tee -a preseed/ubuntu-server.seed
 echo "d-i preseed/late_command string \
 in-target mkdir -p /usr/src/dappnode ; \
 cp -ar /cdrom/dappnode/* /target/usr/src/dappnode/ ; \
