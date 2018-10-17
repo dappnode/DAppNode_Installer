@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+ARG1=${1:-}
 DAPPNODE_DIR="/usr/src/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
@@ -14,10 +15,36 @@ PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 
 source /etc/os-release
 
+function valid_ip()
+{
+    local  ip=$1
+    local  stat=1
+
+    if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        OIFS=$IFS
+        IFS='.'
+        ip=($ip)
+        IFS=$OIFS
+        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
+            && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+        stat=$?
+    fi
+    return $stat
+}
+
 if [ "$NAME" = "Ubuntu" ];then
     WGET="wget -q --show-progress "
 else
     WGET="wget "
+fi
+
+if [[ ! -z $ARG1 ]]; then
+    if valid_ip $ARG1; then
+        echo $ARG1 > /usr/src/dappnode/ip.value
+    else
+        echo "The argument provided is not a valid IP"
+        exit 1
+    fi
 fi
 
 [ -f $PROFILE_FILE ] || ${WGET} -O ${PROFILE_FILE} ${PROFILE_URL}

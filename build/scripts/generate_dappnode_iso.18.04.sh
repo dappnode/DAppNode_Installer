@@ -34,8 +34,8 @@ cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/b
 in-target chmod +x /usr/src/dappnode/scripts/dappnode_install_pre.sh ; \
 in-target chmod +x /usr/src/dappnode/scripts/static_ip.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
+/target/usr/src/dappnode/scripts/static_ip.sh ; \
 in-target /usr/src/dappnode/scripts/dappnode_install_pre.sh" | tee -a preseed/hwe-ubuntu-server.seed
-# /usr/src/dappnode/scripts/static_ip.sh
 
 echo "Appending the Ubuntu Server preseed files with DappNode..."
 echo "d-i preseed/late_command string \
@@ -46,8 +46,9 @@ cp -a /cdrom/dappnode/bin/docker/docker-compose-Linux-x86_64 /target/usr/local/b
 in-target chmod +x /usr/src/dappnode/scripts/dappnode_install_pre.sh; \
 in-target chmod +x /usr/src/dappnode/scripts/static_ip.sh ; \
 in-target chmod +x /usr/local/bin/docker-compose ; \
+/target/usr/src/dappnode/scripts/static_ip.sh ; \
 in-target /usr/src/dappnode/scripts/dappnode_install_pre.sh" | tee -a preseed/ubuntu-server.seed
-# /usr/src/dappnode/scripts/static_ip.sh
+
 
 echo "Configuring the Ubuntu boot menu for DappNode..."
 rm -f boot/grub/grub.cfg
