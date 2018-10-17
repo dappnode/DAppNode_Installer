@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-DAPPNODE_DIR="/usr/src/dappnode/"
+DAPPNODE_DIR="/opt/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 
@@ -125,7 +125,7 @@ dappnode_start()
 
     # Delete dappnode_install.sh execution from rc.local if exists
     if [ -f "/etc/rc.local" ];then
-        sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
+        sed -i '/\/opt\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
     fi
 }
 
@@ -156,7 +156,7 @@ dappnode_core_load
 echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_start
 
-[ ! -f "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
+[ ! -f "/opt/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
 
 exit 0
 

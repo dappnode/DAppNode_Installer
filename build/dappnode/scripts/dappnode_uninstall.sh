@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DAPPNODE_DIR="/usr/src/dappnode/"
+DAPPNODE_DIR="/opt/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 
 mkdir -p $DAPPNODE_DIR
@@ -24,7 +24,7 @@ docker container ls -a -q -f name=DAppNode* | xargs -I {} docker network disconn
 docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE down  --rmi 'all' -v
 
 # Remove dir
-rm -rf /usr/src/dappnode
+rm -rf /opt/dappnode
 
 # Remove profile file
 USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)

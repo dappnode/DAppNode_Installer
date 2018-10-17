@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GIT_BRANCH="master"
-DAPPNODE_DIR="/usr/src/dappnode"
+DAPPNODE_DIR="/opt/dappnode"
 DOCKER_PKG="docker-ce_18.06.1~ce~3-0~ubuntu_amd64.deb"
 LIBLTDL_PKG="libltdl7_2.4.6-2_amd64.deb"
 DOCKER_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_PKG}"

@@ -52,10 +52,10 @@ RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_
   && chmod +x /usr/local/bin/docker-compose
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /opt/app
 
 ADD scripts/* ./
 ADD dappnode dappnode
 ADD boot boot
 
-CMD ["/usr/src/app/generate_ISO.sh"] 
+CMD ["/opt/app/generate_ISO.sh"]

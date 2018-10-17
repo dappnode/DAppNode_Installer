@@ -11,6 +11,6 @@
 #
 # By default this script does nothing.
 
-/usr/src/dappnode/scripts/dappnode_install.sh
+/opt/dappnode/scripts/dappnode_install.sh
 
 exit 0
