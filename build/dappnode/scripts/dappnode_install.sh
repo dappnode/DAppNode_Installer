@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euo pipefail
 
 ARG1=${1:-}
 DAPPNODE_DIR="/usr/src/dappnode/"
