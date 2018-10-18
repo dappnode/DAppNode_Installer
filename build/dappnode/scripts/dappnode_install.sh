@@ -1,6 +1,5 @@
 #!/bin/bash
 
-ARG1=${1:-}
 DAPPNODE_DIR="/usr/src/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
@@ -37,9 +36,9 @@ else
     WGET="wget "
 fi
 
-if [[ ! -z $ARG1 ]]; then
-    if valid_ip $ARG1; then
-        echo $ARG1 > /usr/src/dappnode/ip.value
+if [[ ! -z $STATIC_IP ]]; then
+    if valid_ip $STATIC_IP; then
+        echo $STATIC_IP > /usr/src/dappnode/ip.value
     else
         echo "The argument provided is not a valid IP"
         exit 1
