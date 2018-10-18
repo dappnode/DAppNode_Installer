@@ -52,14 +52,15 @@ db_dialog () {
 
     valid_ip $RET
     if [[ $? -eq 0 ]]; then
-        echo "$RET" > /target/usr/src/dappnode/ip.value
+        mkdir -p /target/usr/src/dappnode/config
+        echo "$RET" > /target/usr/src/dappnode/config/static_ip
     else
         debconf-loadtemplate ip-fail /tmp/ip_fail.template
         db_settitle ip-fail/title
         db_input critical ip-fail/ask
         db_go
         db_get ip-fail/ask
-        # Ask again
+        # Ask again until done
         db_dialog
     fi
 }
