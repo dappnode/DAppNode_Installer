@@ -7,25 +7,48 @@ LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
+mkdir -p "${DAPPNODE_CORE_DIR}config"
 
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 
 source /etc/os-release
 
+function valid_ip()
+{
+    local  ip=$1
+    local  stat=1
+
+    if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        OIFS=$IFS
+        IFS='.'
+        ip=($ip)
+        IFS=$OIFS
+        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
+            && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+        stat=$?
+    fi
+    return $stat
+}
+
 if [ "$NAME" = "Ubuntu" ];then
-    WGET='wget -q --show-progress '
+    WGET="wget -q --show-progress "
 else
-    WGET='wget '
+    WGET="wget "
 fi
 
-[ -f $PROFILE_FILE ] || $WGET -O $PROFILE_FILE $PROFILE_URL
+if [[ ! -z $STATIC_IP ]]; then
+    if valid_ip $STATIC_IP; then
+        echo $STATIC_IP > /usr/src/dappnode/config/static_ip
+    else
+        echo "The static IP provided: ${STATIC_IP} is not valid."
+        exit 1
+    fi
+fi
+
+[ -f $PROFILE_FILE ] || ${WGET} -O ${PROFILE_FILE} ${PROFILE_URL}
 
 source "${PROFILE_FILE}"
-
-###### When incorporating the images from IPFS:
-# echo $URL_LIST | xargs -n 1 -P 8 $WGET -q
-# ref: https://stackoverflow.com/questions/7577615/parallel-wget-in-bash
 
 components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN)
 
@@ -51,7 +74,6 @@ dappnode_core_build()
             # Change version in YAML to the custom one
             sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose-${comp,,}.yml
             docker-compose -f ./DNP_${comp}/docker-compose-${comp,,}.yml build
-            docker save ${comp,,}.dnp.dappnode.eth:"${!ver##*:}" | xz -e9vT0 > ${!file}
             cp ./DNP_${comp}/docker-compose-${comp,,}.yml $DAPPNODE_CORE_DIR
             rm -r ./DNP_${comp}
             popd
@@ -75,7 +97,10 @@ dappnode_core_download()
 dappnode_core_load()
 {
     for comp in "${components[@]}"; do
-        eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+        ver="${comp}_VERSION"
+        if [[ ${!ver} != dev:* ]]; then
+            eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+        fi
     done
 
     # Delete build line from yml
@@ -84,12 +109,12 @@ dappnode_core_load()
 
 addSwap()
 {
-    # does the swap file already exist?
-    grep -q "swapfile" /etc/fstab
+    # Is swap enabled?
+    IS_SWAP=$(swapon --show | wc -l)
 
     # if not then create it
-    if [ $? -ne 0 ]; then
-        echo 'swapfile not found. Adding swapfile.'
+    if [ $IS_SWAP -eq 0 ]; then
+        echo 'Swap not found. Adding swapfile.'
         #RAM=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
         #SWAP=$(($RAM * 2))
         SWAP=8388608
