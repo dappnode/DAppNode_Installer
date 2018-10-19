@@ -7,7 +7,7 @@ LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
-mkdir -p "${DAPPNODE_CORE_DIR}config"
+mkdir -p "${DAPPNODE_DIR}config"
 
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
@@ -39,7 +39,7 @@ fi
 
 if [[ ! -z $STATIC_IP ]]; then
     if valid_ip $STATIC_IP; then
-        echo $STATIC_IP > ${DAPPNODE_CORE_DIR}config/static_ip
+        echo $STATIC_IP > ${DAPPNODE_DIR}config/static_ip
     else
         echo "The static IP provided: ${STATIC_IP} is not valid."
         exit 1
