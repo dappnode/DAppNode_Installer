@@ -39,7 +39,7 @@ fi
 
 if [[ ! -z $STATIC_IP ]]; then
     if valid_ip $STATIC_IP; then
-        echo $STATIC_IP > /usr/src/dappnode/config/static_ip
+        echo $STATIC_IP > ${DAPPNODE_CORE_DIR}config/static_ip
     else
         echo "The static IP provided: ${STATIC_IP} is not valid."
         exit 1
