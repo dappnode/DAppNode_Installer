@@ -4,7 +4,8 @@ sleep 5;
 
 rm -f /images/*.tar.xz
 rm -f /images/*.yml
-
+rm -f /images/*.env
+rm -f /images/*.json
 
 if [ "$BUILD" = true ]; then
     /usr/src/app/generate_docker_images.sh
