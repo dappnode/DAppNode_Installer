@@ -5,7 +5,9 @@ DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 
 if [ "$UPDATE" = true ] ; then
-    rm -rf ${DAPPNODE_CORE_DIR}
+    rm -rf ${DAPPNODE_CORE_DIR}*.yml
+    rm -rf ${DAPPNODE_CORE_DIR}*.json
+    rm -rf ${DAPPNODE_CORE_DIR}*.tar.xz
 fi
 
 mkdir -p $DAPPNODE_DIR
