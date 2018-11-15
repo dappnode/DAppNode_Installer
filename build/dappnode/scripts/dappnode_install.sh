@@ -4,6 +4,10 @@ DAPPNODE_DIR="/usr/src/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 
+if [ "$UPDATE" = true ] ; then
+    rm -rf ${DAPPNODE_CORE_DIR}
+fi
+
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
@@ -44,10 +48,6 @@ if [[ ! -z $STATIC_IP ]]; then
         echo "The static IP provided: ${STATIC_IP} is not valid."
         exit 1
     fi
-fi
-
-if [ "$UPDATE" = true ] ; then
-    rm -rf ${DAPPNODE_CORE_DIR}/*
 fi
 
 [ -f $PROFILE_FILE ] || ${WGET} -O ${PROFILE_FILE} ${PROFILE_URL}
