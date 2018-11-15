@@ -47,7 +47,7 @@ if [[ ! -z $STATIC_IP ]]; then
 fi
 
 if [ "$UPDATE" = true ] ; then
-    rm -rf ${DAPPNODE_CORE_DIR}
+    rm -rf ${DAPPNODE_CORE_DIR}/*
 fi
 
 [ -f $PROFILE_FILE ] || ${WGET} -O ${PROFILE_FILE} ${PROFILE_URL}
