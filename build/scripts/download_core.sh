@@ -6,7 +6,7 @@ DAPPNODE_CORE_DIR="/images/"
 
 WGET="wget"
 
-components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN)
+components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN WIFI)
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
@@ -32,7 +32,7 @@ dappnode_core_download()
             # Download DAppNode Core docker-compose yml files if it's needed
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
             # Download DAppNode Core env files if it's needed
-            eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O/dev/null -q \$${comp}_ENV && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV 2>&1 >/dev/null" 
+            eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O/dev/null -q \$${comp}_ENV 2>&1 >/dev/null && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV 2>&1 >/dev/null" 
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
