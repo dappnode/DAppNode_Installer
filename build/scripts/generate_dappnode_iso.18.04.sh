@@ -31,7 +31,6 @@ echo "d-i netcfg/hostname seen false" | tee -a preseed/hwe-ubuntu-server.seed
 echo "d-i passwd/username string dappnode" | tee -a preseed/hwe-ubuntu-server.seed
 echo "d-i passwd/username seen false" | tee -a preseed/hwe-ubuntu-server.seed
 echo "tasksel tasksel/first multiselect standard" | tee -a preseed/hwe-ubuntu-server.seed
-echo "d-i pkgsel/include string openssh-server" | tee -a preseed/hwe-ubuntu-server.seed
 echo "d-i preseed/late_command string \
 in-target mkdir -p /usr/src/dappnode ; \
 cp -ar /cdrom/dappnode/* /target/usr/src/dappnode/ ; \
@@ -49,7 +48,6 @@ echo "d-i netcfg/hostname seen false" | tee -a preseed/ubuntu-server.seed
 echo "d-i passwd/username string dappnode" | tee -a preseed/ubuntu-server.seed
 echo "d-i passwd/username seen false" | tee -a preseed/ubuntu-server.seed
 echo "tasksel tasksel/first multiselect standard" | tee -a preseed/ubuntu-server.seed
-echo "d-i pkgsel/include string openssh-server" | tee -a preseed/ubuntu-server.seed
 echo "d-i preseed/late_command string \
 in-target mkdir -p /usr/src/dappnode ; \
 cp -ar /cdrom/dappnode/* /target/usr/src/dappnode/ ; \

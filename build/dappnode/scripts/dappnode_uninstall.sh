@@ -21,7 +21,7 @@ find /var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data -name "
 docker container ls -a -q -f name=DAppNode* | xargs -I {} docker network disconnect dncore_network {}
 
 # Remove containers, volumes and images
-docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE down  --rmi 'all' -v
+docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE -f $WIFI_YML_FILE down  --rmi 'all' -v
 
 # Remove dir
 rm -rf /usr/src/dappnode

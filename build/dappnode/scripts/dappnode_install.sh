@@ -57,7 +57,7 @@ fi
 
 source "${PROFILE_FILE}"
 
-components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN)
+components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN WIFI)
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
@@ -146,7 +146,7 @@ addSwap()
 dappnode_start()
 {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
-    docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE up -d 2>&1 | tee -a $LOG_DIR
+    docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE -f $WIFI_YML_FILE up -d 2>&1 | tee -a $LOG_DIR
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
 
     # Show credentials to the user on login
