@@ -85,7 +85,7 @@ dappnode_core_build()
             # Change version in YAML to the custom one
             sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose.yml
             docker-compose -f ./DNP_${comp}/docker-compose.yml build
-            cp ./DNP_${comp}/docker-compose.yml $DAPPNODE_CORE_DIR
+            cp ./DNP_${comp}/docker-compose.yml $DAPPNODE_CORE_DIR/docker-compose-${comp,,}.yml
             rm -r ./DNP_${comp}
             popd
         fi
