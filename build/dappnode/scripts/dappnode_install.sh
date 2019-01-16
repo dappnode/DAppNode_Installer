@@ -9,6 +9,7 @@ if [ "$UPDATE" = true ] ; then
     rm -rf ${DAPPNODE_CORE_DIR}*.yml
     rm -rf ${DAPPNODE_CORE_DIR}*.json
     rm -rf ${DAPPNODE_CORE_DIR}*.tar.xz
+    rm -rf ${DAPPNODE_CORE_DIR}.dappnode_profile
 fi
 
 mkdir -p $DAPPNODE_DIR
