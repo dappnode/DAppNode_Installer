@@ -17,7 +17,8 @@ mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 mkdir -p "${DAPPNODE_DIR}config"
 
-PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
+PROFILE_BRANCH="v0.2.0-alpha"
+PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 
 source /etc/os-release
@@ -154,16 +155,19 @@ dappnode_start()
     USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
     [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
-    if [ ! "$(grep ".dappnode_profile" $PROFILE)" ];then
+    if [ ! "$(grep -qF ".dappnode_profile" $PROFILE)" ]; then
         echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
         echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
     fi
 
     sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
-    echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> $PROFILE_FILE
-    echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
-    echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE_FILE
-    echo -e "return\n" >> $PROFILE_FILE
+
+    if [ ! "$(grep -qF "getAdminCredentials" $PROFILE_FILE)" ]; then
+        echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> $PROFILE_FILE
+        echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
+        echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE_FILE
+        echo -e "return\n" >> $PROFILE_FILE
+    fi
 
     # Delete dappnode_install.sh execution from rc.local if exists
     if [ -f "/etc/rc.local" ];then
