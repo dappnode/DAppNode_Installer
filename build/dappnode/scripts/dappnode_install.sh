@@ -5,6 +5,7 @@ DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 
 if [ "$UPDATE" = true ] ; then
+    echo "Cleaning for update..."
     rm -rf $LOG_DIR
     rm -rf ${DAPPNODE_CORE_DIR}*.yml
     rm -rf ${DAPPNODE_CORE_DIR}*.json
@@ -167,6 +168,9 @@ dappnode_start()
         echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
         echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE_FILE
         echo -e "return\n" >> $PROFILE_FILE
+    else
+        # Run first generation
+        docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials
     fi
 
     # Delete dappnode_install.sh execution from rc.local if exists
