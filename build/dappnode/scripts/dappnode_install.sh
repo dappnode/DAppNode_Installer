@@ -105,7 +105,7 @@ dappnode_core_download()
             # Download DAppNode Core docker-compose yml files if it's needed
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
             # Download DAppNode Core env files if it's needed
-            eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O/dev/null -q \$${comp}_ENV && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV"
+            eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV"
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
@@ -209,4 +209,3 @@ dappnode_start
 [ ! -f "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
 
 exit 0
-

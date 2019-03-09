@@ -31,6 +31,10 @@ Description: If your public IP is dynamic, or you don't know, leave this field b
 Template: ip-question/title
 Type: text
 Description: Your public IP.
+
+Template: ip-question/finished
+Type: text
+Description: Finished.
 !EOF!
 
 cat > /tmp/ip_fail.template <<'!EOF!'
@@ -63,6 +67,13 @@ db_dialog () {
         # Ask again until done
         db_dialog
     fi
+    db_settitle ip-question/title
+}
+
+db_restore () {
+    debconf-loadtemplate ip-question /tmp/ip.template
+    db_settitle ip-question/restore
 }
 
 db_dialog
+db_restore

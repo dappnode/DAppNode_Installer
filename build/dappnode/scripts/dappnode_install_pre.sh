@@ -2,16 +2,20 @@
 
 GIT_BRANCH="master"
 DAPPNODE_DIR="/usr/src/dappnode"
-DOCKER_PKG="docker-ce_18.06.1~ce~3-0~ubuntu_amd64.deb"
-LIBLTDL_PKG="libltdl7_2.4.6-2_amd64.deb"
+DOCKER_PKG="docker-ce_18.09.3~3-0~debian-stretch_amd64.deb"
+DOCKER_CLI_PKG="docker-ce-cli_18.09.3~3-0~debian-stretch_amd64.deb"
+CONTAINERD_PKG="containerd.io_1.2.4-1_amd64.deb"
+DOCKER_REPO="https://download.docker.com/linux/debian/dists/stretch/pool/stable/amd64"
 DOCKER_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_PKG}"
-LIB_DIR="${DAPPNODE_DIR}/libs/linux/debian/"
-LIBLTDL_PATH="${LIB_DIR}/${LIBLTDL_PKG}"
+DOCKER_CLI_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_CLI_PKG}"
+CONTAINERD_PATH="${DAPPNODE_DIR}/bin/docker/${CONTAINERD_PKG}"
 DCMP_PATH="/usr/local/bin/docker-compose"
+DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
+DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
+CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
+DCMP_URL="https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64"
 
-DOCKER_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${GIT_BRANCH}/build/dappnode/bin/docker/${DOCKER_PKG}"
-LIBLTDL_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${GIT_BRANCH}/build/dappnode/libs/linux/debian/${LIBLTDL_PKG}"
-DCMP_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${GIT_BRANCH}/build/dappnode/bin/docker/docker-compose-Linux-x86_64"
+#!ISOBUILD Do not modify, variables above imported for ISO build
 
 detect_installation_type(){
     if [ -f "${DAPPNODE_DIR}/iso_install.log" ]; then
@@ -32,14 +36,15 @@ install_docker()
   ##############################################
 
   # STEP 1: Download files 
-  # TODO: From a decentralized source
   # ----------------------------------------
   [ -f $DOCKER_PATH ] || wget -q --show-progress -O $DOCKER_PATH $DOCKER_URL
-  [ -f $LIBLTDL_PATH ] || wget -q --show-progress -O $LIBLTDL_PATH $LIBLTDL_URL
+  [ -f $DOCKER_CLI_PATH ] || wget -q --show-progress -O $DOCKER_CLI_PATH $DOCKER_CLI_URL
+  [ -f $CONTAINERD_PATH ] || wget -q --show-progress -O $CONTAINERD_PATH $CONTAINERD_URL
 
   # STEP 2: Install packages
   # ----------------------------------------
-  dpkg -i $LIBLTDL_PATH 2>&1 | tee -a $LOG_FILE
+  dpkg -i $CONTAINERD_PATH 2>&1 | tee -a $LOG_FILE
+  dpkg -i $DOCKER_CLI_PATH 2>&1 | tee -a $LOG_FILE
   dpkg -i $DOCKER_PATH 2>&1 | tee -a $LOG_FILE
 
   USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
@@ -100,7 +105,6 @@ detect_installation_type
 # Ensure paths exist
 mkdir -p $DAPPNODE_DIR
 mkdir -p $(dirname "$DOCKER_PATH")
-mkdir -p $LIB_DIR
 
 touch $LOG_FILE
 
@@ -117,4 +121,3 @@ if docker-compose -v >/dev/null 2>&1 ; then
 else
     install_docker_compose 2>&1 | tee -a $LOG_FILE
 fi
-
