@@ -51,27 +51,12 @@ cpio -o -H newc < /tmp/list > initrd
 gzip initrd
 cd -
 mv /tmp/makeinitrd/initrd.gz ./initrd.gz
-# both gtk and text?
-#echo "preseed.cfg" > list
-#cpio -o -v -H newc -A -F initrd < list > initrd
-# to test with gtk one
-#echo "header.png" | cpio -o -H newc -A -p /path/to/image -F initrd 
 cd ..
 
 echo "Configuring the boot menu for DappNode..."
-#rm -f boot/grub/grub.cfg
-#cp ../boot/grub.cfg boot/grub/grub.cfg
 cp ../boot/menu.cfg isolinux/menu.cfg
 cp ../boot/txt.cfg isolinux/txt.cfg
 cp ../boot/splash.png isolinux/splash.png
-# cd isolinux
-# cpio -id init < bootlogo
-# cat bootlogo | cpio -t > /tmp/list
-# cp ../../boot/txt.cfg txt.cfg
-# cp ../../boot/splash.pcx splash.pcx
-# cp ../../boot/gfxboot.cfg gfxboot.cfg
-# cpio -o < /tmp/list > bootlogo
-# cd ..
 
 echo "Fix md5 sum..."
 md5sum `find ! -name "md5sum.txt" ! -path "./isolinux/*" -type f` > md5sum.txt
