@@ -34,8 +34,8 @@ install_docker()
   # STEP 1: Download files 
   # TODO: From a decentralized source
   # ----------------------------------------
-  [ -f $DOCKER_PATH ] || wget -q --show-progress -O $DOCKER_PATH $DOCKER_URL
-  [ -f $LIBLTDL_PATH ] || wget -q --show-progress -O $LIBLTDL_PATH $LIBLTDL_URL
+  wget -q --show-progress -O $DOCKER_PATH $DOCKER_URL
+  wget -q --show-progress -O $LIBLTDL_PATH $LIBLTDL_URL
 
   # STEP 2: Install packages
   # ----------------------------------------
