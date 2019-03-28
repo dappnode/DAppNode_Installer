@@ -6,7 +6,7 @@ services:
     privileged: true
     environment: 
       - BUILD=false
-      - UBUNTU=18.04
+      - UNATTENDED=false
     volumes:
       - ./images:/images
 
