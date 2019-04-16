@@ -2,10 +2,12 @@
 dockerd &
 sleep 5;
 
-#rm -f /images/*.tar.xz
-#rm -f /images/*.yml
-#rm -f /images/*.env
-#rm -f /images/*.json
+if [ "$CLEAN" = true ]; then
+    rm -f /images/*.tar.xz
+    rm -f /images/*.yml
+    rm -f /images/*.env
+    rm -f /images/*.json
+fi
 
 if [ "$BUILD" = true ]; then
     /usr/src/app/generate_docker_images.sh
