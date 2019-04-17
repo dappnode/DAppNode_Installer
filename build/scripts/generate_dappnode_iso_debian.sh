@@ -1,9 +1,9 @@
 #!/bin/sh
 
-echo "Downloading debian ISO image: debian-9.8.0-amd64-xfce-CD-1.iso..."
-if [ ! -f /images/debian-9.8.0-amd64-xfce-CD-1.iso ]; then
-    wget https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-9.8.0-amd64-xfce-CD-1.iso \
-    -O /images/debian-9.8.0-amd64-xfce-CD-1.iso
+echo "Downloading debian ISO image: debian-testing-amd64-netinst.iso..."
+if [ ! -f /images/debian-testing-amd64-netinst.iso ]; then
+    wget https://cdimage.debian.org/cdimage/weekly-builds/amd64/iso-cd/debian-testing-amd64-netinst.iso \
+    -O /images/debian-testing-amd64-netinst.iso
 fi
 echo "Done!"
 
@@ -12,11 +12,11 @@ rm -rf dappnode-iso
 rm DappNode-debian-*
 
 echo "Extracting the iso..."
-xorriso -osirrox on -indev /images/debian-9.8.0-amd64-xfce-CD-1.iso \
+xorriso -osirrox on -indev /images/debian-testing-amd64-netinst.iso \
  -extract / dappnode-iso
 
 echo "Obtaining the isohdpfx.bin for hybrid ISO..."
-dd if=/images/debian-9.8.0-amd64-xfce-CD-1.iso bs=432 count=1 \
+dd if=/images/debian-testing-amd64-netinst.iso bs=432 count=1 \
 of=dappnode-iso/isolinux/isohdpfx.bin
 
 cd dappnode-iso
