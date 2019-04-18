@@ -121,8 +121,8 @@ dappnode_core_load()
         fi
     done
 
-    # Delete build line from yml
-    sed -i '/build: \.\/build/d' $DAPPNODE_CORE_DIR/*.yml 2>&1 | tee -a $LOG_DIR
+    # Delete build lines from yml
+    sed -i '/build:\|context:\|dockerfile/d' $DAPPNODE_CORE_DIR/*.yml | tee -a $LOG_DIR
 }
 
 addSwap()
