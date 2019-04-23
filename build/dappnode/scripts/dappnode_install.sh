@@ -3,6 +3,7 @@
 DAPPNODE_DIR="/usr/src/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
+MOTD_FILE="/etc/motd"
 
 if [ "$UPDATE" = true ] ; then
     echo "Cleaning for update..."
@@ -125,6 +126,19 @@ dappnode_core_load()
     sed -i '/build: \.\/build/d' $DAPPNODE_CORE_DIR/*.yml 2>&1 | tee -a $LOG_DIR
 }
 
+customMotd()
+{
+    if [ -f ${MOTD_FILE} ]; then
+    cat <<EOF > ${MOTD_FILE}
+ ___   _             _  _         _
+|   \ /_\  _ __ _ __| \| |___  __| |___
+| |) / _ \| '_ \ '_ \ .` / _ \/ _` / -_)
+|___/_/ \_\ .__/ .__/_|\_\___/\__,_\___|
+          |_|  |_|
+EOF
+    fi
+}
+
 addSwap()
 {
     # Is swap enabled?
@@ -132,7 +146,7 @@ addSwap()
 
     # if not then create it
     if [ $IS_SWAP -eq 0 ]; then
-        echo 'Swap not found. Adding swapfile.'
+        echo -e '\e[32mSwap not found. Adding swapfile.\e[0m'
         #RAM=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
         #SWAP=$(($RAM * 2))
         SWAP=8388608
@@ -142,7 +156,7 @@ addSwap()
         swapon /swapfile
         echo '/swapfile none swap defaults 0 0' >> /etc/fstab
     else
-        echo 'swapfile found. No changes made.'
+        echo -e '\e[32mSwap found. No changes made.\e[0m'
     fi
 }
 
@@ -193,6 +207,9 @@ echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -
 
 echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOG_DIR
 addSwap
+
+echo -e "\e[32mCustomizing login...\e[0m" 2>&1 | tee -a $LOG_DIR
+customMotd
 
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build
