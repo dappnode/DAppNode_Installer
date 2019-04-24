@@ -107,7 +107,7 @@ dappnode_core_download()
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV"
-            # Download DAppNode Core env files if it's needed
+            # Download DAppNode Core manifest files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
     done
@@ -132,7 +132,7 @@ customMotd()
     cat <<EOF > ${MOTD_FILE}
  ___   _             _  _         _
 |   \ /_\  _ __ _ __| \| |___  __| |___
-| |) / _ \| '_ \ '_ \ .` / _ \/ _` / -_)
+| |) / _ \| '_ \ '_ \ .  / _ \/ _  / -_)
 |___/_/ \_\ .__/ .__/_|\_\___/\__,_\___|
           |_|  |_|
 EOF
