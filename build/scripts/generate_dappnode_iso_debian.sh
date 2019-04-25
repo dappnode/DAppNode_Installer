@@ -13,7 +13,7 @@ rm DappNode-debian-*
 
 echo "Extracting the iso..."
 xorriso -osirrox on -indev /images/firmware-buster-DI-rc1-amd64-netinst.iso \
- -extract / dappnode-iso
+-extract / dappnode-iso
 
 echo "Obtaining the isohdpfx.bin for hybrid ISO..."
 dd if=/images/firmware-buster-DI-rc1-amd64-netinst.iso bs=432 count=1 \

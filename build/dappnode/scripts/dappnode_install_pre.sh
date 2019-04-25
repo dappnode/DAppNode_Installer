@@ -1,6 +1,5 @@
 #!/bin/bash
 
-GIT_BRANCH="master"
 DAPPNODE_DIR="/usr/src/dappnode"
 DOCKER_PKG="docker-ce_18.09.5~3-0~debian-buster_amd64.deb"
 DOCKER_CLI_PKG="docker-ce-cli_18.09.5~3-0~debian-buster_amd64.deb"
@@ -25,80 +24,82 @@ detect_installation_type(){
         LOG_FILE=${DAPPNODE_DIR}/install.log
         ISO_INSTALLATION=false
     fi
-    # If installing from script, select the local version (stretch or buster)
-    if [ -f "/etc/debian_version" ]; then
-        DEBIAN_VERSION=$(cat /etc/debian_version | awk -F / '{print $1}')
-        DOCKER_PKG="docker-ce_18.09.5~3-0~debian-${DEBIAN_VERSION}_amd64.deb"
-        DOCKER_CLI_PKG="docker-ce-cli_18.09.5~3-0~debian-${DEBIAN_VERSION}_amd64.deb"
-        DOCKER_REPO="https://download.docker.com/linux/debian/dists/${DEBIAN_VERSION}/pool/stable/amd64"
-    fi
 }
 
 install_docker()
 {
-  ##############################################
-  ##############################################
-  ####          DOCKER INSTALATION          ####
-  ##############################################
-  ##############################################
-
-  # STEP 1: Download files 
-  # ----------------------------------------
-  [ -f $DOCKER_PATH ] || wget -q --show-progress -O $DOCKER_PATH $DOCKER_URL
-  [ -f $DOCKER_CLI_PATH ] || wget -q --show-progress -O $DOCKER_CLI_PATH $DOCKER_CLI_URL
-  [ -f $CONTAINERD_PATH ] || wget -q --show-progress -O $CONTAINERD_PATH $CONTAINERD_URL
-
-  # STEP 2: Install packages
-  # ----------------------------------------
-  dpkg -i $CONTAINERD_PATH 2>&1 | tee -a $LOG_FILE
-  dpkg -i $DOCKER_CLI_PATH 2>&1 | tee -a $LOG_FILE
-  dpkg -i $DOCKER_PATH 2>&1 | tee -a $LOG_FILE
-
-  USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
-  [ -z $USER ] || usermod -aG docker $USER
- 
-  # Disable check if ISO installation since it is not possible to check in this way
-  if [ "$ISO_INSTALLATION" = "false" ]; then
-    # Validate the installation of docker
-    if docker -v; then
-        echo -e "\e[32m \n\n Verified docker installation \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
-    else
-        echo -e "\e[31m \n\n ERROR: docker is not installed \n\n Please re-install it \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
-        exit 1 
+    ##############################################
+    ##############################################
+    ####          DOCKER INSTALLATION         ####
+    ##############################################
+    ##############################################
+    
+    # STEP 0: Detect if it's a Debian 9 (stretch) installation
+    # ----------------------------------------
+    if [ -f "/etc/os-release" ] && grep -q "stretch" "/etc/os-release"; then
+        DOCKER_PKG="docker-ce_18.09.5~3-0~debian-stretch_amd64.deb"
+        DOCKER_CLI_PKG="docker-ce-cli_18.09.5~3-0~debian-stretch_amd64.deb"
+        CONTAINERD_PKG="containerd.io_1.2.5-1_amd64.deb"
+        DOCKER_REPO="https://download.docker.com/linux/debian/dists/stretch/pool/stable/amd64"
     fi
-  fi
+    
+    # STEP 1: Download files
+    # ----------------------------------------
+    [ -f $DOCKER_PATH ] || wget -q --show-progress -O $DOCKER_PATH $DOCKER_URL
+    [ -f $DOCKER_CLI_PATH ] || wget -q --show-progress -O $DOCKER_CLI_PATH $DOCKER_CLI_URL
+    [ -f $CONTAINERD_PATH ] || wget -q --show-progress -O $CONTAINERD_PATH $CONTAINERD_URL
+    
+    # STEP 2: Install packages
+    # ----------------------------------------
+    dpkg -i $CONTAINERD_PATH 2>&1 | tee -a $LOG_FILE
+    dpkg -i $DOCKER_CLI_PATH 2>&1 | tee -a $LOG_FILE
+    dpkg -i $DOCKER_PATH 2>&1 | tee -a $LOG_FILE
+    
+    USER=$(grep -q 1000 "/etc/passwd" | cut -f 1 -d:)
+    [ -z "$USER" ] || usermod -aG docker "$USER"
+    
+    # Disable check if ISO installation since it is not possible to check in this way
+    if [ "$ISO_INSTALLATION" = "false" ]; then
+        # Validate the installation of docker
+        if docker -v; then
+            echo -e "\e[32m \n\n Verified docker installation \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+        else
+            echo -e "\e[31m \n\n ERROR: docker is not installed \n\n Please re-install it \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+            exit 1
+        fi
+    fi
 }
 
 install_docker_compose()
 {
-  ##############################################
-  ##############################################
-  ####      DOCKER COMPOSE INSTALATION      ####
-  ##############################################
-  ##############################################
-
-  # STEP 0: Declare paths and directories
-  # ----------------------------------------
-  
-  # Ensure paths exist
-  mkdir -p $(dirname "$DCMP_PATH") 2>&1 | tee -a $LOG_FILE
-
-  # STEP 1: Download files from a decentralized source
-  # ----------------------------------------
-  [ -f $DCMP_PATH ] || wget -q --show-progress -O $DCMP_PATH $DCMP_URL
-  # Give permissions
-  chmod +x $DCMP_PATH 2>&1 | tee -a $LOG_FILE
-
-  # Disable check if ISO installation since it is not possible to check in this way
-  if [ "$ISO_INSTALLATION" = "false" ]; then
-    # Validate the installation of docker-compose
-    if docker-compose -v; then
-        echo -e "\e[32m \n\n Verified docker-compose installation \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
-    else
-        echo -e "\e[31m \n\n ERROR: docker-compose is not installed \n\n Please re-install it \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
-        exit 1
+    ##############################################
+    ##############################################
+    ####      DOCKER COMPOSE INSTALLATION     ####
+    ##############################################
+    ##############################################
+    
+    # STEP 0: Declare paths and directories
+    # ----------------------------------------
+    
+    # Ensure paths exist
+    mkdir -p $(dirname "$DCMP_PATH") 2>&1 | tee -a $LOG_FILE
+    
+    # STEP 1: Download files from a decentralized source
+    # ----------------------------------------
+    [ -f $DCMP_PATH ] || wget -q --show-progress -O $DCMP_PATH $DCMP_URL
+    # Give permissions
+    chmod +x $DCMP_PATH 2>&1 | tee -a $LOG_FILE
+    
+    # Disable check if ISO installation since it is not possible to check in this way
+    if [ "$ISO_INSTALLATION" = "false" ]; then
+        # Validate the installation of docker-compose
+        if docker-compose -v; then
+            echo -e "\e[32m \n\n Verified docker-compose installation \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+        else
+            echo -e "\e[31m \n\n ERROR: docker-compose is not installed \n\n Please re-install it \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+            exit 1
+        fi
     fi
-  fi
 }
 
 ##############################################
