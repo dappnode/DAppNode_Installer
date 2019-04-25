@@ -61,7 +61,7 @@ install_docker()
     dpkg -i $DOCKER_CLI_PATH 2>&1 | tee -a $LOG_FILE
     dpkg -i $DOCKER_PATH 2>&1 | tee -a $LOG_FILE
     
-    USER=$(grep -q 1000 "/etc/passwd" | cut -f 1 -d:)
+    USER=$(grep 1000 "/etc/passwd" | cut -f 1 -d:)
     [ -z "$USER" ] || usermod -aG docker "$USER"
     
     # Disable check if ISO installation since it is not possible to check in this way
