@@ -25,6 +25,13 @@ detect_installation_type(){
         LOG_FILE=${DAPPNODE_DIR}/install.log
         ISO_INSTALLATION=false
     fi
+    # If installing from script, select the local version (stretch or buster)
+    if [ -f "/etc/debian_version" ]; then
+        DEBIAN_VERSION=$(cat /etc/debian_version | awk -F / '{print $1}')
+        DOCKER_PKG="docker-ce_18.09.5~3-0~debian-${DEBIAN_VERSION}_amd64.deb"
+        DOCKER_CLI_PKG="docker-ce-cli_18.09.5~3-0~debian-${DEBIAN_VERSION}_amd64.deb"
+        DOCKER_REPO="https://download.docker.com/linux/debian/dists/${DEBIAN_VERSION}/pool/stable/amd64"
+    fi
 }
 
 install_docker()
