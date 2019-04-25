@@ -41,6 +41,12 @@ install_docker()
         DOCKER_CLI_PKG="docker-ce-cli_18.09.5~3-0~debian-stretch_amd64.deb"
         CONTAINERD_PKG="containerd.io_1.2.5-1_amd64.deb"
         DOCKER_REPO="https://download.docker.com/linux/debian/dists/stretch/pool/stable/amd64"
+        DOCKER_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_PKG}"
+        DOCKER_CLI_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_CLI_PKG}"
+        CONTAINERD_PATH="${DAPPNODE_DIR}/bin/docker/${CONTAINERD_PKG}"
+        DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
+        DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
+        CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
     fi
     
     # STEP 1: Download files
