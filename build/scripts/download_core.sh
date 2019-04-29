@@ -33,6 +33,8 @@ dappnode_core_download()
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O/dev/null -q \$${comp}_ENV 2>&1 >/dev/null && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV 2>&1 >/dev/null" 
+            # Create DAppNode Core empty env files if missing
+            eval "[ -f \$${comp}_ENV_FILE ] || touch \$${comp}_ENV_FILE"
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
