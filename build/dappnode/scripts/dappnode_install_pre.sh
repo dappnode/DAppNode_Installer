@@ -47,6 +47,8 @@ install_docker()
         DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
         DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
         CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
+        
+        
     fi
     
     # STEP 1: Download files
@@ -60,6 +62,9 @@ install_docker()
     dpkg -i $CONTAINERD_PATH 2>&1 | tee -a $LOG_FILE
     dpkg -i $DOCKER_CLI_PATH 2>&1 | tee -a $LOG_FILE
     dpkg -i $DOCKER_PATH 2>&1 | tee -a $LOG_FILE
+    
+    # Ensure xz is installed
+    [ -f "/usr/bin/xz" ] || (apt-get update && apt-get install -y xz-utils)
     
     USER=$(grep 1000 "/etc/passwd" | cut -f 1 -d:)
     [ -z "$USER" ] || usermod -aG docker "$USER"
