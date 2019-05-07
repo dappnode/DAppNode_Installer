@@ -179,7 +179,7 @@ dappnode_start()
 
     if [ ! "$(grep -qF "getAdminCredentials" $PROFILE_FILE)" ]; then
         echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> $PROFILE_FILE
-        echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
+        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >> $PROFILE_FILE
         echo -e "return\n" >> $PROFILE_FILE
     else
