@@ -3,8 +3,10 @@
 DAPPNODE_DIR="/usr/src/dappnode/"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
+MOTD_FILE="/etc/motd"
 
 if [ "$UPDATE" = true ] ; then
+    echo "Cleaning for update..."
     rm -rf $LOG_DIR
     rm -rf ${DAPPNODE_CORE_DIR}*.yml
     rm -rf ${DAPPNODE_CORE_DIR}*.json
@@ -17,7 +19,8 @@ mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}scripts"
 mkdir -p "${DAPPNODE_DIR}config"
 
-PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/master/build/scripts/.dappnode_profile"
+PROFILE_BRANCH="master"
+PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 
 source /etc/os-release
@@ -103,7 +106,7 @@ dappnode_core_download()
             # Download DAppNode Core docker-compose yml files if it's needed
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
             # Download DAppNode Core env files if it's needed
-            eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O/dev/null -q \$${comp}_ENV && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV"
+            eval "[ -f \$${comp}_ENV_FILE ] || ( $WGET -O/dev/null -q \$${comp}_ENV && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV )"
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
@@ -119,8 +122,21 @@ dappnode_core_load()
         fi
     done
 
-    # Delete build line from yml
-    sed -i '/build: \.\/build/d' $DAPPNODE_CORE_DIR/*.yml 2>&1 | tee -a $LOG_DIR
+    # Delete build lines from yml
+    sed -i '/build:\|context:\|dockerfile/d' $DAPPNODE_CORE_DIR/*.yml | tee -a $LOG_DIR
+}
+
+customMotd()
+{
+    if [ -f ${MOTD_FILE} ]; then
+    cat <<EOF > ${MOTD_FILE}
+ ___   _             _  _         _
+|   \ /_\  _ __ _ __| \| |___  __| |___
+| |) / _ \| '_ \ '_ \ .  / _ \/ _  / -_)
+|___/_/ \_\ .__/ .__/_|\_\___/\__,_\___|
+          |_|  |_|
+EOF
+    fi
 }
 
 addSwap()
@@ -130,7 +146,7 @@ addSwap()
 
     # if not then create it
     if [ $IS_SWAP -eq 0 ]; then
-        echo 'Swap not found. Adding swapfile.'
+        echo -e '\e[32mSwap not found. Adding swapfile.\e[0m'
         #RAM=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
         #SWAP=$(($RAM * 2))
         SWAP=8388608
@@ -140,7 +156,7 @@ addSwap()
         swapon /swapfile
         echo '/swapfile none swap defaults 0 0' >> /etc/fstab
     else
-        echo 'swapfile found. No changes made.'
+        echo -e '\e[32mSwap found. No changes made.\e[0m'
     fi
 }
 
@@ -154,16 +170,22 @@ dappnode_start()
     USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
     [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
-    if [ ! "$(grep ".dappnode_profile" $PROFILE)" ];then
+    if [ ! "$(grep -qF ".dappnode_profile" $PROFILE)" ]; then
         echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
         echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
     fi
 
     sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
-    echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> $PROFILE_FILE
-    echo "echo -e \"\n\e[32mOnce connected through the VPN (L2TP/IPSec) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
-    echo "echo -e \"\nhttp://my.admin.dnp.dappnode.eth/\n\"" >> $PROFILE_FILE
-    echo -e "return\n" >> $PROFILE_FILE
+
+    if [ ! "$(grep -qF "getAdminCredentials" $PROFILE_FILE)" ]; then
+        echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> $PROFILE_FILE
+        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
+        echo "echo -e \"\nhttp://my.dappnode/\n\"" >> $PROFILE_FILE
+        echo -e "return\n" >> $PROFILE_FILE
+    else
+        # Run first generation
+        docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials
+    fi
 
     # Delete dappnode_install.sh execution from rc.local if exists
     if [ -f "/etc/rc.local" ];then
@@ -186,6 +208,9 @@ echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -
 echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOG_DIR
 addSwap
 
+echo -e "\e[32mCustomizing login...\e[0m" 2>&1 | tee -a $LOG_DIR
+customMotd
+
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build
 
@@ -201,4 +226,3 @@ dappnode_start
 [ ! -f "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
 
 exit 0
-

@@ -1,12 +1,12 @@
-version: '3.4'
-  
+version: "3.4"
+
 services:
   dappnode_installer:
     build: build
     privileged: true
-    environment: 
+    environment:
       - BUILD=false
-      - UBUNTU=18.04
+      - CLEAN=false
+      - UNATTENDED=false
     volumes:
       - ./images:/images
-
