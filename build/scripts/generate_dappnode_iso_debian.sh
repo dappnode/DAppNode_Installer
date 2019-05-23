@@ -60,6 +60,7 @@ cd ..
 echo "Configuring the boot menu for DappNode..."
 cp ../boot/grub.cfg boot/grub/grub.cfg
 cp ../boot/theme_1 boot/grub/theme/1
+cp ../boot/isolinux.cfg isolinux/isolinux.cfg
 cp ../boot/menu.cfg isolinux/menu.cfg
 cp ../boot/txt.cfg isolinux/txt.cfg
 cp ../boot/splash.png isolinux/splash.png
