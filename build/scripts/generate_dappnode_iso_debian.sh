@@ -41,7 +41,7 @@ mkdir /tmp/makeinitrd
 cd install.amd
 cp initrd.gz /tmp/makeinitrd/
 if [[  ${UNATTENDED} == "true" ]]; then
-    cp ../../dappnode/scripts/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
+    cp ../../dappnode/scripts/preseed_unattended_nvme.cfg /tmp/makeinitrd/preseed.cfg
 else
     cp ../../dappnode/scripts/preseed.cfg /tmp/makeinitrd/preseed.cfg
 fi
