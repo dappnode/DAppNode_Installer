@@ -8,5 +8,6 @@ services:
       - BUILD=false
       - CLEAN=false
       - UNATTENDED=false
+      - FLAVOR=default
     volumes:
       - ./images:/images
