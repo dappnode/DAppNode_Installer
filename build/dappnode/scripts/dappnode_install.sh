@@ -187,8 +187,8 @@ dappnode_start()
         docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials
     fi
 
-    # Delete dappnode_install.sh execution from rc.local if exists
-    if [ -f "/etc/rc.local" ];then
+    # Delete dappnode_install.sh execution from rc.local if exists, and is not the unattended firstboot
+    if [ -f "/etc/rc.local" ] && [ ! -f "/usr/src/dappnode/.firstboot" ]; then
         sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
     fi
 }
@@ -220,8 +220,15 @@ dappnode_core_download
 echo -e "\e[32mLoading DAppNode Core...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_load
 
-echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOG_DIR
-dappnode_start
+if [ ! -f "/usr/src/dappnode/.firstboot" ]; then
+    echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOG_DIR
+    dappnode_start
+fi
+
+# Run test in interactive terminal
+if [ -f "/usr/src/dappnode/.firstboot" ]; then
+   openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
+fi
 
 [ ! -f "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
 
