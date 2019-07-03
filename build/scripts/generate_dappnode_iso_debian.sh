@@ -43,6 +43,8 @@ cp initrd.gz /tmp/makeinitrd/
 if [[  ${UNATTENDED} == "true" ]]; then
     if [[  ${FLAVOR} == "nvme" ]]; then
         cp ../../dappnode/scripts/preseed_unattended_nvme.cfg /tmp/makeinitrd/preseed.cfg
+        elif [[  ${FLAVOR} == "archive" ]]; then
+        cp ../../dappnode/scripts/preseed_unattended_archive.cfg /tmp/makeinitrd/preseed.cfg
     else
         cp ../../dappnode/scripts/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
     fi
