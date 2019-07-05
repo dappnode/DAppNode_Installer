@@ -204,6 +204,13 @@ grabContentHashes() {
     fi
 }
 
+installSgx() {
+    if [ -d "/usr/src/dappnode/sgx" ]; then
+        /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin >$LOG_DIR
+        /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOG_DIR
+    fi
+}
+
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -227,6 +234,9 @@ installExtra
 
 echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
+
+echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOG_DIR
+installSgx
 
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOGFILE
 dappnode_core_build
