@@ -1,9 +1,9 @@
 #!/bin/sh
 
-echo "Downloading debian ISO image: firmware-buster-DI-rc1-amd64-netinst.iso..."
-if [ ! -f /images/firmware-buster-DI-rc1-amd64-netinst.iso ]; then
-    wget https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/buster_di_rc1+nonfree/amd64/iso-cd/firmware-buster-DI-rc1-amd64-netinst.iso \
-    -O /images/firmware-buster-DI-rc1-amd64-netinst.iso
+echo "Downloading debian ISO image: firmware-10.0.0-amd64-netinst.iso..."
+if [ ! -f /images/firmware-10.0.0-amd64-netinst.iso ]; then
+    wget https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/10.0.0+nonfree/amd64/iso-cd/firmware-10.0.0-amd64-netinst.iso \
+    -O /images/firmware-10.0.0-amd64-netinst.iso
 fi
 echo "Done!"
 
@@ -12,11 +12,11 @@ rm -rf dappnode-iso
 rm DappNode-debian-*
 
 echo "Extracting the iso..."
-xorriso -osirrox on -indev /images/firmware-buster-DI-rc1-amd64-netinst.iso \
+xorriso -osirrox on -indev /images/firmware-10.0.0-amd64-netinst.iso \
 -extract / dappnode-iso
 
 echo "Obtaining the isohdpfx.bin for hybrid ISO..."
-dd if=/images/firmware-buster-DI-rc1-amd64-netinst.iso bs=432 count=1 \
+dd if=/images/firmware-10.0.0-amd64-netinst.iso bs=432 count=1 \
 of=dappnode-iso/isolinux/isohdpfx.bin
 
 cd dappnode-iso
@@ -41,7 +41,13 @@ mkdir /tmp/makeinitrd
 cd install.amd
 cp initrd.gz /tmp/makeinitrd/
 if [[  ${UNATTENDED} == "true" ]]; then
-    cp ../../dappnode/scripts/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
+    if [[  ${FLAVOR} == "nvme" ]]; then
+        cp ../../dappnode/scripts/preseed_unattended_nvme.cfg /tmp/makeinitrd/preseed.cfg
+        elif [[  ${FLAVOR} == "archive" ]]; then
+        cp ../../dappnode/scripts/preseed_unattended_archive.cfg /tmp/makeinitrd/preseed.cfg
+    else
+        cp ../../dappnode/scripts/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
+    fi
 else
     cp ../../dappnode/scripts/preseed.cfg /tmp/makeinitrd/preseed.cfg
 fi
@@ -60,6 +66,7 @@ cd ..
 echo "Configuring the boot menu for DappNode..."
 cp ../boot/grub.cfg boot/grub/grub.cfg
 cp ../boot/theme_1 boot/grub/theme/1
+cp ../boot/isolinux.cfg isolinux/isolinux.cfg
 cp ../boot/menu.cfg isolinux/menu.cfg
 cp ../boot/txt.cfg isolinux/txt.cfg
 cp ../boot/splash.png isolinux/splash.png
