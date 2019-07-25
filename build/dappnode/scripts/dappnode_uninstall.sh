@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
