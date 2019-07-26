@@ -13,6 +13,7 @@ DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
 DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
 CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
 DCMP_URL="https://github.com/docker/compose/releases/download/1.24.0/docker-compose-Linux-x86_64"
+WGET="wget -q --show-progress --progress=bar:force"
 
 #!ISOBUILD Do not modify, variables above imported for ISO build
 
@@ -53,9 +54,9 @@ install_docker()
     
     # STEP 1: Download files
     # ----------------------------------------
-    [ -f $DOCKER_PATH ] || wget -q --show-progress -O $DOCKER_PATH $DOCKER_URL
-    [ -f $DOCKER_CLI_PATH ] || wget -q --show-progress -O $DOCKER_CLI_PATH $DOCKER_CLI_URL
-    [ -f $CONTAINERD_PATH ] || wget -q --show-progress -O $CONTAINERD_PATH $CONTAINERD_URL
+    [ -f $DOCKER_PATH ] || $WGET -O $DOCKER_PATH $DOCKER_URL
+    [ -f $DOCKER_CLI_PATH ] || $WGET -O $DOCKER_CLI_PATH $DOCKER_CLI_URL
+    [ -f $CONTAINERD_PATH ] || $WGET -O $CONTAINERD_PATH $CONTAINERD_URL
     
     # STEP 2: Install packages
     # ----------------------------------------
@@ -64,7 +65,7 @@ install_docker()
     dpkg -i $DOCKER_PATH 2>&1 | tee -a $LOG_FILE
     
     # Ensure xz is installed
-    [ -f "/usr/bin/xz" ] || (apt-get update && apt-get install -y xz-utils)
+    [ -f "/usr/bin/xz" ] || (apt-get update -y && apt-get install -y xz-utils)
     
     USER=$(grep 1000 "/etc/passwd" | cut -f 1 -d:)
     [ -z "$USER" ] || usermod -aG docker "$USER"
@@ -97,7 +98,7 @@ install_docker_compose()
     
     # STEP 1: Download files from a decentralized source
     # ----------------------------------------
-    [ -f $DCMP_PATH ] || wget -q --show-progress -O $DCMP_PATH $DCMP_URL
+    [ -f $DCMP_PATH ] || $WGET -O $DCMP_PATH $DCMP_URL
     # Give permissions
     chmod +x $DCMP_PATH 2>&1 | tee -a $LOG_FILE
     
