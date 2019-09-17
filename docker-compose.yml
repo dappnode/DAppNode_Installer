@@ -7,7 +7,7 @@ services:
     environment:
       - BUILD=false
       - CLEAN=false
-      - UNATTENDED=false
+      - UNATTENDED=true
       - FLAVOR=default
     volumes:
       - ./images:/images
