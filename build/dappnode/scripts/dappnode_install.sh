@@ -206,10 +206,7 @@ grabContentHashes() {
 
 installSgx() {
     if [ -d "/usr/src/dappnode/sgx" ]; then
-        apt-get update -y 2>&1 | tee -a $LOG_DIR
-        apt-get install libcurl4 2>&1 | tee -a $LOG_DIR
-        dpkg -i /usr/src/dappnode/sgx/libprotobuf10_3.0.0-9_amd64.deb 2>&1 | tee -a $LOG_DIR
-        dpkg -i /usr/src/dappnode/sgx/libsgx-enclave-common_2.6.100.51363-bionic1_amd64.deb 2>&1 | tee -a $LOG_DIR
+        # from sgx_linux_x64_driver_2.5.0_2605efa.bin
         /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOG_DIR
         /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOG_DIR
     fi
