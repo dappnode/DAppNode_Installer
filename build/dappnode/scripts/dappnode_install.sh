@@ -22,8 +22,7 @@ mkdir -p "${DAPPNODE_DIR}config"
 PROFILE_BRANCH="master"
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
-
-source /etc/os-release
+WGET="wget -q --show-progress --progress=bar:force"
 
 function valid_ip()
 {
@@ -41,12 +40,6 @@ function valid_ip()
     fi
     return $stat
 }
-
-if [ "$NAME" = "Ubuntu" ];then
-    WGET="wget -q --show-progress "
-else
-    WGET="wget "
-fi
 
 if [[ ! -z $STATIC_IP ]]; then
     if valid_ip $STATIC_IP; then
