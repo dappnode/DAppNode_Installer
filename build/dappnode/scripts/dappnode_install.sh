@@ -8,8 +8,8 @@ MOTD_FILE="/etc/motd"
 if [ "$UPDATE" = true ] ; then
     echo "Cleaning for update..."
     rm -rf $LOG_DIR
-    rm -rf ${DAPPNODE_CORE_DIR}*.yml
-    rm -rf ${DAPPNODE_CORE_DIR}*.json
+    rm -rf ${DAPPNODE_CORE_DIR}docker-compose-*.yml
+    rm -rf ${DAPPNODE_CORE_DIR}dappnode_package-*.json
     rm -rf ${DAPPNODE_CORE_DIR}*.tar.xz
     rm -rf ${DAPPNODE_CORE_DIR}.dappnode_profile
 fi
