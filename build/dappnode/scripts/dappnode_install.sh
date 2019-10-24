@@ -163,14 +163,14 @@ dappnode_start()
     USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
     [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
-    if [ ! "$(grep -qF ".dappnode_profile" $PROFILE)" ]; then
+    if ! grep -q '.dappnode_profile' "$PROFILE"; then
         echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
         echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
     fi
 
     sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
 
-    if [ ! "$(grep -qF "getAdminCredentials" $PROFILE_FILE)" ]; then
+    if ! grep -q 'getAdminCredentials' "$PROFILE_FILE"; then
         echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> $PROFILE_FILE
         echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >> $PROFILE_FILE
