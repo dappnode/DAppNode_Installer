@@ -171,7 +171,7 @@ dappnode_start()
     sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
 
     if ! grep -q 'getAdminCredentials' "$PROFILE_FILE"; then
-        echo "docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials" >> $PROFILE_FILE
+        echo "docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets \$(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials" >> $PROFILE_FILE
         echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >> $PROFILE_FILE
         echo -e "return\n" >> $PROFILE_FILE
