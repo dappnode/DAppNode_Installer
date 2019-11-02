@@ -61,7 +61,7 @@ components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN WIFI)
 for comp in "${components[@]}"; do
     ver="${comp}_VERSION"
     eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}.tar.xz\""
-    eval "${comp}_YML=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/docker-compose-${comp,,}.yml\""
+    eval "${comp}_YML=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/docker-compose.yml\""
     eval "${comp}_ENV=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth.env\""
     eval "${comp}_MANIFEST=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/dappnode_package.json\""
     eval "${comp}_YML_FILE=\"${DAPPNODE_CORE_DIR}docker-compose-${comp,,}.yml\""
@@ -163,15 +163,15 @@ dappnode_start()
     USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
     [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
-    if [ ! "$(grep -qF ".dappnode_profile" $PROFILE)" ]; then
+    if ! grep -q '.dappnode_profile' "$PROFILE"; then
         echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
         echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
     fi
 
     sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
 
-    if [ ! "$(grep -qF "getAdminCredentials" $PROFILE_FILE)" ]; then
-        echo "docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials" >> $PROFILE_FILE
+    if ! grep -q 'getAdminCredentials' "$PROFILE_FILE"; then
+        echo "docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials" >> $PROFILE_FILE
         echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >> $PROFILE_FILE
         echo -e "return\n" >> $PROFILE_FILE
