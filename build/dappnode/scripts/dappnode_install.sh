@@ -186,6 +186,12 @@ dappnode_start()
     fi
 }
 
+installExtra() {
+    if [ -d "/usr/src/dappnode/extra" ]; then
+        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOG_DIR
+    fi
+}
+
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -203,6 +209,9 @@ addSwap
 
 echo -e "\e[32mCustomizing login...\e[0m" 2>&1 | tee -a $LOG_DIR
 customMotd
+
+echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOG_DIR
+installExtra
 
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build
