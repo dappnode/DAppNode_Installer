@@ -5,7 +5,7 @@ DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
 LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
 MOTD_FILE="/etc/motd"
 
-if [ "$UPDATE" = true ] ; then
+if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
     rm -rf $LOG_DIR
     rm -rf ${DAPPNODE_CORE_DIR}docker-compose-*.yml
@@ -24,18 +24,17 @@ PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PRO
 PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
 WGET="wget -q --show-progress --progress=bar:force"
 
-function valid_ip()
-{
-    local  ip=$1
-    local  stat=1
+function valid_ip() {
+    local ip=$1
+    local stat=1
 
     if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
         OIFS=$IFS
         IFS='.'
         ip=($ip)
         IFS=$OIFS
-        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
-            && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 && \
+        ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
         stat=$?
     fi
     return $stat
@@ -43,7 +42,7 @@ function valid_ip()
 
 if [[ ! -z $STATIC_IP ]]; then
     if valid_ip $STATIC_IP; then
-        echo $STATIC_IP > ${DAPPNODE_DIR}config/static_ip
+        echo $STATIC_IP >${DAPPNODE_DIR}config/static_ip
     else
         echo "The static IP provided: ${STATIC_IP} is not valid."
         exit 1
@@ -70,8 +69,7 @@ for comp in "${components[@]}"; do
     eval "${comp}_MANIFEST_FILE=\"${DAPPNODE_CORE_DIR}dappnode_package-${comp,,}.json\""
 done
 
-dappnode_core_build()
-{
+dappnode_core_build() {
     for comp in "${components[@]}"; do
         ver="${comp}_VERSION"
         file="${comp}_FILE"
@@ -89,8 +87,7 @@ dappnode_core_build()
     done
 }
 
-dappnode_core_download()
-{
+dappnode_core_download() {
     for comp in "${components[@]}"; do
         ver="${comp}_VERSION"
         if [[ ${!ver} != dev:* ]]; then
@@ -106,8 +103,7 @@ dappnode_core_download()
     done
 }
 
-dappnode_core_load()
-{
+dappnode_core_load() {
     for comp in "${components[@]}"; do
         ver="${comp}_VERSION"
         if [[ ${!ver} != dev:* ]]; then
@@ -119,10 +115,9 @@ dappnode_core_load()
     sed -i '/build:\|context:\|dockerfile/d' $DAPPNODE_CORE_DIR/*.yml | tee -a $LOG_DIR
 }
 
-customMotd()
-{
+customMotd() {
     if [ -f ${MOTD_FILE} ]; then
-    cat <<EOF > ${MOTD_FILE}
+        cat <<EOF >${MOTD_FILE}
  ___   _             _  _         _
 |   \ /_\  _ __ _ __| \| |___  __| |___
 | |) / _ \| '_ \ '_ \ .  / _ \/ _  / -_)
@@ -132,8 +127,7 @@ EOF
     fi
 }
 
-addSwap()
-{
+addSwap() {
     # Is swap enabled?
     IS_SWAP=$(swapon --show | wc -l)
 
@@ -147,34 +141,36 @@ addSwap()
         chmod 600 /swapfile
         mkswap /swapfile
         swapon /swapfile
-        echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+        echo '/swapfile none swap defaults 0 0' >>/etc/fstab
     else
         echo -e '\e[32mSwap found. No changes made.\e[0m'
     fi
 }
 
-dappnode_start()
-{
+dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
     docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE -f $WIFI_YML_FILE up -d 2>&1 | tee -a $LOG_DIR
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
 
     # Show credentials to the user on login
-    USER=$(cat /etc/passwd | grep 1000  | cut -f 1 -d:)
+    USER=$(cat /etc/passwd | grep 1000 | cut -f 1 -d:)
     [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
     if ! grep -q '.dappnode_profile' "$PROFILE"; then
-        echo "########          DAPPNODE PROFILE          ########" >> $PROFILE
-        echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >> $PROFILE
+        echo "########          DAPPNODE PROFILE          ########" >>$PROFILE
+        echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >>$PROFILE
     fi
 
-    sed -i '/return/d' $PROFILE_FILE| tee -a $LOG_DIR
+    sed -i '/return/d' $PROFILE_FILE | tee -a $LOG_DIR
 
     if ! grep -q 'getAdminCredentials' "$PROFILE_FILE"; then
-        echo "docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets \$(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials" >> $PROFILE_FILE
-        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >> $PROFILE_FILE
-        echo "echo -e \"\nhttp://my.dappnode/\n\"" >> $PROFILE_FILE
-        echo -e "return\n" >> $PROFILE_FILE
+        #echo "docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets \$(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials" >> $PROFILE_FILE
+        echo "echo -e \"\n\e[32mTo get a link to the OpenVPN admin access, run the following command:\e[0m\"" >>$PROFILE_FILE
+        echo "echo -e \"\n\e[32mdappnode_get dappnode_admin\e[0m\"" >>$PROFILE_FILE
+        echo "echo -e \"\n\"" >>$PROFILE_FILE
+        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >>$PROFILE_FILE
+        echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$PROFILE_FILE
+        echo -e "return\n" >>$PROFILE_FILE
     else
         # Run first generation
         docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials
@@ -229,7 +225,7 @@ fi
 
 # Run test in interactive terminal
 if [ -f "/usr/src/dappnode/.firstboot" ]; then
-   openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
+    openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
 fi
 
 [ ! -f "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
