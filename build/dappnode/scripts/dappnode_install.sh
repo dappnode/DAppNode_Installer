@@ -188,6 +188,17 @@ dappnode_start()
 
 installExtra() {
     if [ -d "/usr/src/dappnode/extra" ]; then
+         echo -e "\e[32minstallExtra will start in few seconds ... : " 2>&1 | tee -a $LOG_DIR
+        # wait 10 sec to DNS resolver to be up for debian site url access ok
+        sleep 10
+        for dependencies_file in /usr/src/dappnode/extra/*.dependencies; do
+            echo -e "\e[32minstallExtra. Deals dependencies file: $dependencies_file...\e[0m" 2>&1 | tee -a $LOG_DIR
+            while IFS="" read -r deb_link || [ -n "$deb_link" ]
+            do
+                echo -e "\e[32minstallExtra. Download .deb : $deb_link...\e[0m" 2>&1 | tee -a $LOG_DIR
+                eval "$WGET -P /usr/src/dappnode/extra/ \"${deb_link}\"" 2>&1 | tee -a $LOG_DIR
+            done < $dependencies_file
+        done
         dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOG_DIR
     fi
 }
