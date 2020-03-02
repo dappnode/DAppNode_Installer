@@ -114,6 +114,20 @@ install_docker_compose()
     fi
 }
 
+install_wireguard()
+{
+    ##############################################
+    ##############################################
+    ####      WIREGUARD INSTALLATION     ####
+    ##############################################
+    ##############################################
+
+    echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable.list
+    printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' > /etc/apt/preferences.d/limit-unstable
+    apt update | tee -a $LOG_FILE
+    apt -y install wireguard | tee -a $LOG_FILE
+}
+
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -140,4 +154,11 @@ if docker-compose -v >/dev/null 2>&1 ; then
     echo -e "\e[32m \n\n docker-compose is already installed \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
 else
     install_docker_compose 2>&1 | tee -a $LOG_FILE
+fi
+
+# Only install wireguard if needed
+if modprobe wireguard >/dev/null 2>&1 ; then
+    echo -e "\e[32m \n\n wireguard is already installed \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+else
+    install_wireguard 2>&1 | tee -a $LOG_FILE
 fi
