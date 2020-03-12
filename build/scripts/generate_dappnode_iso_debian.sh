@@ -1,9 +1,12 @@
 #!/bin/sh
 
-echo "Downloading debian ISO image: firmware-10.2.0-amd64-netinst.iso..."
-if [ ! -f /images/firmware-10.2.0-amd64-netinst.iso ]; then
-    wget https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/10.2.0+nonfree/amd64/iso-cd/firmware-10.2.0-amd64-netinst.iso \
-    -O /images/firmware-10.2.0-amd64-netinst.iso
+DEBIAN_VERSION=10.3.0
+BASE_IMAGE=firmware-$DEBIAN_VERSION-amd64-netinst.iso
+
+echo "Downloading debian ISO image: $BASE_IMAGE..."
+if [ ! -f /images/$BASE_IMAGE ]; then
+    wget https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/$DEBIAN_VERSION+nonfree/amd64/iso-cd/$BASE_IMAGE \
+        -O /images/$BASE_IMAGE
 fi
 echo "Done!"
 
@@ -12,12 +15,12 @@ rm -rf dappnode-iso
 rm DappNode-debian-*
 
 echo "Extracting the iso..."
-xorriso -osirrox on -indev /images/firmware-10.2.0-amd64-netinst.iso \
--extract / dappnode-iso
+xorriso -osirrox on -indev /images/$BASE_IMAGE \
+    -extract / dappnode-iso
 
 echo "Obtaining the isohdpfx.bin for hybrid ISO..."
-dd if=/images/firmware-10.2.0-amd64-netinst.iso bs=432 count=1 \
-of=dappnode-iso/isolinux/isohdpfx.bin
+dd if=/images/$BASE_IMAGE bs=432 count=1 \
+    of=dappnode-iso/isolinux/isohdpfx.bin
 
 cd dappnode-iso
 
@@ -26,7 +29,7 @@ mkdir dappnode
 cp -r ../dappnode/* dappnode/
 
 echo "Downloading third-party packages..."
-sed '1,/^\#\!ISOBUILD/!d' ../dappnode/scripts/dappnode_install_pre.sh > /tmp/vars.sh
+sed '1,/^\#\!ISOBUILD/!d' ../dappnode/scripts/dappnode_install_pre.sh >/tmp/vars.sh
 source /tmp/vars.sh
 mkdir -p dappnode/bin/docker
 cd dappnode/bin/docker
@@ -40,10 +43,10 @@ echo "Customizing preseed..."
 mkdir /tmp/makeinitrd
 cd install.amd
 cp initrd.gz /tmp/makeinitrd/
-if [[  ${UNATTENDED} == "true" ]]; then
-    if [[  ${FLAVOR} == "nvme" ]]; then
+if [[ ${UNATTENDED} == "true" ]]; then
+    if [[ ${FLAVOR} == "nvme" ]]; then
         cp ../../dappnode/scripts/preseed_unattended_nvme.cfg /tmp/makeinitrd/preseed.cfg
-        elif [[  ${FLAVOR} == "archive" ]]; then
+    elif [[ ${FLAVOR} == "archive" ]]; then
         cp ../../dappnode/scripts/preseed_unattended_archive.cfg /tmp/makeinitrd/preseed.cfg
     else
         cp ../../dappnode/scripts/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
@@ -53,11 +56,11 @@ else
 fi
 cd /tmp/makeinitrd
 gunzip initrd.gz
-cpio -id -H newc< initrd
-cat initrd | cpio -t > /tmp/list
-echo "preseed.cfg" >> /tmp/list
+cpio -id -H newc <initrd
+cat initrd | cpio -t >/tmp/list
+echo "preseed.cfg" >>/tmp/list
 rm initrd
-cpio -o -H newc < /tmp/list > initrd
+cpio -o -H newc </tmp/list >initrd
 gzip initrd
 cd -
 mv /tmp/makeinitrd/initrd.gz ./initrd.gz
@@ -72,10 +75,10 @@ cp ../boot/txt.cfg isolinux/txt.cfg
 cp ../boot/splash.png isolinux/splash.png
 
 echo "Fix md5 sum..."
-md5sum `find ! -name "md5sum.txt" ! -path "./isolinux/*" -type f` > md5sum.txt
+md5sum $(find ! -name "md5sum.txt" ! -path "./isolinux/*" -type f) >md5sum.txt
 
 echo "Generating new iso..."
 xorriso -as mkisofs -isohybrid-mbr isolinux/isohdpfx.bin \
--c isolinux/boot.cat -b isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 \
--boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
--isohybrid-gpt-basdat -o /images/DAppNode-debian-buster-amd64.iso .
+    -c isolinux/boot.cat -b isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 \
+    -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
+    -isohybrid-gpt-basdat -o /images/DAppNode-debian-buster-amd64.iso .

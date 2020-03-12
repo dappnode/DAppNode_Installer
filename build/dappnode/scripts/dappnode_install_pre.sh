@@ -1,9 +1,9 @@
 #!/bin/bash
 
 DAPPNODE_DIR="/usr/src/dappnode"
-DOCKER_PKG="docker-ce_18.09.5~3-0~debian-buster_amd64.deb"
-DOCKER_CLI_PKG="docker-ce-cli_18.09.5~3-0~debian-buster_amd64.deb"
-CONTAINERD_PKG="containerd.io_1.2.5-1_amd64.deb"
+DOCKER_PKG="docker-ce_19.03.8~3-0~debian-buster_amd64.deb"
+DOCKER_CLI_PKG="docker-ce-cli_19.03.8~3-0~debian-buster_amd64.deb"
+CONTAINERD_PKG="containerd.io_1.2.6-3_amd64.deb"
 DOCKER_REPO="https://download.docker.com/linux/debian/dists/buster/pool/stable/amd64"
 DOCKER_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_PKG}"
 DOCKER_CLI_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_CLI_PKG}"
@@ -12,12 +12,12 @@ DCMP_PATH="/usr/local/bin/docker-compose"
 DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
 DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
 CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
-DCMP_URL="https://github.com/docker/compose/releases/download/1.24.0/docker-compose-Linux-x86_64"
+DCMP_URL="https://github.com/docker/compose/releases/download/1.25.4/docker-compose-Linux-x86_64"
 WGET="wget -q --show-progress --progress=bar:force"
 
 #!ISOBUILD Do not modify, variables above imported for ISO build
 
-detect_installation_type(){
+detect_installation_type() {
     if [ -f "${DAPPNODE_DIR}/iso_install.log" ]; then
         LOG_FILE=${DAPPNODE_DIR}/iso_install.log
         ISO_INSTALLATION=true
@@ -27,14 +27,13 @@ detect_installation_type(){
     fi
 }
 
-install_docker()
-{
+install_docker() {
     ##############################################
     ##############################################
     ####          DOCKER INSTALLATION         ####
     ##############################################
     ##############################################
-    
+
     # STEP 0: Detect if it's a Debian 9 (stretch) installation
     # ----------------------------------------
     if [ -f "/etc/os-release" ] && grep -q "stretch" "/etc/os-release"; then
@@ -48,28 +47,27 @@ install_docker()
         DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
         DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
         CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
-        
-        
+
     fi
-    
+
     # STEP 1: Download files
     # ----------------------------------------
     [ -f $DOCKER_PATH ] || $WGET -O $DOCKER_PATH $DOCKER_URL
     [ -f $DOCKER_CLI_PATH ] || $WGET -O $DOCKER_CLI_PATH $DOCKER_CLI_URL
     [ -f $CONTAINERD_PATH ] || $WGET -O $CONTAINERD_PATH $CONTAINERD_URL
-    
+
     # STEP 2: Install packages
     # ----------------------------------------
     dpkg -i $CONTAINERD_PATH 2>&1 | tee -a $LOG_FILE
     dpkg -i $DOCKER_CLI_PATH 2>&1 | tee -a $LOG_FILE
     dpkg -i $DOCKER_PATH 2>&1 | tee -a $LOG_FILE
-    
+
     # Ensure xz is installed
     [ -f "/usr/bin/xz" ] || (apt-get update -y && apt-get install -y xz-utils)
-    
+
     USER=$(grep 1000 "/etc/passwd" | cut -f 1 -d:)
     [ -z "$USER" ] || usermod -aG docker "$USER"
-    
+
     # Disable check if ISO installation since it is not possible to check in this way
     if [ "$ISO_INSTALLATION" = "false" ]; then
         # Validate the installation of docker
@@ -82,26 +80,25 @@ install_docker()
     fi
 }
 
-install_docker_compose()
-{
+install_docker_compose() {
     ##############################################
     ##############################################
     ####      DOCKER COMPOSE INSTALLATION     ####
     ##############################################
     ##############################################
-    
+
     # STEP 0: Declare paths and directories
     # ----------------------------------------
-    
+
     # Ensure paths exist
     mkdir -p $(dirname "$DCMP_PATH") 2>&1 | tee -a $LOG_FILE
-    
+
     # STEP 1: Download files from a decentralized source
     # ----------------------------------------
     [ -f $DCMP_PATH ] || $WGET -O $DCMP_PATH $DCMP_URL
     # Give permissions
     chmod +x $DCMP_PATH 2>&1 | tee -a $LOG_FILE
-    
+
     # Disable check if ISO installation since it is not possible to check in this way
     if [ "$ISO_INSTALLATION" = "false" ]; then
         # Validate the installation of docker-compose
@@ -129,14 +126,14 @@ mkdir -p $(dirname "$DOCKER_PATH")
 touch $LOG_FILE
 
 # Only install docker if needed
-if docker -v >/dev/null 2>&1 ; then
+if docker -v >/dev/null 2>&1; then
     echo -e "\e[32m \n\n docker is already installed \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
 else
     install_docker 2>&1 | tee -a $LOG_FILE
 fi
 
 # Only install docker-compose if needed
-if docker-compose -v >/dev/null 2>&1 ; then
+if docker-compose -v >/dev/null 2>&1; then
     echo -e "\e[32m \n\n docker-compose is already installed \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
 else
     install_docker_compose 2>&1 | tee -a $LOG_FILE
