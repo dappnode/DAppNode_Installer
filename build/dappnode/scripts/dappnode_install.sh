@@ -150,6 +150,7 @@ addSwap() {
 
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
+    source "${PROFILE_FILE}"
     docker-compose $DNCORE_YMLS up -d 2>&1 | tee -a $LOG_DIR
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
 
