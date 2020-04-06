@@ -15,11 +15,6 @@ git clone -b "v${IPFS_VERSION}" https://github.com/dappnode/DNP_IPFS
 docker-compose -f ./DNP_IPFS/docker-compose-ipfs.yml build
 docker save ipfs.dnp.dappnode.eth:${IPFS_VERSION} | xz -e9vT0 >/images/ipfs.dnp.dappnode.eth_${IPFS_VERSION}.tar.xz
 
-echo "Cloning & building DNP_ETHFORWARD..."
-git clone -b "v${ETHFORWARD_VERSION}" https://github.com/dappnode/DNP_ETHFORWARD
-docker-compose -f ./DNP_ETHFORWARD/docker-compose-ethforward.yml build
-docker save ethforward.dnp.dappnode.eth:${ETHFORWARD_VERSION} | xz -e9vT0 >/images/ethforward.dnp.dappnode.eth_${ETHFORWARD_VERSION}.tar.xz
-
 echo "Cloning & building DNP_BIND..."
 git clone -b "v${BIND_VERSION}" https://github.com/dappnode/DNP_BIND
 docker-compose -f ./DNP_BIND/docker-compose-bind.yml build

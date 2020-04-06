@@ -9,7 +9,7 @@ error_exit() {
 echo "DAppNode Installation Test"
 echo "##########################"
 
-components=(BIND IPFS ETHFORWARD VPN WAMP DAPPMANAGER ADMIN WIFI)
+components=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
 
 if docker -v >/dev/null 2>&1; then
     echo -e "\e[32m Docker installed ok\n \e[0m"
