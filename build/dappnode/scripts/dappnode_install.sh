@@ -75,7 +75,8 @@ dappnode_core_build() {
         file="${comp}_FILE"
         if [[ ${!ver} == dev:* ]]; then
             echo "Cloning & building DNP_${comp}..."
-            pushd $DAPPNODE_CORE_DIR
+            TMPDIR=$(mktemp -d)
+            pushd $TMPDIR
             git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_${comp}
             # Change version in YAML to the custom one
             sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose.yml
@@ -98,7 +99,7 @@ dappnode_core_download() {
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_ENV_FILE ] || ( $WGET -O/dev/null -q \$${comp}_ENV && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV )"
-            # Download DAppNode Core env files if it's needed
+            # Download DAppNode Core manifest files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
     done
