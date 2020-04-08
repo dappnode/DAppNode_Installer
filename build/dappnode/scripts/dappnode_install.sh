@@ -1,28 +1,32 @@
 #!/bin/bash
 
-DAPPNODE_DIR="/usr/src/dappnode/"
-DAPPNODE_CORE_DIR="${DAPPNODE_DIR}DNCORE/"
-LOG_DIR="${DAPPNODE_DIR}dappnode_install.log"
+DAPPNODE_DIR="/usr/src/dappnode"
+DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
+LOG_DIR="${DAPPNODE_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
+PKGS=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
+CONTENT_HASH_PKGS=(geth openethereum)
+CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
     rm -rf $LOG_DIR
-    rm -rf ${DAPPNODE_CORE_DIR}docker-compose-*.yml
-    rm -rf ${DAPPNODE_CORE_DIR}dappnode_package-*.json
-    rm -rf ${DAPPNODE_CORE_DIR}*.tar.xz
-    rm -rf ${DAPPNODE_CORE_DIR}.dappnode_profile
+    rm -rf ${DAPPNODE_CORE_DIR}/docker-compose-*.yml
+    rm -rf ${DAPPNODE_CORE_DIR}/dappnode_package-*.json
+    rm -rf ${DAPPNODE_CORE_DIR}/*.tar.xz
+    rm -rf ${DAPPNODE_CORE_DIR}/.dappnode_profile
 fi
 
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
-mkdir -p "${DAPPNODE_CORE_DIR}scripts"
-mkdir -p "${DAPPNODE_DIR}config"
+mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
+mkdir -p "${DAPPNODE_DIR}/config"
 
 PROFILE_BRANCH="v0.2.27"
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
-PROFILE_FILE="${DAPPNODE_CORE_DIR}.dappnode_profile"
+PROFILE_FILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
 WGET="wget -q --show-progress --progress=bar:force"
+SWGET="wget -q -O-"
 
 function valid_ip() {
     local ip=$1
@@ -42,7 +46,7 @@ function valid_ip() {
 
 if [[ ! -z $STATIC_IP ]]; then
     if valid_ip $STATIC_IP; then
-        echo $STATIC_IP >${DAPPNODE_DIR}config/static_ip
+        echo $STATIC_IP >${DAPPNODE_DIR}/config/static_ip
     else
         echo "The static IP provided: ${STATIC_IP} is not valid."
         exit 1
@@ -53,24 +57,22 @@ fi
 
 source "${PROFILE_FILE}"
 
-components=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
-
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
-for comp in "${components[@]}"; do
+for comp in "${PKGS[@]}"; do
     ver="${comp}_VERSION"
     eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}.tar.xz\""
     eval "${comp}_YML=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/docker-compose.yml\""
     eval "${comp}_ENV=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth.env\""
     eval "${comp}_MANIFEST=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/dappnode_package.json\""
-    eval "${comp}_YML_FILE=\"${DAPPNODE_CORE_DIR}docker-compose-${comp,,}.yml\""
-    eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}${comp,,}.dnp.dappnode.eth_${!ver##*:}.tar.xz\""
-    eval "${comp}_ENV_FILE=\"${DAPPNODE_CORE_DIR}${comp,,}.dnp.dappnode.eth.env\""
-    eval "${comp}_MANIFEST_FILE=\"${DAPPNODE_CORE_DIR}dappnode_package-${comp,,}.json\""
+    eval "${comp}_YML_FILE=\"${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml\""
+    eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}/${comp,,}.dnp.dappnode.eth_${!ver##*:}.tar.xz\""
+    eval "${comp}_ENV_FILE=\"${DAPPNODE_CORE_DIR}/${comp,,}.dnp.dappnode.eth.env\""
+    eval "${comp}_MANIFEST_FILE=\"${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json\""
 done
 
 dappnode_core_build() {
-    for comp in "${components[@]}"; do
+    for comp in "${PKGS[@]}"; do
         ver="${comp}_VERSION"
         file="${comp}_FILE"
         if [[ ${!ver} == dev:* ]]; then
@@ -93,7 +95,7 @@ dappnode_core_build() {
 }
 
 dappnode_core_download() {
-    for comp in "${components[@]}"; do
+    for comp in "${PKGS[@]}"; do
         ver="${comp}_VERSION"
         if [[ ${!ver} != dev:* ]]; then
             # Download DAppNode Core Images if it's needed
@@ -109,7 +111,7 @@ dappnode_core_download() {
 }
 
 dappnode_core_load() {
-    for comp in "${components[@]}"; do
+    for comp in "${PKGS[@]}"; do
         ver="${comp}_VERSION"
         if [[ ${!ver} != dev:* ]]; then
             eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
@@ -164,7 +166,7 @@ dappnode_start() {
 
     if ! grep -q '.dappnode_profile' "$PROFILE"; then
         echo "########          DAPPNODE PROFILE          ########" >>$PROFILE
-        echo -e "source ${DAPPNODE_CORE_DIR}.dappnode_profile\n" >>$PROFILE
+        echo -e "source ${DAPPNODE_CORE_DIR}/.dappnode_profile\n" >>$PROFILE
     fi
 
     sed -i '/return/d' $PROFILE_FILE | tee -a $LOG_DIR
@@ -193,6 +195,13 @@ installExtra() {
     fi
 }
 
+grabContentHashes() {
+    for comp in "${CONTENT_HASH_PKGS[@]}"; do
+        CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash) 2>&1 | tee -a $LOG_DIR
+        echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${DAPPNODE_CORE_DIR}/packages-content-hash.csv
+    done
+}
+
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -213,6 +222,9 @@ customMotd
 
 echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOG_DIR
 installExtra
+
+echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOG_DIR
+grabContentHashes
 
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build
