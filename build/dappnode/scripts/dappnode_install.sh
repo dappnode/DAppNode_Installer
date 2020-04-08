@@ -75,6 +75,9 @@ dappnode_core_build() {
         file="${comp}_FILE"
         if [[ ${!ver} == dev:* ]]; then
             echo "Cloning & building DNP_${comp}..."
+            if ! dpkg -s git >/dev/null 2>&1; then
+                apt-get install -y git
+            fi
             TMPDIR=$(mktemp -d)
             pushd $TMPDIR
             git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_${comp}
@@ -151,7 +154,7 @@ addSwap() {
 
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
-    source "${PROFILE_FILE}"
+    source "${PROFILE_FILE}" >/dev/null 2>&1
     docker-compose $DNCORE_YMLS up -d 2>&1 | tee -a $LOG_DIR
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
 
@@ -166,8 +169,7 @@ dappnode_start() {
 
     sed -i '/return/d' $PROFILE_FILE | tee -a $LOG_DIR
 
-    if ! grep -q 'getAdminCredentials' "$PROFILE_FILE"; then
-        #echo "docker run --rm -ti -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets \$(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials" >>$PROFILE_FILE
+    if ! grep -q 'http://my.dappnode/' "$PROFILE_FILE"; then
         echo "echo -e \"\n\e[32mTo get a VPN profile file and connect to your DAppNode, run the following command:\e[0m\"" >>$PROFILE_FILE
         echo "echo -e \"\n\"" >>$PROFILE_FILE
         echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$PROFILE_FILE
@@ -175,10 +177,9 @@ dappnode_start() {
         echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >>$PROFILE_FILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$PROFILE_FILE
         echo -e "return\n" >>$PROFILE_FILE
-    else
-        # Run first generation
-        docker exec DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials
     fi
+    # Show credentials at shell installation
+    [ ! -f "/usr/src/dappnode/iso_install.log" ] && docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials
 
     # Delete dappnode_install.sh execution from rc.local if exists, and is not the unattended firstboot
     if [ -f "/etc/rc.local" ] && [ ! -f "/usr/src/dappnode/.firstboot" ]; then
@@ -232,6 +233,7 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
 fi
 
-[ ! -f "/usr/src/dappnode/iso_install.log" ] && source "${PROFILE_FILE}"
+echo -e "\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m"
+echo -e "\nhttp://my.dappnode/\n"
 
 exit 0
