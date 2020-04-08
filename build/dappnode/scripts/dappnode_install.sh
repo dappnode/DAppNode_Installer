@@ -196,6 +196,7 @@ installExtra() {
 }
 
 grabContentHashes() {
+    >${DAPPNODE_CORE_DIR}/packages-content-hash.csv
     for comp in "${CONTENT_HASH_PKGS[@]}"; do
         CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash) 2>&1 | tee -a $LOG_DIR
         echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${DAPPNODE_CORE_DIR}/packages-content-hash.csv
