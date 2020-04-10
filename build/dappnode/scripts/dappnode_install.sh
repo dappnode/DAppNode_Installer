@@ -2,7 +2,7 @@
 
 DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
-LOG_DIR="${DAPPNODE_DIR}/dappnode_install.log"
+LOGFILE="${DAPPNODE_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
 PKGS=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
 CONTENT_HASH_PKGS=(geth openethereum)
@@ -10,7 +10,7 @@ CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
-    rm -rf $LOG_DIR
+    rm -rf $LOGFILE
     rm -rf ${DAPPNODE_CORE_DIR}/docker-compose-*.yml
     rm -rf ${DAPPNODE_CORE_DIR}/dappnode_package-*.json
     rm -rf ${DAPPNODE_CORE_DIR}/*.tar.xz
@@ -114,12 +114,12 @@ dappnode_core_load() {
     for comp in "${PKGS[@]}"; do
         ver="${comp}_VERSION"
         if [[ ${!ver} != dev:* ]]; then
-            eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOG_DIR"
+            eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOGFILE"
         fi
     done
 
     # Delete build lines from yml
-    sed -i '/build:\|context:\|dockerfile/d' $DAPPNODE_CORE_DIR/*.yml | tee -a $LOG_DIR
+    sed -i '/build:\|context:\|dockerfile/d' $DAPPNODE_CORE_DIR/*.yml | tee -a $LOGFILE
 }
 
 customMotd() {
@@ -155,10 +155,10 @@ addSwap() {
 }
 
 dappnode_start() {
-    echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOG_DIR
+    echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
     source "${PROFILE_FILE}" >/dev/null 2>&1
-    docker-compose $DNCORE_YMLS up -d 2>&1 | tee -a $LOG_DIR
-    echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOG_DIR
+    docker-compose $DNCORE_YMLS up -d 2>&1 | tee -a $LOGFILE
+    echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOGFILE
 
     # Show credentials to the user on login
     USER=$(cat /etc/passwd | grep 1000 | cut -f 1 -d:)
@@ -169,7 +169,7 @@ dappnode_start() {
         echo -e "source ${DAPPNODE_CORE_DIR}/.dappnode_profile\n" >>$PROFILE
     fi
 
-    sed -i '/return/d' $PROFILE_FILE | tee -a $LOG_DIR
+    sed -i '/return/d' $PROFILE_FILE | tee -a $LOGFILE
 
     if ! grep -q 'http://my.dappnode/' "$PROFILE_FILE"; then
         echo "echo -e \"\n\e[32mTo get a VPN profile file and connect to your DAppNode, run the following command:\e[0m\"" >>$PROFILE_FILE
@@ -185,20 +185,24 @@ dappnode_start() {
 
     # Delete dappnode_install.sh execution from rc.local if exists, and is not the unattended firstboot
     if [ -f "/etc/rc.local" ] && [ ! -f "/usr/src/dappnode/.firstboot" ]; then
-        sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOG_DIR
+        sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOGFILE
     fi
 }
 
 installExtra() {
     if [ -d "/usr/src/dappnode/extra" ]; then
-        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOG_DIR
+        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOGFILE
     fi
 }
 
 grabContentHashes() {
     >${DAPPNODE_CORE_DIR}/packages-content-hash.csv
     for comp in "${CONTENT_HASH_PKGS[@]}"; do
-        CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash) 2>&1 | tee -a $LOG_DIR
+        CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash) 2>&1 | tee -a $LOGFILE
+        if [ -z "${CONTENT_HASH}"]; then
+            echo "ERROR! Failed to find content hash of ${comp}." 2>&1 | tee -a $LOGFILE
+            exit 1
+        fi
         echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${DAPPNODE_CORE_DIR}/packages-content-hash.csv
     done
 }
@@ -209,35 +213,35 @@ grabContentHashes() {
 ##############################################
 ##############################################
 
-echo -e "\e[32m\n##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
-echo -e "\e[32m####          DAPPNODE INSTALLER          ####\e[0m" 2>&1 | tee -a $LOG_DIR
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32m\n##############################################\e[0m" 2>&1 | tee -a $LOGFILE
+echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
+echo -e "\e[32m####          DAPPNODE INSTALLER          ####\e[0m" 2>&1 | tee -a $LOGFILE
+echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
+echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 
-echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOGFILE
 addSwap
 
-echo -e "\e[32mCustomizing login...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mCustomizing login...\e[0m" 2>&1 | tee -a $LOGFILE
 customMotd
 
-echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOGFILE
 installExtra
 
-echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
 
-echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOGFILE
 dappnode_core_build
 
-echo -e "\e[32mDownloading DAppNode Core...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mDownloading DAppNode Core...\e[0m" 2>&1 | tee -a $LOGFILE
 dappnode_core_download
 
-echo -e "\e[32mLoading DAppNode Core...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mLoading DAppNode Core...\e[0m" 2>&1 | tee -a $LOGFILE
 dappnode_core_load
 
 if [ ! -f "/usr/src/dappnode/.firstboot" ]; then
-    echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOG_DIR
+    echo -e "\e[32mDAppNode installed\e[0m" 2>&1 | tee -a $LOGFILE
     dappnode_start
 fi
 
