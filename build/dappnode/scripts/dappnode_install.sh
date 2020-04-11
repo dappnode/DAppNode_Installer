@@ -16,6 +16,7 @@ if [ "$UPDATE" = true ]; then
     rm -rf ${DAPPNODE_CORE_DIR}/dappnode_package-*.json
     rm -rf ${DAPPNODE_CORE_DIR}/*.tar.xz
     rm -rf ${DAPPNODE_CORE_DIR}/.dappnode_profile
+    rm -rf ${CONTENT_HASH_FILE}
 fi
 
 mkdir -p $DAPPNODE_DIR
@@ -197,15 +198,16 @@ installExtra() {
 }
 
 grabContentHashes() {
-    >${DAPPNODE_CORE_DIR}/packages-content-hash.csv
-    for comp in "${CONTENT_HASH_PKGS[@]}"; do
-        CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
-        if [ -z $CONTENT_HASH ]; then
-            echo "ERROR! Failed to find content hash of ${comp}." 2>&1 | tee -a $LOGFILE
-            exit 1
-        fi
-        echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${DAPPNODE_CORE_DIR}/packages-content-hash.csv
-    done
+    if [ ! -f "${DAPPNODE_HASH_FILE}" ]; then
+        for comp in "${CONTENT_HASH_PKGS[@]}"; do
+            CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
+            if [ -z $CONTENT_HASH ]; then
+                echo "ERROR! Failed to find content hash of ${comp}." 2>&1 | tee -a $LOGFILE
+                exit 1
+            fi
+            echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${DAPPNODE_HASH_FILE}
+        done
+    fi
 }
 
 ##############################################
