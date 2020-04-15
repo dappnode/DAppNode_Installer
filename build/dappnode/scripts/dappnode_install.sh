@@ -5,8 +5,7 @@ DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 LOGFILE="${DAPPNODE_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
 PKGS=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
-CONTENT_HASH_PKGS=(geth)
-#CONTENT_HASH_PKGS=(geth openethereum nethermind)
+CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 
 if [ "$UPDATE" = true ]; then
@@ -198,14 +197,14 @@ installExtra() {
 }
 
 grabContentHashes() {
-    if [ ! -f "${DAPPNODE_HASH_FILE}" ]; then
+    if [ ! -f "${CONTENT_HASH_FILE}" ]; then
         for comp in "${CONTENT_HASH_PKGS[@]}"; do
             CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
             if [ -z $CONTENT_HASH ]; then
                 echo "ERROR! Failed to find content hash of ${comp}." 2>&1 | tee -a $LOGFILE
                 exit 1
             fi
-            echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${DAPPNODE_HASH_FILE}
+            echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${CONTENT_HASH_FILE}
         done
     fi
 }

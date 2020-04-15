@@ -1,9 +1,13 @@
 #!/bin/bash
 
-source ./.dappnode_profile
+sed '1,/^\#\!ISOBUILD/!d' ./.dappnode_profile >/tmp/vars.sh
+source /tmp/vars.sh
 
 DAPPNODE_CORE_DIR="/images/"
+DAPPNODE_HASH_FILE="${DAPPNODE_CORE_DIR}packages-content-hash.csv"
+CONTENT_HASH_PKGS=(geth openethereum nethermind)
 
+SWGET="wget -q -O-"
 WGET="wget"
 
 components=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
@@ -32,16 +36,30 @@ dappnode_core_download() {
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
             # Download DAppNode Core env files if it's needed
             eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O/dev/null -q \$${comp}_ENV 2>&1 >/dev/null && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV 2>&1 >/dev/null"
-            # Create DAppNode Core empty env files if missing
-            eval "[ -f \$${comp}_ENV_FILE ] || touch \$${comp}_ENV_FILE"
-            # Download DAppNode Core env files if it's needed
+            # Download DAppNode Core manifest files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
     done
 }
 
+grabContentHashes() {
+    rm -f $DAPPNODE_HASH_FILE
+    for comp in "${CONTENT_HASH_PKGS[@]}"; do
+        echo "Grabbing ${comp}"
+        CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
+        if [ -z $CONTENT_HASH ]; then
+            echo "ERROR! Failed to find content hash of ${comp}."
+            exit 1
+        fi
+        echo "${comp}.dnp.dappnode.eth,${CONTENT_HASH}" >>${DAPPNODE_HASH_FILE}
+    done
+}
+
 echo -e "\e[32mDownloading DAppNode Core...\e[0m"
 dappnode_core_download
+
+echo -e "\e[32mGrabbing latest content hashes...\e[0m"
+grabContentHashes
 
 mkdir -p dappnode/DNCORE
 
@@ -50,4 +68,5 @@ cp /images/*.tar.xz dappnode/DNCORE
 cp /images/*.yml dappnode/DNCORE
 cp /images/*.json dappnode/DNCORE
 cp /images/*.env dappnode/DNCORE
+cp ${DAPPNODE_HASH_FILE} dappnode/DNCORE
 cp ./.dappnode_profile dappnode/DNCORE

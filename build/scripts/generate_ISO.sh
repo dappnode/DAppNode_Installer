@@ -1,11 +1,12 @@
 #!/bin/sh
+set -e
+
 dockerd &
-sleep 5;
+sleep 5
 
 if [ "$CLEAN" = true ]; then
     rm -f /images/*.tar.xz
     rm -f /images/*.yml
-    rm -f /images/*.env
     rm -f /images/*.json
 fi
 
