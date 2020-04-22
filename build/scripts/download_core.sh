@@ -18,11 +18,9 @@ for comp in "${components[@]}"; do
     ver="${comp}_VERSION"
     eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}.tar.xz\""
     eval "${comp}_YML=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/docker-compose.yml\""
-    eval "${comp}_ENV=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth.env\""
     eval "${comp}_MANIFEST=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/dappnode_package.json\""
     eval "${comp}_YML_FILE=\"${DAPPNODE_CORE_DIR}docker-compose-${comp,,}.yml\""
     eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}${comp,,}.dnp.dappnode.eth_${!ver##*:}.tar.xz\""
-    eval "${comp}_ENV_FILE=\"${DAPPNODE_CORE_DIR}${comp,,}.dnp.dappnode.eth.env\""
     eval "${comp}_MANIFEST_FILE=\"${DAPPNODE_CORE_DIR}dappnode_package-${comp,,}.json\""
 done
 
@@ -34,8 +32,6 @@ dappnode_core_download() {
             eval "[ -f \$${comp}_FILE ] || $WGET -O \$${comp}_FILE \$${comp}_URL"
             # Download DAppNode Core docker-compose yml files if it's needed
             eval "[ -f \$${comp}_YML_FILE ] || $WGET -O \$${comp}_YML_FILE \$${comp}_YML"
-            # Download DAppNode Core env files if it's needed
-            eval "[ -f \$${comp}_ENV_FILE ] || $WGET -O/dev/null -q \$${comp}_ENV 2>&1 >/dev/null && $WGET -O \$${comp}_ENV_FILE \$${comp}_ENV 2>&1 >/dev/null"
             # Download DAppNode Core manifest files if it's needed
             eval "[ -f \$${comp}_MANIFEST_FILE ] || $WGET -O \$${comp}_MANIFEST_FILE \$${comp}_MANIFEST"
         fi
@@ -67,6 +63,5 @@ echo -e "\e[32mCopying files...\e[0m"
 cp /images/*.tar.xz dappnode/DNCORE
 cp /images/*.yml dappnode/DNCORE
 cp /images/*.json dappnode/DNCORE
-cp /images/*.env dappnode/DNCORE
 cp ${DAPPNODE_HASH_FILE} dappnode/DNCORE
 cp ./.dappnode_profile dappnode/DNCORE
