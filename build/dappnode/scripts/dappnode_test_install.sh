@@ -9,15 +9,15 @@ error_exit() {
 echo "DAppNode Installation Test"
 echo "##########################"
 
-components=(BIND IPFS ETHCHAIN ETHFORWARD VPN WAMP DAPPMANAGER ADMIN WIFI)
+components=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
 
-if docker -v >/dev/null 2>&1 ; then
+if docker -v >/dev/null 2>&1; then
     echo -e "\e[32m Docker installed ok\n \e[0m"
 else
     error_exit
 fi
 
-if docker-compose -v >/dev/null 2>&1 ; then
+if docker-compose -v >/dev/null 2>&1; then
     echo -e "\e[32m docker-compose installed ok\n \e[0m"
 else
     error_exit
@@ -34,4 +34,3 @@ done
 
 rm /usr/src/dappnode/.firstboot
 read -r -p "Test completed successfully. Press enter to continue"
-

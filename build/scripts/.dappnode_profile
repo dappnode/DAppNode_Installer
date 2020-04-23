@@ -1,32 +1,22 @@
 #!/bin/bash
 
-export BIND_VERSION="${BIND_VERSION:-0.2.1}"
-export IPFS_VERSION="${IPFS_VERSION:-0.2.4}"
-export ETHCHAIN_VERSION="${ETHCHAIN_VERSION:-0.2.20}"
-export ETHFORWARD_VERSION="${ETHFORWARD_VERSION:-0.2.3}"
-export VPN_VERSION="${VPN_VERSION:-0.2.4}"
-export WAMP_VERSION="${WAMP_VERSION:-0.2.0}"
-export ADMIN_VERSION="${ADMIN_VERSION:-0.2.15}"
-export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.24}"
-export WIFI_VERSION="${WIFI_VERSION:-0.2.0}"
+export BIND_VERSION="${BIND_VERSION:-0.2.2}"
+export IPFS_VERSION="${IPFS_VERSION:-0.2.6}"
+export VPN_VERSION="${VPN_VERSION:-0.2.5}"
+export WAMP_VERSION="${WAMP_VERSION:-0.2.2}"
+export ADMIN_VERSION="${ADMIN_VERSION:-0.2.17}"
+export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.25}"
+export WIFI_VERSION="${WIFI_VERSION:-0.2.2}"
 
 export DAPPNODE_DIR="/usr/src/dappnode"
 export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE/"
 
-export BIND_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-bind.yml"
-export IPFS_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-ipfs.yml"
-export ETHCHAIN_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-ethchain.yml"
-export ETHFORWARD_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-ethforward.yml"
-export VPN_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-vpn.yml"
-export WAMP_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-wamp.yml"
-export DAPPMANAGER_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-dappmanager.yml"
-export ADMIN_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-admin.yml"
-export WIFI_YML_FILE="${DAPPNODE_CORE_DIR}docker-compose-wifi.yml"
-
-
-alias dappnode_status='docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE -f $WIFI_YML_FILE ps'
-alias dappnode_stop='docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE -f $WIFI_YML_FILE stop && docker stop $(docker container ls -a -q -f name=DAppNode*)'
-alias dappnode_start='docker-compose -f $BIND_YML_FILE -f $IPFS_YML_FILE -f $ETHCHAIN_YML_FILE -f $ETHFORWARD_YML_FILE -f $VPN_YML_FILE -f $WAMP_YML_FILE -f $DAPPMANAGER_YML_FILE -f $ADMIN_YML_FILE -f $WIFI_YML_FILE up -d && docker start $(docker container ls -a -q -f name=DAppNode*)'
-alias dappnode_get='docker exec -t DAppNodeCore-vpn.dnp.dappnode.eth vpncli get'
+#!ISOBUILD Do not modify, variables above imported for ISO build
+DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")
+alias dappnode_status='docker-compose $DNCORE_YMLS ps'
+alias dappnode_stop='docker-compose $DNCORE_YMLS stop && docker stop $(docker container ls -a -q -f name=DAppNode*)'
+alias dappnode_start='docker-compose $DNCORE_YMLS up -d && docker start $(docker container ls -a -q -f name=DAppNode*)'
+alias dappnode_get='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth vpncli get'
+alias dappnode_connect='docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials'
 
 return
