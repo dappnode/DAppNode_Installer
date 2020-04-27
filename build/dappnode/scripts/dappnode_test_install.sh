@@ -11,7 +11,17 @@ date
 echo "Serial: ${SERIAL}"
 echo "################################"
 
+<<<<<<< HEAD
 components=(BIND IPFS VPN DAPPMANAGER WIFI)
+=======
+if ping -c 1 -q google.com >&/dev/null; then
+    echo -e "\e[32m Connectivity OK\n \e[0m"
+else
+    error_exit
+fi
+
+components=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
+>>>>>>> 32c3e4a... Check ethernet connectivity
 
 if docker -v >/dev/null 2>&1; then
     echo -e "\e[32m Docker installed ok\e[0m"
