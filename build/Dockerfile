@@ -56,6 +56,7 @@ WORKDIR /usr/src/app
 
 ADD scripts/* ./
 ADD dappnode dappnode
+ADD firmware firmware
 ADD boot boot
 
 CMD ["/usr/src/app/generate_ISO.sh"] 
