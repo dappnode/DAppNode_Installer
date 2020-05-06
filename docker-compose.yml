@@ -8,6 +8,6 @@ services:
       - BUILD=false
       - CLEAN=false
       - UNATTENDED=true
-      - FLAVOR=nvme
+      - FLAVOR=archive
     volumes:
       - ./images:/images
