@@ -20,20 +20,10 @@ git clone -b "v${BIND_VERSION}" https://github.com/dappnode/DNP_BIND
 docker-compose -f ./DNP_BIND/docker-compose-bind.yml build
 docker save bind.dnp.dappnode.eth:${BIND_VERSION} | xz -e9vT0 >/images/bind.dnp.dappnode.eth_${BIND_VERSION}.tar.xz
 
-echo "Cloning & building DNP_WAMP..."
-git clone -b "v${WAMP_VERSION}" https://github.com/dappnode/DNP_WAMP
-docker-compose -f ./DNP_WAMP/docker-compose-wamp.yml build
-docker save wamp.dnp.dappnode.eth:${WAMP_VERSION} | xz -e9vT0 >/images/wamp.dnp.dappnode.eth_${WAMP_VERSION}.tar.xz
-
 echo "Cloning & building DNP_DAPPMANAGER..."
 git clone -b "v${DAPPMANAGER_VERSION}" https://github.com/dappnode/DNP_DAPPMANAGER
 docker-compose -f ./DNP_DAPPMANAGER/docker-compose-dappmanager.yml build
 docker save dappmanager.dnp.dappnode.eth:${DAPPMANAGER_VERSION} | xz -e9vT0 >/images/dappmanager.dnp.dappnode.eth_${DAPPMANAGER_VERSION}.tar.xz
-
-echo "Cloning & building DNP_ADMIN..."
-git clone -b "v${ADMIN_VERSION}" https://github.com/dappnode/DNP_ADMIN
-docker-compose -f ./DNP_ADMIN/docker-compose-admin.yml build
-docker save admin.dnp.dappnode.eth:${ADMIN_VERSION} | xz -e9vT0 >/images/admin.dnp.dappnode.eth_${ADMIN_VERSION}.tar.xz
 
 echo "Coping dappnode_all_docker_images.tar.xz to dappnode dir..."
 cp /images/* dappnode/
