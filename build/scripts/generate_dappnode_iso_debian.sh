@@ -39,7 +39,7 @@ cp -r ../dappnode/* dappnode/
 cp -vr /images/bin dappnode/
 
 echo "Customizing preseed..."
-mkdir /tmp/makeinitrd
+mkdir -p /tmp/makeinitrd
 cd install.amd
 cp initrd.gz /tmp/makeinitrd/
 if [[ ${UNATTENDED} == "true" ]]; then
