@@ -23,7 +23,7 @@ mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
 
-PROFILE_BRANCH="master"
+PROFILE_BRANCH="monolithic"
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
 WGET="wget -q --show-progress --progress=bar:force"
@@ -173,7 +173,7 @@ dappnode_start() {
         echo "echo -e \"\n\"" >>$PROFILE_FILE
         echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$PROFILE_FILE
         echo "echo -e \"\n\"" >>$PROFILE_FILE
-        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >>$PROFILE_FILE
+        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the admin UI by following this link:\e[0m\"" >>$PROFILE_FILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$PROFILE_FILE
         echo -e "return\n" >>$PROFILE_FILE
     fi
@@ -248,7 +248,7 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
 fi
 
-echo -e "\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m"
+echo -e "\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the admin UI by following this link:\e[0m"
 echo -e "\nhttp://my.dappnode/\n"
 
 exit 0
