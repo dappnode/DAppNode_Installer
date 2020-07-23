@@ -169,11 +169,9 @@ dappnode_start() {
     sed -i '/return/d' $DAPPNODE_PROFILE | tee -a $LOGFILE
 
     if ! grep -q 'http://my.dappnode/' "$DAPPNODE_PROFILE"; then
-        echo "echo -e \"\n\e[32mTo get a VPN profile file and connect to your DAppNode, run the following command:\e[0m\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\n\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nTo get a VPN profile file and connect to your DAppNode, run the following command:\"" >>$DAPPNODE_PROFILE
         echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\n\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the admin UI by following this link:\e[0m\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nOnce connected through the VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
         echo -e "return\n" >>$DAPPNODE_PROFILE
     fi
