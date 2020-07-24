@@ -7,6 +7,7 @@ MOTD_FILE="/etc/motd"
 PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
+CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
 
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
@@ -203,6 +204,15 @@ grabContentHashes() {
     fi
 }
 
+loadCreds() {
+    until eval ${CRED_CMD} &>/dev/null; do
+        echo -en "\e[32m.\e[0m"
+        sleep 2
+    done
+    echo
+    eval ${CRED_CMD}
+}
+
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -244,8 +254,10 @@ fi
 # Run test in interactive terminal
 if [ -f "/usr/src/dappnode/.firstboot" ]; then
     openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
+    exit 0
 fi
 
-source "${DAPPNODE_PROFILE}"
+echo -en "\e[32mWaiting for the VPN credentials, please wait ...\e[0m" 2>&1 | tee -a $LOGFILE
+loadCreds
 
 exit 0
