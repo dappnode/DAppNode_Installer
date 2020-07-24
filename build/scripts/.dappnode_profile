@@ -7,7 +7,7 @@ export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.33}"
 export WIFI_VERSION="${WIFI_VERSION:-0.2.3}"
 
 export DAPPNODE_DIR="/usr/src/dappnode"
-export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE/"
+export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 
 #!ISOBUILD Do not modify, variables above imported for ISO build
 DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")

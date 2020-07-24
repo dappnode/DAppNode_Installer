@@ -85,8 +85,8 @@ dappnode_core_build() {
             # Change version in YAML to the custom one
             sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose.yml
             docker-compose -f ./DNP_${comp}/docker-compose.yml build
-            cp ./DNP_${comp}/docker-compose.yml $DAPPNODE_CORE_DIR/docker-compose-${comp,,}.yml
-            cp ./DNP_${comp}/dappnode_package.json $DAPPNODE_CORE_DIR/dappnode_package-${comp,,}.json
+            cp ./DNP_${comp}/docker-compose.yml ${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml
+            cp ./DNP_${comp}/dappnode_package.json ${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json
             rm -r ./DNP_${comp}
             popd
         fi
@@ -116,7 +116,7 @@ dappnode_core_load() {
     done
 
     # Delete build lines from yml
-    sed -i '/build:\|context:\|dockerfile/d' $DAPPNODE_CORE_DIR/*.yml | tee -a $LOGFILE
+    sed -i '/build:\|context:\|dockerfile/d' ${DAPPNODE_CORE_DIR}/*.yml | tee -a $LOGFILE
 }
 
 customMotd() {
