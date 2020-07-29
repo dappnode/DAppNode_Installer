@@ -263,7 +263,8 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     exit 0
 fi
 
-echo -en "\e[32mWaiting for the VPN credentials, please wait ...\e[0m" 2>&1 | tee -a $LOGFILE
-loadCreds
+# Wait for credentials if installed from script
+[ ! -f "/usr/src/dappnode/iso_install.log" ] && echo -en "\e[32mWaiting for the VPN credentials, please wait ...\e[0m" 2>&1 | tee -a $LOGFILE
+[ ! -f "/usr/src/dappnode/iso_install.log" ] && loadCreds
 
 exit 0
