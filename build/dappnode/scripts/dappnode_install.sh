@@ -8,7 +8,6 @@ PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
-CRED_CMD_COUNT=0
 
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
@@ -205,20 +204,6 @@ grabContentHashes() {
     fi
 }
 
-loadCreds() {
-    until eval ${CRED_CMD} &>/dev/null; do
-        echo -en "\e[32m.\e[0m"
-        sleep 2
-        ((CRED_CMD_COUNT += 1))
-        if [ $CRED_CMD_COUNT -gt 10 ]; then
-            echo -e "\e[31mError generating VPN link!\e[0m" 2>&1 | tee -a $LOGFILE
-            exit 1
-        fi
-    done
-    echo
-    eval ${CRED_CMD}
-}
-
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -263,8 +248,7 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     exit 0
 fi
 
-# Wait for credentials if installed from script
-[ ! -f "/usr/src/dappnode/iso_install.log" ] && echo -en "\e[32mWaiting for the VPN credentials, please wait ...\e[0m" 2>&1 | tee -a $LOGFILE
-[ ! -f "/usr/src/dappnode/iso_install.log" ] && loadCreds
+# Show credentials if installed from script
+[ ! -f "/usr/src/dappnode/iso_install.log" ] && eval ${CRED_CMD}
 
 exit 0
