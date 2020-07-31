@@ -1,15 +1,13 @@
 #!/bin/bash
 
-export BIND_VERSION="${BIND_VERSION:-0.2.4}"
-export IPFS_VERSION="${IPFS_VERSION:-0.2.9}"
-export VPN_VERSION="${VPN_VERSION:-0.2.5}"
-export WAMP_VERSION="${WAMP_VERSION:-0.2.2}"
-export ADMIN_VERSION="${ADMIN_VERSION:-0.2.20}"
-export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.32}"
+export BIND_VERSION="${BIND_VERSION:-0.2.5}"
+export IPFS_VERSION="${IPFS_VERSION:-0.2.10}"
+export VPN_VERSION="${VPN_VERSION:-0.2.6}"
+export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.33}"
 export WIFI_VERSION="${WIFI_VERSION:-0.2.3}"
 
 export DAPPNODE_DIR="/usr/src/dappnode"
-export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE/"
+export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 
 #!ISOBUILD Do not modify, variables above imported for ISO build
 DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")
@@ -17,6 +15,6 @@ alias dappnode_status='docker-compose $DNCORE_YMLS ps'
 alias dappnode_stop='docker-compose $DNCORE_YMLS stop && docker stop $(docker container ls -a -q -f name=DAppNode*)'
 alias dappnode_start='docker-compose $DNCORE_YMLS up -d && docker start $(docker container ls -a -q -f name=DAppNode*)'
 alias dappnode_get='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth vpncli get'
-alias dappnode_connect='docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials'
+alias dappnode_connect='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials'
 
 return

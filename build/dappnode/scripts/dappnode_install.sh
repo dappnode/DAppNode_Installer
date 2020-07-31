@@ -4,9 +4,10 @@ DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 LOGFILE="${DAPPNODE_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
-PKGS=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
+PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
+CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
 
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
@@ -25,7 +26,7 @@ mkdir -p "${DAPPNODE_DIR}/config"
 
 PROFILE_BRANCH="master"
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
-PROFILE_FILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
+DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
 WGET="wget -q --show-progress --progress=bar:force"
 SWGET="wget -q -O-"
 
@@ -54,9 +55,9 @@ if [[ ! -z $STATIC_IP ]]; then
     fi
 fi
 
-[ -f $PROFILE_FILE ] || ${WGET} -O ${PROFILE_FILE} ${PROFILE_URL}
+[ -f $DAPPNODE_PROFILE ] || ${WGET} -O ${DAPPNODE_PROFILE} ${PROFILE_URL}
 
-source "${PROFILE_FILE}"
+source "${DAPPNODE_PROFILE}"
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
@@ -85,8 +86,8 @@ dappnode_core_build() {
             # Change version in YAML to the custom one
             sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose.yml
             docker-compose -f ./DNP_${comp}/docker-compose.yml build
-            cp ./DNP_${comp}/docker-compose.yml $DAPPNODE_CORE_DIR/docker-compose-${comp,,}.yml
-            cp ./DNP_${comp}/dappnode_package.json $DAPPNODE_CORE_DIR/dappnode_package-${comp,,}.json
+            cp ./DNP_${comp}/docker-compose.yml ${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml
+            cp ./DNP_${comp}/dappnode_package.json ${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json
             rm -r ./DNP_${comp}
             popd
         fi
@@ -116,7 +117,7 @@ dappnode_core_load() {
     done
 
     # Delete build lines from yml
-    sed -i '/build:\|context:\|dockerfile/d' $DAPPNODE_CORE_DIR/*.yml | tee -a $LOGFILE
+    sed -i '/build:\|context:\|dockerfile/d' ${DAPPNODE_CORE_DIR}/*.yml | tee -a $LOGFILE
 }
 
 customMotd() {
@@ -153,7 +154,7 @@ addSwap() {
 
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
-    source "${PROFILE_FILE}" >/dev/null 2>&1
+    source "${DAPPNODE_PROFILE}" >/dev/null 2>&1
     docker-compose $DNCORE_YMLS up -d 2>&1 | tee -a $LOGFILE
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOGFILE
 
@@ -161,24 +162,22 @@ dappnode_start() {
     USER=$(cat /etc/passwd | grep 1000 | cut -f 1 -d:)
     [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
-    if ! grep -q '.dappnode_profile' "$PROFILE"; then
+    if ! grep -q "${DAPPNODE_PROFILE}" "$PROFILE"; then
         echo "########          DAPPNODE PROFILE          ########" >>$PROFILE
-        echo -e "source ${DAPPNODE_CORE_DIR}/.dappnode_profile\n" >>$PROFILE
+        echo -e "source ${DAPPNODE_PROFILE}\n" >>$PROFILE
     fi
 
-    sed -i '/return/d' $PROFILE_FILE | tee -a $LOGFILE
+    sed -i '/return/d' $DAPPNODE_PROFILE | tee -a $LOGFILE
 
-    if ! grep -q 'http://my.dappnode/' "$PROFILE_FILE"; then
-        echo "echo -e \"\n\e[32mTo get a VPN profile file and connect to your DAppNode, run the following command:\e[0m\"" >>$PROFILE_FILE
-        echo "echo -e \"\n\"" >>$PROFILE_FILE
-        echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$PROFILE_FILE
-        echo "echo -e \"\n\"" >>$PROFILE_FILE
-        echo "echo -e \"\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m\"" >>$PROFILE_FILE
-        echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$PROFILE_FILE
-        echo -e "return\n" >>$PROFILE_FILE
+    if ! grep -q 'http://my.dappnode/' "$DAPPNODE_PROFILE"; then
+        echo "echo -e \"\nTo get a VPN profile file and connect to your DAppNode, run the following command:\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nOnce connected through the VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
+        echo -e "return\n" >>$DAPPNODE_PROFILE
     fi
     # Show credentials at shell installation
-    [ ! -f "/usr/src/dappnode/iso_install.log" ] && docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials
+    # [ ! -f "/usr/src/dappnode/iso_install.log" ] && docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials
 
     # Delete dappnode_install.sh execution from rc.local if exists, and is not the unattended firstboot
     if [ -f "/etc/rc.local" ] && [ ! -f "/usr/src/dappnode/.firstboot" ]; then
@@ -246,9 +245,10 @@ fi
 # Run test in interactive terminal
 if [ -f "/usr/src/dappnode/.firstboot" ]; then
     openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
+    exit 0
 fi
 
-echo -e "\n\e[32mOnce connected through the VPN (OpenVPN) you can access to the administration console by following this link:\e[0m"
-echo -e "\nhttp://my.dappnode/\n"
+# Show credentials if installed from script
+[ ! -f "/usr/src/dappnode/iso_install.log" ] && eval ${CRED_CMD}
 
 exit 0

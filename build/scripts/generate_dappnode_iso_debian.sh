@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-echo "Downloading debian ISO image: firmware-10.3.0-amd64-netinst.iso..."
-if [ ! -f /images/firmware-10.3.0-amd64-netinst.iso ]; then
-    wget https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/10.3.0+nonfree/amd64/iso-cd/firmware-10.3.0-amd64-netinst.iso \
-        -O /images/firmware-10.3.0-amd64-netinst.iso
+echo "Downloading debian ISO image: debian-firmware-testing-amd64-netinst-2020-06-22.iso..."
+if [ ! -f /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso ]; then
+    wget http://vdo.dappnode.io/debian-firmware-testing-amd64-netinst-2020-06-22.iso \
+        -O /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso
 fi
 echo "Done!"
 
@@ -13,11 +13,11 @@ rm -rf dappnode-iso
 rm -rf DappNode-debian-*
 
 echo "Extracting the iso..."
-xorriso -osirrox on -indev /images/firmware-10.3.0-amd64-netinst.iso \
+xorriso -osirrox on -indev /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso \
     -extract / dappnode-iso
 
 echo "Obtaining the isohdpfx.bin for hybrid ISO..."
-dd if=/images/firmware-10.3.0-amd64-netinst.iso bs=432 count=1 \
+dd if=/images/debian-firmware-testing-amd64-netinst-2020-06-22.iso bs=432 count=1 \
     of=dappnode-iso/isolinux/isohdpfx.bin
 
 cd dappnode-iso
@@ -39,7 +39,7 @@ cp -r ../dappnode/* dappnode/
 cp -vr /images/bin dappnode/
 
 echo "Customizing preseed..."
-mkdir /tmp/makeinitrd
+mkdir -p /tmp/makeinitrd
 cd install.amd
 cp initrd.gz /tmp/makeinitrd/
 if [[ ${UNATTENDED} == "true" ]]; then
@@ -80,4 +80,4 @@ echo "Generating new iso..."
 xorriso -as mkisofs -isohybrid-mbr isolinux/isohdpfx.bin \
     -c isolinux/boot.cat -b isolinux/isolinux.bin -no-emul-boot -boot-load-size 4 \
     -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
-    -isohybrid-gpt-basdat -o /images/DAppNode-debian-buster-amd64.iso .
+    -isohybrid-gpt-basdat -o /images/DAppNode-debian-bullseye-amd64.iso .

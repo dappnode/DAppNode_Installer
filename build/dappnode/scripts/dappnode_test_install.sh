@@ -5,31 +5,43 @@ error_exit() {
     read -r -p "Check installation source. Press enter to continue"
     exit 1
 }
-
+SERIAL=$(dmidecode -s system-serial-number)
 echo "DAppNode Installation Test"
-echo "##########################"
+date
+echo "Serial: ${SERIAL}"
+echo "################################"
 
-components=(BIND IPFS VPN WAMP DAPPMANAGER ADMIN WIFI)
+components=(BIND IPFS VPN DAPPMANAGER WIFI)
 
 if docker -v >/dev/null 2>&1; then
-    echo -e "\e[32m Docker installed ok\n \e[0m"
+    echo -e "\e[32m Docker installed ok\e[0m"
 else
     error_exit
 fi
 
 if docker-compose -v >/dev/null 2>&1; then
-    echo -e "\e[32m docker-compose installed ok\n \e[0m"
+    echo -e "\e[32m docker-compose installed ok\e[0m"
 else
     error_exit
 fi
 
 for comp in "${components[@]}"; do
     if docker images | grep "${comp,,}" >/dev/null 2>&1; then
-        echo -e "\e[32m ${comp} docker image loaded ok\n \e[0m"
+        echo -e "\e[32m ${comp} docker image loaded ok\e[0m"
     else
-        echo -e "\e[31m ${comp} docker image not loaded ok! \n \e[0m"
+        echo -e "\e[31m ${comp} docker image not loaded ok!\e[0m"
         error_exit
     fi
+done
+
+echo -e "\e[32m docker image versions:\e[0m"
+docker images | grep dappnode | awk '{print $1, $2}'
+
+echo -e "\e[32m doing docker image integrity test...\e[0m"
+imgs=$(docker images | grep dappnode | awk '{print $3}')
+
+for img in $imgs; do
+    docker save $img >/dev/null && echo -ne "\e[32mImage $img OK\n\e[0m" || echo "\e[31mImage $img Corrupted!\n\e[0m"
 done
 
 rm /usr/src/dappnode/.firstboot
