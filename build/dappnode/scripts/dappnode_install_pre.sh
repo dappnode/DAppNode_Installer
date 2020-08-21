@@ -139,3 +139,10 @@ if docker-compose -v >/dev/null 2>&1; then
 else
     install_docker_compose 2>&1 | tee -a $LOG_FILE
 fi
+
+#Check connectivity
+cat /etc/network/interfaces 2>&1 | tee -a $LOG_FILE
+grep "iface en.* inet dhcp" /etc/network/interfaces
+if [ $? -ne 0 ]; then
+    exit 1
+fi

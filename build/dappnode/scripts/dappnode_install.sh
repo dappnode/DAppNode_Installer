@@ -206,6 +206,20 @@ grabContentHashes() {
     fi
 }
 
+installSgx() {
+    if [ -d "/usr/src/dappnode/sgx" ]; then
+        # from sgx_linux_x64_driver_2.5.0_2605efa.bin
+        /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOG_DIR
+        /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOG_DIR
+    fi
+}
+
+installExtra() {
+    if [ -d "/usr/src/dappnode/extra" ]; then
+        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOG_DIR
+    fi
+}
+
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -230,7 +244,13 @@ installExtra
 echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
 
-echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOGFILE
+echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOG_DIR
+installSgx
+
+echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOG_DIR
+installExtra
+
+echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build
 
 echo -e "\e[32mDownloading DAppNode Core...\e[0m" 2>&1 | tee -a $LOGFILE
