@@ -118,8 +118,17 @@ dappnode_core_load() {
         fi
     done
 
-    # Delete build lines from yml
-    sed -i '/build:\|context:\|dockerfile/d' ${DAPPNODE_CORE_DIR}/*.yml | tee -a $LOGFILE
+    for COMPOSE_PATH in ${DAPPNODE_CORE_DIR}/*.yml; do
+        # Remove the build property from the core docker-compose-*.yml
+        # Previous attempts with sed are dangerous as they can break the compose depending on syntax
+        python -c '
+import sys; import yaml
+compose = yaml.safe_load(open(sys.argv[1], "r"));
+for serviceName in compose["services"]:
+    del compose["services"][serviceName]["build"];
+open(sys.argv[1], "w").write(yaml.dump(compose));
+        ' $COMPOSE_PATH
+    done
 }
 
 customMotd() {
