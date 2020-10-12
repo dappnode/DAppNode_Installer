@@ -8,7 +8,7 @@ PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
-ARCH=$(uname -m)
+ARCH=$(dpkg --print-architecture)
 
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
@@ -16,6 +16,7 @@ if [ "$UPDATE" = true ]; then
     rm -rf ${DAPPNODE_CORE_DIR}/docker-compose-*.yml
     rm -rf ${DAPPNODE_CORE_DIR}/dappnode_package-*.json
     rm -rf ${DAPPNODE_CORE_DIR}/*.tar.xz
+    rm -rf ${DAPPNODE_CORE_DIR}/*.txz
     rm -rf ${DAPPNODE_CORE_DIR}/.dappnode_profile
     rm -rf ${CONTENT_HASH_FILE}
 fi
@@ -25,7 +26,7 @@ mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
 
-PROFILE_BRANCH="master"
+PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
 DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
 WGET="wget -q --show-progress --progress=bar:force"
@@ -64,12 +65,11 @@ source "${DAPPNODE_PROFILE}"
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
 for comp in "${PKGS[@]}"; do
     ver="${comp}_VERSION"
-    eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}.tar.xz\""
-    [ $ARCH == 'aarch64' ] && eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}_arm64.tar.xz\""
+    eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}_linux-${ARCH}.txz\""
     eval "${comp}_YML=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/docker-compose.yml\""
     eval "${comp}_MANIFEST=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/dappnode_package.json\""
     eval "${comp}_YML_FILE=\"${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml\""
-    eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}/${comp,,}.dnp.dappnode.eth_${!ver##*:}.tar.xz\""
+    eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}/${comp,,}.dnp.dappnode.eth_${!ver}_linux-${ARCH}.txz\""
     eval "${comp}_MANIFEST_FILE=\"${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json\""
 done
 
@@ -118,8 +118,17 @@ dappnode_core_load() {
         fi
     done
 
-    # Delete build lines from yml
-    sed -i '/build:\|context:\|dockerfile/d' ${DAPPNODE_CORE_DIR}/*.yml | tee -a $LOGFILE
+    for COMPOSE_PATH in ${DAPPNODE_CORE_DIR}/*.yml; do
+        # Remove the build property from the core docker-compose-*.yml
+        # Previous attempts with sed are dangerous as they can break the compose depending on syntax
+        python -c '
+import sys; import yaml
+compose = yaml.safe_load(open(sys.argv[1], "r"));
+for serviceName in compose["services"]:
+    del compose["services"][serviceName]["build"];
+open(sys.argv[1], "w").write(yaml.dump(compose));
+        ' $COMPOSE_PATH
+    done
 }
 
 customMotd() {
