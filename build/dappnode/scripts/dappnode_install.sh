@@ -246,7 +246,7 @@ installExtra
 echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
 
-if [ $ARCH == "amd64"]; then 
+if [ $ARCH == "amd64" ]; then 
     echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOG_DIR
     installSgx
 
