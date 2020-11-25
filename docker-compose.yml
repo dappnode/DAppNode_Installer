@@ -5,9 +5,8 @@ services:
     build: build
     privileged: true
     environment:
-      - BUILD=false
-      - CLEAN=false
-      - UNATTENDED=false
-      - FLAVOR=default
+      - BUILD=false       # In case you want to re-generate a all the images, not recommended
+      - CLEAN=true       # it remove the images directory
+      - UNATTENDED=true  # UNATTENDED version
     volumes:
       - ./images:/images

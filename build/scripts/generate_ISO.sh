@@ -8,6 +8,7 @@ if [ "$CLEAN" = true ]; then
     rm -f /images/*.tar.xz
     rm -f /images/*.yml
     rm -f /images/*.json
+    rm -f /images/*.txz
 fi
 
 if [ "$BUILD" = true ]; then

@@ -120,7 +120,7 @@ dappnode_core_load() {
 
     for COMPOSE_PATH in ${DAPPNODE_CORE_DIR}/*.yml; do
         # Remove the build property from the core docker-compose-*.yml
-       sed -i '/build:/,/image:/{//!d};/build:/d' docker-compose-ipfs.yml $COMPOSE_PATH
+       sed -i '/build:/,/image:/{//!d};/build:/d' $COMPOSE_PATH
     done
 }
 

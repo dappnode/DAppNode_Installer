@@ -146,3 +146,14 @@ grep "iface en.* inet dhcp" /etc/network/interfaces
 if [ $? -ne 0 ]; then
     exit 1
 fi
+
+## Add missing interfaces
+if [ -f /usr/src/dappnode/hotplug ]; then
+    for IFACE in $(cat /usr/src/dappnode/hotplug | grep en.* ); do
+        if [[ $(grep -L "$IFACE" /etc/network/interfaces) ]]; then
+            echo "# $IFACE"  >> /etc/network/interfaces;
+	        echo "allow-hotplug $IFACE"  >> /etc/network/interfaces;
+            echo "iface $IFACE inet dhcp"  >> /etc/network/interfaces;
+        fi
+    done
+fi

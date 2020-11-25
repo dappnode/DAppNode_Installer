@@ -1,10 +1,20 @@
 #!/bin/sh
 set -e
 
-echo "Downloading debian ISO image: debian-firmware-testing-amd64-netinst-2020-06-22.iso..."
-if [ ! -f /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso ]; then
-    wget http://vdo.dappnode.io/debian-firmware-testing-amd64-netinst-2020-06-22.iso \
-        -O /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso
+#echo "Downloading debian ISO image: debian-firmware-testing-amd64-netinst-2020-06-22.iso..."
+#if [ ! -f /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso ]; then
+#    wget http://vdo.dappnode.io/debian-firmware-testing-amd64-netinst-2020-06-22.iso \
+#        -O /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso
+#fi
+#echo "Done!"
+
+ISO_NAME=firmware-testing-amd64-netinst.iso
+ISO_URL=https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/weekly-builds/amd64/iso-cd/
+
+echo "Downloading debian ISO image: firmware-bullseye-DI-alpha2-amd64-netinst.iso..."
+if [ ! -f /images/${ISO_NAME} ]; then
+    wget ${ISO_URL}/${ISO_NAME} \
+        -O /images/${ISO_NAME}
 fi
 echo "Done!"
 
@@ -13,11 +23,11 @@ rm -rf dappnode-iso
 rm -rf DappNode-debian-*
 
 echo "Extracting the iso..."
-xorriso -osirrox on -indev /images/debian-firmware-testing-amd64-netinst-2020-06-22.iso \
+xorriso -osirrox on -indev /images/${ISO_NAME} \
     -extract / dappnode-iso
 
 echo "Obtaining the isohdpfx.bin for hybrid ISO..."
-dd if=/images/debian-firmware-testing-amd64-netinst-2020-06-22.iso bs=432 count=1 \
+dd if=/images/${ISO_NAME} bs=432 count=1 \
     of=dappnode-iso/isolinux/isohdpfx.bin
 
 cd dappnode-iso
@@ -43,13 +53,7 @@ mkdir -p /tmp/makeinitrd
 cd install.amd
 cp initrd.gz /tmp/makeinitrd/
 if [[ ${UNATTENDED} == "true" ]]; then
-    if [[ ${FLAVOR} == "nvme" ]]; then
-        cp ../../dappnode/scripts/preseed_unattended_nvme.cfg /tmp/makeinitrd/preseed.cfg
-    elif [[ ${FLAVOR} == "archive" ]]; then
-        cp ../../dappnode/scripts/preseed_unattended_archive.cfg /tmp/makeinitrd/preseed.cfg
-    else
-        cp ../../dappnode/scripts/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
-    fi
+   cp ../../dappnode/scripts/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
 else
     cp ../../dappnode/scripts/preseed.cfg /tmp/makeinitrd/preseed.cfg
 fi
