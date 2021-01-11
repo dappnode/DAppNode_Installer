@@ -270,7 +270,7 @@ fi
 
 # Run test in interactive terminal
 if [ -f "/usr/src/dappnode/.firstboot" ]; then
-    openvt -s -w /usr/src/dappnode/scripts/dappnode_test_install.sh
+    openvt -s -w -- sudo -u root /usr/src/dappnode/scripts/dappnode_test_install.sh
     exit 0
 fi
 

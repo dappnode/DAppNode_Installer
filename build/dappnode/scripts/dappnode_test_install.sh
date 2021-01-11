@@ -51,5 +51,5 @@ for img in $imgs; do
     docker save $img >/dev/null && echo -ne "\e[32mImage $img OK\n\e[0m" || echo "\e[31mImage $img Corrupted!\n\e[0m"
 done
 
-rm /usr/src/dappnode/.firstboot
+rm -f /usr/src/dappnode/.firstboot
 read -r -p "Test completed successfully. Press enter to continue"
