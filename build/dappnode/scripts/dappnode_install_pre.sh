@@ -1,9 +1,9 @@
 #!/bin/bash
 
 DAPPNODE_DIR="/usr/src/dappnode"
-DOCKER_PKG="docker-ce_19.03.8~3-0~debian-buster_amd64.deb"
-DOCKER_CLI_PKG="docker-ce-cli_19.03.8~3-0~debian-buster_amd64.deb"
-CONTAINERD_PKG="containerd.io_1.2.6-3_amd64.deb"
+DOCKER_PKG="docker-ce_20.10.2~3-0~debian-buster_amd64.deb"
+DOCKER_CLI_PKG="docker-ce-cli_20.10.2~3-0~debian-buster_amd64.deb"
+CONTAINERD_PKG="containerd.io_1.4.3-1_amd64.deb"
 DOCKER_REPO="https://download.docker.com/linux/debian/dists/buster/pool/stable/amd64"
 DOCKER_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_PKG}"
 DOCKER_CLI_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_CLI_PKG}"
