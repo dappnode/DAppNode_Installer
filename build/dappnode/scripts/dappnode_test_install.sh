@@ -1,5 +1,7 @@
 #!/bin/bash
 
+HOME=${HOME:-/home/dappnode}
+
 error_exit() {
     echo -e "\e[31m Error on installation!!! \n \e[0m"
     read -r -p "Check installation source. Press enter to continue"
@@ -49,5 +51,5 @@ for img in $imgs; do
     docker save $img >/dev/null && echo -ne "\e[32mImage $img OK\n\e[0m" || echo "\e[31mImage $img Corrupted!\n\e[0m"
 done
 
-rm /usr/src/dappnode/.firstboot
+rm -f /usr/src/dappnode/.firstboot
 read -r -p "Test completed successfully. Press enter to continue"

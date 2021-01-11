@@ -8,8 +8,14 @@ set -e
 #fi
 #echo "Done!"
 
-ISO_NAME=firmware-testing-amd64-netinst.iso
-ISO_URL=https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/weekly-builds/amd64/iso-cd/
+#ISO_NAME=firmware-testing-amd64-netinst.iso
+#ISO_URL=https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/weekly-builds/amd64/iso-cd/
+
+#ISO_NAME=firmware-bullseye-DI-alpha3-amd64-netinst.iso
+#ISO_URL=https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/bullseye_di_alpha3+nonfree/amd64/iso-cd/
+
+ISO_NAME=firmware-bullseye-DI-alpha3-amd64-netinst.iso
+ISO_URL=https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/bullseye_di_alpha3+nonfree/amd64/iso-cd/
 
 echo "Downloading debian ISO image: firmware-bullseye-DI-alpha2-amd64-netinst.iso..."
 if [ ! -f /images/${ISO_NAME} ]; then
@@ -19,7 +25,7 @@ fi
 echo "Done!"
 
 echo "Clean old files..."
-rm -rf dappnode-iso
+rm -rf dappnode-isoº
 rm -rf DappNode-debian-*
 
 echo "Extracting the iso..."
