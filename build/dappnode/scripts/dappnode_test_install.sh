@@ -1,5 +1,7 @@
 #!/bin/bash
 
+HOME=${HOME:-/home/dappnode}
+
 error_exit() {
     echo -e "\e[31m Error on installation!!! \n \e[0m"
     read -r -p "Check installation source. Press enter to continue"
