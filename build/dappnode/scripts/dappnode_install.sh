@@ -86,7 +86,8 @@ dappnode_core_build() {
             pushd $TMPDIR
             git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_${comp}
             # Change version in YAML to the custom one
-            sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${!ver##*:}~" DNP_${comp}/docker-compose.yml
+            DOCKER_VER=$(echo "${!ver##*:}" | sed 's/\\/_/g')
+            sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${DOCKER_VER}~" DNP_${comp}/docker-compose.yml
             docker-compose -f ./DNP_${comp}/docker-compose.yml build
             cp ./DNP_${comp}/docker-compose.yml ${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml
             cp ./DNP_${comp}/dappnode_package.json ${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json
