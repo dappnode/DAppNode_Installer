@@ -17,11 +17,11 @@ uninstall() {
     # Disconnect all packages from the network
     docker container ls -a -q -f name=DAppNode* | xargs -I {} docker network disconnect dncore_network {}
 
-    # Remove dncore_network
-    docker network remove dncore_network
-
     # Remove containers, volumes and images
     docker-compose $DNCORE_YMLS down --rmi 'all' -v
+
+    # Remove dncore_network
+    docker network remove dncore_network
 
     # Remove dir
     rm -rf /usr/src/dappnode
