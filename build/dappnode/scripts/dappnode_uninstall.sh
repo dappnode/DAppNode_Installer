@@ -21,7 +21,7 @@ uninstall() {
     docker-compose $DNCORE_YMLS down --rmi 'all' -v
 
     # Remove dncore_network
-    docker network remove dncore_network
+    docker network remove dncore_network || echo "dncore_network already removed"
 
     # Remove dir
     rm -rf /usr/src/dappnode
