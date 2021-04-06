@@ -157,6 +157,3 @@ if [ -f /usr/src/dappnode/hotplug ]; then
         fi
     done
 fi
-
-# Only create docker network if needed
-docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network || echo "dncore_network already exists"
