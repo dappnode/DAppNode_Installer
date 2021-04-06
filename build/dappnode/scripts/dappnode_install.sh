@@ -255,6 +255,9 @@ if [ $ARCH == "amd64" ]; then
     installExtra
 fi
 
+echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
+docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network || echo "dncore_network already exists"
+
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build
 
