@@ -160,7 +160,13 @@ addSwap() {
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
     source "${DAPPNODE_PROFILE}" >/dev/null 2>&1
-    docker-compose $DNCORE_YMLS up -d 2>&1 | tee -a $LOGFILE
+
+    # Execute `compose-up` independently
+    # To execute `compose-up` against more than 1 compose, composes files must share compose file version (e.g 3.5)
+    for comp in "${DNCORE_YMLS[@]}"; do
+        docker-compose $comp up -d 2>&1 | tee -a $LOGFILE
+        echo -e "\e[32m${comp} started\e[0m" 2>&1 | tee -a $LOGFILE
+    done
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOGFILE
 
     # Show credentials to the user on login
