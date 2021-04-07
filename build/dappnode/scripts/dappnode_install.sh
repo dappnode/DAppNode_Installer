@@ -165,7 +165,7 @@ dappnode_start() {
     # To execute `compose-up` against more than 1 compose, composes files must share compose file version (e.g 3.5)
     for comp in "${DNCORE_YMLS[@]}"; do
         docker-compose $comp up -d 2>&1 | tee -a $LOGFILE
-        echo -e "\e[32m${comp} started\e[0m" 2>&1 | tee -a $LOGFILE
+        echo "${comp} started" 2>&1 | tee -a $LOGFILE
     done
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOGFILE
 
