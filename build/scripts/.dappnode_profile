@@ -11,6 +11,8 @@ export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 
 #!ISOBUILD Do not modify, variables above imported for ISO build
 DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")
+DNCORE_YMLS_ARRAY=($(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml"))
+
 alias dappnode_status='docker-compose $DNCORE_YMLS ps'
 alias dappnode_stop='docker-compose $DNCORE_YMLS stop && docker stop $(docker container ls -a -q -f name=DAppNode*)'
 alias dappnode_start='docker-compose $DNCORE_YMLS up -d && docker start $(docker container ls -a -q -f name=DAppNode*)'
