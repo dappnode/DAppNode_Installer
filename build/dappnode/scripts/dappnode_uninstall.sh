@@ -18,9 +18,7 @@ uninstall() {
     docker container ls -a -q -f name=DAppNode* | xargs -I {} docker network disconnect dncore_network {}
 
     # Remove containers, volumes and images
-    for comp in "${DNCORE_YMLS_ARRAY[@]}"; do
-        docker-compose -f $comp down --rmi 'all' -v
-    done
+    docker-compose $DNCORE_YMLS down --rmi 'all' -v
 
     # Remove dncore_network
     docker network remove dncore_network || echo "dncore_network already removed"
