@@ -13,7 +13,7 @@ date
 echo "Serial: ${SERIAL}"
 echo "################################"
 
-components=(BIND IPFS VPN DAPPMANAGER WIFI)
+components=(BIND IPFS VPN DAPPMANAGER WIFI HTTPS)
 if ping -c 1 -q google.com >&/dev/null; then
     echo -e "\e[32m Connectivity OK\n \e[0m"
 else
