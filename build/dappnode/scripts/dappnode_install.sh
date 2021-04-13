@@ -4,7 +4,7 @@ DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 LOGFILE="${DAPPNODE_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
-PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+PKGS=(BIND IPFS VPN DAPPMANAGER WIFI HTTPS)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
@@ -170,7 +170,13 @@ addSwap() {
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
     source "${DAPPNODE_PROFILE}" >/dev/null 2>&1
-    docker-compose $DNCORE_YMLS up -d 2>&1 | tee -a $LOGFILE
+
+    # Execute `compose-up` independently
+    # To execute `compose-up` against more than 1 compose, composes files must share compose file version (e.g 3.5)
+    for comp in "${DNCORE_YMLS_ARRAY[@]}"; do
+        docker-compose -f $comp up -d 2>&1 | tee -a $LOGFILE
+        echo "${comp} started" 2>&1 | tee -a $LOGFILE
+    done
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOGFILE
 
     # Show credentials to the user on login
@@ -264,6 +270,9 @@ if [ $ARCH == "amd64" ]; then
     echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOG_DIR
     installExtra
 fi
+
+echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
+docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network || echo "dncore_network already exists"
 
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build

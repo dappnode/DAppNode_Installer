@@ -3,14 +3,17 @@
 export BIND_VERSION="${BIND_VERSION:-0.2.6}"
 export IPFS_VERSION="${IPFS_VERSION:-0.2.14}"
 export VPN_VERSION="${VPN_VERSION:-0.2.8}"
-export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.38}"
+export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.39}"
 export WIFI_VERSION="${WIFI_VERSION:-0.2.6}"
+export HTTPS_VERSION="${HTTPS_VERSION:-0.1.0}"
 
 export DAPPNODE_DIR="/usr/src/dappnode"
 export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 
 #!ISOBUILD Do not modify, variables above imported for ISO build
 DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")
+DNCORE_YMLS_ARRAY=($(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml"))
+
 alias dappnode_status='docker-compose $DNCORE_YMLS ps'
 alias dappnode_stop='docker-compose $DNCORE_YMLS stop && docker stop $(docker container ls -a -q -f name=DAppNode*)'
 alias dappnode_start='docker-compose $DNCORE_YMLS up -d && docker start $(docker container ls -a -q -f name=DAppNode*)'
