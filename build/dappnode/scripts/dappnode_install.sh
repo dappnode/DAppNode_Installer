@@ -194,7 +194,9 @@ dappnode_start() {
     if ! grep -q 'http://my.dappnode/' "$DAPPNODE_PROFILE"; then
         echo "echo -e \"\nTo get a VPN profile file and connect to your DAppNode, run the following command:\"" >>$DAPPNODE_PROFILE
         echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nOnce connected through the VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nTo connect to your dappnode via Wifi use the following credentials:\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\n$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nOnce connected through the Wifi or VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
         echo -e "return\n" >>$DAPPNODE_PROFILE
     fi
