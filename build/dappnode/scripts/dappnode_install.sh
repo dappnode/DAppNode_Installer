@@ -8,6 +8,7 @@ PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
+WIFI_CREDENTIALS=$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')
 ARCH=$(dpkg --print-architecture)
 
 if [ "$UPDATE" = true ]; then
@@ -294,7 +295,10 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     exit 0
 fi
 
-# Show credentials if installed from script
+# Show VPN credentials if installed from script
 [ ! -f "/usr/src/dappnode/iso_install.log" ] && eval ${CRED_CMD}
+
+# Show wifi credentials
+[ -f "/usr/src/dappnode/DNCORE/docker-compose-wifi.yml" ] && echo -e "\e[32mConnect to dappnode wifi. Credentials:\n${WIFI_CREDENTIALS}\e[0m"
 
 exit 0
