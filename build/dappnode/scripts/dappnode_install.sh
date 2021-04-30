@@ -2,7 +2,8 @@
 
 DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
-LOGFILE="${DAPPNODE_DIR}/dappnode_install.log"
+LOGS_DIR="$DAPPNODE_DIR/logs"
+LOGFILE="${LOGS_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
 PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
@@ -25,6 +26,7 @@ mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
+mkdir -p $LOGS_DIR
 
 PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
@@ -272,7 +274,7 @@ if [ $ARCH == "amd64" ]; then
 fi
 
 echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
-docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network || echo "dncore_network already exists"
+docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network 2>&1 | tee -a $LOGFILE
 
 echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
 dappnode_core_build

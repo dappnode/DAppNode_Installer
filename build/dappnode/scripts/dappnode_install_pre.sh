@@ -18,11 +18,11 @@ WGET="wget -q --show-progress --progress=bar:force"
 #!ISOBUILD Do not modify, variables above imported for ISO build
 
 detect_installation_type() {
-    if [ -f "${DAPPNODE_DIR}/iso_install.log" ]; then
-        LOG_FILE=${DAPPNODE_DIR}/iso_install.log
+    if [ -f "${DAPPNODE_DIR}/logs/iso_install.log" ]; then
+        LOG_FILE="${DAPPNODE_DIR}/logs/iso_install.log"
         ISO_INSTALLATION=true
     else
-        LOG_FILE=${DAPPNODE_DIR}/install.log
+        LOG_FILE="${DAPPNODE_DIR}/logs/install.log"
         ISO_INSTALLATION=false
     fi
 }
