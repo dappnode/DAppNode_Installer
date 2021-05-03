@@ -230,14 +230,14 @@ grabContentHashes() {
 installSgx() {
     if [ -d "/usr/src/dappnode/sgx" ]; then
         # from sgx_linux_x64_driver_2.5.0_2605efa.bin
-        /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOG_DIR
-        /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOG_DIR
+        /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOGFILE
+        /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOGFILE
     fi
 }
 
 installExtra() {
     if [ -d "/usr/src/dappnode/extra" ]; then
-        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOG_DIR
+        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOGFILE
     fi
 }
 
@@ -266,17 +266,17 @@ echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
 
 if [ $ARCH == "amd64" ]; then 
-    echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOG_DIR
+    echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOGFILE
     installSgx
 
-    echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOG_DIR
+    echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOGFILE
     installExtra
 fi
 
-echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOGFILE
 docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network 2>&1 | tee -a $LOGFILE
 
-echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOGFILE
 dappnode_core_build
 
 echo -e "\e[32mDownloading DAppNode Core...\e[0m" 2>&1 | tee -a $LOGFILE
