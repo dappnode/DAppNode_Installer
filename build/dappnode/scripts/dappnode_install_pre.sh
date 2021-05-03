@@ -1,10 +1,10 @@
 #!/bin/bash
 
 DAPPNODE_DIR="/usr/src/dappnode"
-DOCKER_PKG="docker-ce_20.10.2~3-0~debian-buster_amd64.deb"
-DOCKER_CLI_PKG="docker-ce-cli_20.10.2~3-0~debian-buster_amd64.deb"
-CONTAINERD_PKG="containerd.io_1.4.3-1_amd64.deb"
-DOCKER_REPO="https://download.docker.com/linux/debian/dists/buster/pool/stable/amd64"
+DOCKER_PKG="docker-ce_20.10.6~3-0~debian-bullseye_amd64.deb"
+DOCKER_CLI_PKG="docker-ce-cli_20.10.6~3-0~debian-bullseye_amd64.deb"
+CONTAINERD_PKG="containerd.io_1.4.4-1_amd64.deb"
+DOCKER_REPO="https://download.docker.com/linux/debian/dists/bullseye/pool/stable/amd64/"
 DOCKER_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_PKG}"
 DOCKER_CLI_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_CLI_PKG}"
 CONTAINERD_PATH="${DAPPNODE_DIR}/bin/docker/${CONTAINERD_PKG}"
@@ -34,9 +34,20 @@ install_docker() {
     ##############################################
     ##############################################
 
-    # STEP 0: Detect if it's a Debian 9 (stretch) installation
+    # STEP 0: Detect if it's a Debian 9 (stretch) or Debian 10 (Buster) installation
     # ----------------------------------------
     if [ -f "/etc/os-release" ] && grep -q "stretch" "/etc/os-release"; then
+        DOCKER_PKG="docker-ce_20.10.2~3-0~debian-buster_amd64.deb"
+        DOCKER_CLI_PKG="docker-ce-cli_20.10.2~3-0~debian-buster_amd64.deb"
+        CONTAINERD_PKG="containerd.io_1.4.3-1_amd64.deb"
+        DOCKER_REPO="https://download.docker.com/linux/debian/dists/buster/pool/stable/amd64"
+        DOCKER_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_PKG}"
+        DOCKER_CLI_PATH="${DAPPNODE_DIR}/bin/docker/${DOCKER_CLI_PKG}"
+        CONTAINERD_PATH="${DAPPNODE_DIR}/bin/docker/${CONTAINERD_PKG}"
+        DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
+        DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
+        CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
+    elif [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
         DOCKER_PKG="docker-ce_19.03.8~3-0~debian-stretch_amd64.deb"
         DOCKER_CLI_PKG="docker-ce-cli_19.03.8~3-0~debian-stretch_amd64.deb"
         CONTAINERD_PKG="containerd.io_1.2.6-3_amd64.deb"
@@ -47,7 +58,6 @@ install_docker() {
         DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
         DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
         CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
-
     fi
 
     # STEP 1: Download files
