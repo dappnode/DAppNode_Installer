@@ -36,7 +36,7 @@ install_docker() {
 
     # STEP 0: Detect if it's a Debian 9 (stretch) or Debian 10 (Buster) installation
     # ----------------------------------------
-    if [ -f "/etc/os-release" ] && grep -q "stretch" "/etc/os-release"; then
+    if [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
         DOCKER_PKG="docker-ce_20.10.2~3-0~debian-buster_amd64.deb"
         DOCKER_CLI_PKG="docker-ce-cli_20.10.2~3-0~debian-buster_amd64.deb"
         CONTAINERD_PKG="containerd.io_1.4.3-1_amd64.deb"
@@ -47,7 +47,7 @@ install_docker() {
         DOCKER_URL="${DOCKER_REPO}/${DOCKER_PKG}"
         DOCKER_CLI_URL="${DOCKER_REPO}/${DOCKER_CLI_PKG}"
         CONTAINERD_URL="${DOCKER_REPO}/${CONTAINERD_PKG}"
-    elif [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
+    elif [ -f "/etc/os-release" ] && grep -q "stretch" "/etc/os-release"; then
         DOCKER_PKG="docker-ce_19.03.8~3-0~debian-stretch_amd64.deb"
         DOCKER_CLI_PKG="docker-ce-cli_19.03.8~3-0~debian-stretch_amd64.deb"
         CONTAINERD_PKG="containerd.io_1.2.6-3_amd64.deb"
