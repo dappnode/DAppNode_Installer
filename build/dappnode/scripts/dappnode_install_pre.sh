@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DAPPNODE_DIR="/usr/src/dappnode"
+LOGS_DIR="$DAPPNODE_DIR/logs"
 DOCKER_PKG="docker-ce_20.10.6~3-0~debian-bullseye_amd64.deb"
 DOCKER_CLI_PKG="docker-ce-cli_20.10.6~3-0~debian-bullseye_amd64.deb"
 CONTAINERD_PKG="containerd.io_1.4.4-1_amd64.deb"
@@ -18,11 +19,11 @@ WGET="wget -q --show-progress --progress=bar:force"
 #!ISOBUILD Do not modify, variables above imported for ISO build
 
 detect_installation_type() {
-    if [ -f "${DAPPNODE_DIR}/iso_install.log" ]; then
-        LOG_FILE=${DAPPNODE_DIR}/iso_install.log
+    if [ -f "${LOGS_DIR}/iso_install.log" ]; then
+        LOG_FILE="${LOGS_DIR}/iso_install.log"
         ISO_INSTALLATION=true
     else
-        LOG_FILE=${DAPPNODE_DIR}/install.log
+        LOG_FILE="${LOGS_DIR}/install.log"
         ISO_INSTALLATION=false
     fi
 }
@@ -132,6 +133,7 @@ detect_installation_type
 
 # Ensure paths exist
 mkdir -p $DAPPNODE_DIR
+mkdir -p $LOGS_DIR
 mkdir -p $(dirname "$DOCKER_PATH")
 
 touch $LOG_FILE

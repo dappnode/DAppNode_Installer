@@ -2,12 +2,14 @@
 
 DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
-LOGFILE="${DAPPNODE_DIR}/dappnode_install.log"
+LOGS_DIR="$DAPPNODE_DIR/logs"
+LOGFILE="${LOGS_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
 PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
+WIFI_CREDENTIALS=$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')
 ARCH=$(dpkg --print-architecture)
 
 if [ "$UPDATE" = true ]; then
@@ -25,6 +27,7 @@ mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
+mkdir -p $LOGS_DIR
 
 PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/scripts/.dappnode_profile"
@@ -193,7 +196,9 @@ dappnode_start() {
     if ! grep -q 'http://my.dappnode/' "$DAPPNODE_PROFILE"; then
         echo "echo -e \"\nTo get a VPN profile file and connect to your DAppNode, run the following command:\"" >>$DAPPNODE_PROFILE
         echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nOnce connected through the VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nTo connect to your dappnode via Wifi use the following credentials:\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\n$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')\"" >>$DAPPNODE_PROFILE
+        echo "echo -e \"\nOnce connected through the Wifi or VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
         echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
         echo -e "return\n" >>$DAPPNODE_PROFILE
     fi
@@ -228,14 +233,14 @@ grabContentHashes() {
 installSgx() {
     if [ -d "/usr/src/dappnode/sgx" ]; then
         # from sgx_linux_x64_driver_2.5.0_2605efa.bin
-        /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOG_DIR
-        /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOG_DIR
+        /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOGFILE
+        /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOGFILE
     fi
 }
 
 installExtra() {
     if [ -d "/usr/src/dappnode/extra" ]; then
-        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOG_DIR
+        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOGFILE
     fi
 }
 
@@ -264,17 +269,17 @@ echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
 
 if [ $ARCH == "amd64" ]; then 
-    echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOG_DIR
+    echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOGFILE
     installSgx
 
-    echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOG_DIR
+    echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOGFILE
     installExtra
 fi
 
-echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
-docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network || echo "dncore_network already exists"
+echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOGFILE
+docker network create --driver bridge --subnet 172.33.0.0/16 dncore_network 2>&1 | tee -a $LOGFILE
 
-echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOG_DIR
+echo -e "\e[32mBuilding DAppNode Core if needed...\e[0m" 2>&1 | tee -a $LOGFILE
 dappnode_core_build
 
 echo -e "\e[32mDownloading DAppNode Core...\e[0m" 2>&1 | tee -a $LOGFILE
@@ -294,7 +299,10 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     exit 0
 fi
 
-# Show credentials if installed from script
+# Show VPN credentials if installed from script
 [ ! -f "/usr/src/dappnode/iso_install.log" ] && eval ${CRED_CMD}
+
+# Show wifi credentials
+[ -f "/usr/src/dappnode/DNCORE/docker-compose-wifi.yml" ] && echo -e "\e[32mConnect to dappnode wifi. Credentials:\n${WIFI_CREDENTIALS}\e[0m"
 
 exit 0
