@@ -5,12 +5,21 @@ DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 LOGS_DIR="$DAPPNODE_DIR/logs"
 LOGFILE="${LOGS_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
-PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
-CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
+CRED_CMD="docker exec DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf"
+
 WIFI_CREDENTIALS=$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')
 ARCH=$(dpkg --print-architecture)
+
+MODE="WIREGUARD"
+
+if ! modprobe wireguard >/dev/null 2>&1 ; then
+    MODE="VPN"
+    PKGS[2]="VPN"
+    CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
+fi
 
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
@@ -194,13 +203,27 @@ dappnode_start() {
     sed -i '/return/d' $DAPPNODE_PROFILE | tee -a $LOGFILE
 
     if ! grep -q 'http://my.dappnode/' "$DAPPNODE_PROFILE"; then
-        echo "echo -e \"\nTo get a VPN profile file and connect to your DAppNode, run the following command:\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nTo connect to your dappnode via Wifi use the following credentials:\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\n$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nOnce connected through the Wifi or VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
+        if $MODE=="VPN" ; then
+            echo "echo -e \"\nTo connect to your dappnode via Wifi use the following credentials:\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\n$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nTo get a VPN profile file and connect to your DAppNode, run the following command:\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nOnce connected through the Wifi or VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
+            echo -e "return\n" >>$DAPPNODE_PROFILE
+        else
+            echo "echo -e \"\nTo connect to your dappnode via Wifi use the following credentials:\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\n$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nYour Wireguard configuration file is as follows\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"=================================================\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"$(eval ${CRED_CMD})\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"=================================================\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nInstructions for setting up a Wireguard client are available at https://xxxx.dappnode.io\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nIf your router doesn't support NAT Loopback and you want to access your DAppNode from local network via Wireguard add additional configuration with Endpoint field changed to DAppNode's local IP\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nOnce connected through the Wifi or VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
+            echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
         echo -e "return\n" >>$DAPPNODE_PROFILE
+        fi 
     fi
     # Show credentials at shell installation
     # [ ! -f "/usr/src/dappnode/logs/iso_install.log" ] && docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials
