@@ -133,7 +133,7 @@ install_wireguard_dkms() {
     ##############################################
     apt-get update -y
     if [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
-        echo "deb http://deb.debian.org/debian/ buster-backports main main" > /etc/apt/sources.list.d/buster-backports.list
+        echo "deb http://deb.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/buster-backports.list
         printf 'Package: *\nPin: release a=buster-backports\nPin-Priority: 90\n' > /etc/apt/preferences.d/limit-backports
     fi
 
