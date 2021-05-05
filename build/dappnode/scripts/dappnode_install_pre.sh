@@ -141,7 +141,7 @@ install_wireguard_dkms() {
 
     if  modprobe wireguard >/dev/null 2>&1 ; then
         echo -e "\e[32m \n\n Verified wiregurd-dkms installation \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
-    elif
+    else
         echo -e "\e[31m \n\n WARNING: wireguard kernel module is not installed, Wireguard DAppNode package might not work! \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
     fi
 }
