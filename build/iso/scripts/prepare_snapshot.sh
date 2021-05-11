@@ -3,7 +3,7 @@
 DAPPNODE_INSTALL_SCRIPT_URL=$1
 if [ -z "$DAPPNODE_INSTALL_SCRIPT_URL" ]; then
   echo "Must supply one argument, DAPPNODE_INSTALL_SCRIPT_URL"
-  echo "Example: https://raw.githubusercontent.com/dappnode/DAppNode_Installer/monolithic/build/dappnode/scripts/dappnode_install.sh"
+  echo "Example: https://raw.githubusercontent.com/dappnode/DAppNode_Installer/monolithic/build/utils/scripts/dappnode_install.sh"
   exit 1
 fi
 
