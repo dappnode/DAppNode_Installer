@@ -13,12 +13,19 @@ export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")
 DNCORE_YMLS_ARRAY=($(find /usr/src/dappnode/DNCORE -name "docker-compose-*.yml" | sort))
 
+# Returns docker core containers status
 alias dappnode_status='docker-compose $DNCORE_YMLS ps'
+# Stop docker core containers
 alias dappnode_stop='docker-compose $DNCORE_YMLS stop && docker stop $(docker container ls -a -q -f name=DAppNode*)'
+# Start docker core containers
 alias dappnode_start='docker-compose $DNCORE_YMLS up -d && docker start $(docker container ls -a -q -f name=DAppNode*)'
+# Return open-vpn credentials from a specific user. e.g: dappnode_get dappnode_admin
 alias dappnode_get='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth vpncli get'
+# Return open-vpn admin credentials
 alias dappnode_connect='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials'
+# Return wifi credentials (ssid and password)
 alias dappnode_wifi='cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep "SSID\|WPA_PASSPHRASE"'
-alias dappnode_wireguard='docker exec DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf'
+# Return wireguard credentials
+alias dappnode_wireguard='docker exec DAppNodeCore-wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf'
 
 return
