@@ -18,7 +18,7 @@ jobs:
         run: |
           docker-compose build
           docker-compose up
-          ls
+          ls images/
       - name: verify image
         run: |
           ls -lrt images/DappNode-*
