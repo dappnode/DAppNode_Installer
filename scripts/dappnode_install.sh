@@ -30,7 +30,7 @@ mkdir -p "${DAPPNODE_DIR}/config"
 mkdir -p $LOGS_DIR
 
 PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
-PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/build/iso/scripts/.dappnode_profile"
+PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/.dappnode_profile"
 DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
 WGET="wget -q --show-progress --progress=bar:force"
 SWGET="wget -q -O-"
@@ -211,9 +211,9 @@ dappnode_start() {
     fi
 }
 
-installExtra() {
-    if [ -d "/usr/src/dappnode/extra" ]; then
-        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOGFILE
+installExtraDpkg() {
+    if [ -d "/usr/src/dappnode/extra_dpkg" ]; then
+        dpkg -i /usr/src/dappnode/extra_dpkg/*.deb 2>&1 | tee -a $LOGFILE
     fi
 }
 
@@ -230,17 +230,19 @@ grabContentHashes() {
     fi
 }
 
+# /sgx will only be installed on ISO's dappnode not on standalone script
 installSgx() {
-    if [ -d "/usr/src/dappnode/sgx" ]; then
+    if [ -d "/usr/src/dappnode/iso/sgx" ]; then
         # from sgx_linux_x64_driver_2.5.0_2605efa.bin
         /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOGFILE
         /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOGFILE
     fi
 }
 
-installExtra() {
-    if [ -d "/usr/src/dappnode/extra" ]; then
-        dpkg -i /usr/src/dappnode/extra/*.deb 2>&1 | tee -a $LOGFILE
+# /extra_dpkg will only be installed on ISO's dappnode not on standalone script
+installExtraDpkg() {
+    if [ -d "/usr/src/dappnode/iso/extra_dpkg" ]; then
+        dpkg -i /usr/src/dappnode/extra_dpkg/*.deb 2>&1 | tee -a $LOGFILE
     fi
 }
 
@@ -263,7 +265,7 @@ echo -e "\e[32mCustomizing login...\e[0m" 2>&1 | tee -a $LOGFILE
 customMotd
 
 echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOGFILE
-installExtra
+installExtraDpkg
 
 echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
@@ -273,7 +275,7 @@ if [ $ARCH == "amd64" ]; then
     installSgx
 
     echo -e "\e[32mInstalling extra packages...\e[0m" 2>&1 | tee -a $LOGFILE
-    installExtra
+    installExtraDpkg
 fi
 
 echo -e "\e[32mCreating dncore_network if needed...\e[0m" 2>&1 | tee -a $LOGFILE

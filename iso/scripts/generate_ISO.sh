@@ -12,12 +12,12 @@ if [ "$CLEAN" = true ]; then
 fi
 
 if [ "$BUILD" = true ]; then
-    /usr/src/app/generate_docker_images.sh
+    /usr/src/app/iso/scripts/generate_docker_images.sh
 else
-    /usr/src/app/download_core.sh
+    /usr/src/app/iso/scripts/download_core.sh
 fi
 
 #file generated to detectd ISO installation
 touch dappnode/iso_install.log
 
-/usr/src/app/generate_dappnode_iso_debian.sh
+/usr/src/app/iso/scripts/generate_dappnode_iso_debian.sh

@@ -39,7 +39,7 @@ dd if=/images/${ISO_NAME} bs=432 count=1 \
 cd dappnode-iso
 
 echo "Downloading third-party packages..."
-sed '1,/^\#\!ISOBUILD/!d' ../dappnode/scripts/dappnode_install_pre.sh >/tmp/vars.sh
+sed '1,/^\#\!ISOBUILD/!d' ../scripts/dappnode_install_pre.sh >/tmp/vars.sh
 source /tmp/vars.sh
 mkdir -p /images/bin/docker
 cd /images/bin/docker
@@ -59,9 +59,9 @@ mkdir -p /tmp/makeinitrd
 cd install.amd
 cp initrd.gz /tmp/makeinitrd/
 if [[ ${UNATTENDED} == "true" ]]; then
-   cp ../../dappnode/preseeds/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
+   cp ../../iso/preseeds/preseed_unattended.cfg /tmp/makeinitrd/preseed.cfg
 else
-    cp ../../dappnode/preseeds/preseed.cfg /tmp/makeinitrd/preseed.cfg
+    cp ../../iso/preseeds/preseed.cfg /tmp/makeinitrd/preseed.cfg
 fi
 cd /tmp/makeinitrd
 gunzip initrd.gz
@@ -76,12 +76,12 @@ mv /tmp/makeinitrd/initrd.gz ./initrd.gz
 cd ..
 
 echo "Configuring the boot menu for DappNode..."
-cp ../boot/grub.cfg boot/grub/grub.cfg
-cp ../boot/theme_1 boot/grub/theme/1
-cp ../boot/isolinux.cfg isolinux/isolinux.cfg
-cp ../boot/menu.cfg isolinux/menu.cfg
-cp ../boot/txt.cfg isolinux/txt.cfg
-cp ../boot/splash.png isolinux/splash.png
+cp ../iso/boot/grub.cfg boot/grub/grub.cfg
+cp ../iso/boot/theme_1 boot/grub/theme/1
+cp ../iso/boot/isolinux.cfg isolinux/isolinux.cfg
+cp ../iso/boot/menu.cfg isolinux/menu.cfg
+cp ../iso/boot/txt.cfg isolinux/txt.cfg
+cp ../iso/boot/splash.png isolinux/splash.png
 
 echo "Fix md5 sum..."
 md5sum $(find ! -name "md5sum.txt" ! -path "./isolinux/*" -type f) >md5sum.txt

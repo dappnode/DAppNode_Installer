@@ -77,24 +77,6 @@ Uinstall DAppNode on your host machine by running the following command:
 wget -qO - https://uninstaller.dappnode.io | sudo bash
 ```
 
-# Repository file structure
-
-```
-|-.github
-|-build/
-| |-iso/ (stuff needed to create ISO)-
-| | |-boot/ (host boot files)
-| | |-preseeds/ (Debian specifications)
-| | |-scripts/ (Scripts to generate docker images and iso)
-| |
-| |-utils/
-| | |-extra/
-| | |-scripts/ (DAppNode installation scripts)
-| | |-sgx/
-|
-|-images/ (only generated after running `docker-compose up`)
-```
-
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://github.com/dappnode) for details on our code of conduct, and the process for submitting pull requests to us.
