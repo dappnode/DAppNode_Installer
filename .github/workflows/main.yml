@@ -21,4 +21,4 @@ jobs:
           ls images/
       - name: verify image
         run: |
-          ls -lrt images/DappNode-*
+          ls -lrt images/DAppNode-debian-bullseye-amd64.iso
