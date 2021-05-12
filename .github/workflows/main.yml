@@ -20,4 +20,4 @@ jobs:
           docker-compose up
       - name: verify image
         run: |
-          ls -lrt images/DappNode-ubuntu-*
+          ls -lrt images/DappNode-*
