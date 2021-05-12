@@ -54,8 +54,9 @@ RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_
 # Create app directory
 WORKDIR /usr/src/app
 
-ADD scripts/* ./
-ADD dappnode dappnode
-ADD boot boot
+ADD iso/scripts/* ./
+ADD iso/boot boot
+ADD iso/preseeds dappnode/preseeds
+ADD utils dappnode
 
 CMD ["/usr/src/app/generate_ISO.sh"] 

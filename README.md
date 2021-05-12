@@ -1,4 +1,4 @@
-# DAppNode_Installer 
+# DAppNode_Installer
 
 [![Website dappnode.io](https://img.shields.io/badge/Website-dappnode.io-brightgreen.svg)](https://dappnode.io/)
 [![Documentation Wiki](https://img.shields.io/badge/Documentation-Wiki-brightgreen.svg)](https://github.com/dappnode/DAppNode/wiki)
@@ -8,39 +8,30 @@
 
 This repository generates the .iso file for installing DappNode to a server. Below are the instructions that you will need to make your own DappNode ISO.
 
-Follow this link if you want to know how to install DAppNode: [DappNode-Installation-Guide](https://github.com/dappnode/Dappnode/wiki/DappNode-Installation-Guide)
+# Get DAppNode
 
-# How to generate a DAppNode's ISO
-## Prerequisites
-Make sure the following sotfware is installed
+Get your DAppNode and start contributing to decentralization by running your own nodes.
 
-### 1. git
-Run this command to verify the git:
-```
-$ git --version
-```
-If you don't see a valid version, install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) commandline tool.
+## Buy DAppNode
 
-### 2. docker
-Run this command to verify the git:
-```
-$ docker -v
-```
-If you don't see a valid version, install [docker](https://docs.docker.com/engine/installation). The community edition (docker-ce) will work. In Linux make sure you grant permissions to the current user to use docker by adding current user to docker group, `sudo usermod -aG docker $USER`. Once you update the users group, exit from the current terminal and open a new one to make effect.
+Buy your DAppNode with all the stuff configured and prepared to be used in [DAppNode shop](https://shop.dappnode.io/)
 
-### 3. docker-compose
-Run this command to verify the git:
-```
-$ docker-compose -v
-```
-If you don't see a valid version, install [docker-compose](https://docs.docker.com/compose/install)
-   
-**Note**: Make sure you can run `git`, `docker ps`, `docker-compose` without any issue and without sudo command.
+## Install DAppNode
 
-# Generate the ISO image
+[Install DAppNode on your host machine](https://docs.dappnode.io/install/)
 
-### 1. Generate DAppNode's ISO
-Run the following commands in your terminal. Make sure you have at least 2 GB of disk space available.
+### Install DAppNode from ISO
+
+DAppNode ISO available in: [latest DAppNode release](https://github.com/dappnode/DAppNode/releases)
+
+Install DAppNode on your host machine by burning DAppNode ISO to a DVD or creating a bootable USB. Follow the tutorial of your operating system below and come back when you are finished:
+
+- [MacOS](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-macos)
+- [Windows](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows)
+- [Ubuntu](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-ubuntu)
+
+**Developers**: DAppNode ISO could be generated following these steps:
+
 ```
 $ git clone https://github.com/dappnode/DAppNode_Installer.git
 $ cd DAppNode_Installer
@@ -48,22 +39,61 @@ $ docker-compose build
 $ docker-compose up
 ```
 
-### 2. Verify image generation
-When the execution of the Docker-compose finishes, run the following command to verify the image existance:
+DAppNode iso will be generated inside images folder, to verify it:
+
 ```
 $ ls -lrt images/DappNode-ubuntu-*
--rw-r--r--  1 edu  staff  916455424 20 mar 13:19 images/DAppNode-ubuntu-18.04-server-amd64.iso
 ```
 
-### 3. Burn the ISO into a USB
-Now you can burn the ISO to a DVD or create a bootable USB. Follow the tutorial of your operating system below and come back when you are finished:
+_Note_: ISO could be generated as unhattended/attended by editing the env var available in the docker-compose.yml file
 
-* [MacOS](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-macos)
-* [Windows](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows)
-* [Ubuntu](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-ubuntu)
+### Install DAppNode from scripts
 
-Once completed, come back to the [main guide to install an Ubuntu server](https://github.com/dappnode/DAppNode/wiki/DAppNode-Installation-Guide#13-install-an-ubuntu-distribution).
+Scripts available in: [latest DAppNode release](https://github.com/dappnode/DAppNode/releases)
 
+DAppNode could be also installed on a host machine with an OS already running on it. DAppNode has been developed and configured to be run on debian host machines so is preferably to install DAppNode on Debian or debian based (like Ubuntu) host machines.
+
+#### Prerrequisites
+
+Before install DAppNode with the script option, make sure you fullfill the requirements by running the following script:
+
+```
+sudo wget -O - https://prerequisites.dappnode.io | sudo bash
+```
+
+#### Script installation
+
+Once you make sure you have the requirements, install DAPpNode with the installation script:
+
+```
+sudo wget -O - https://installer.dappnode.io | sudo bash
+```
+
+### Uninstall DAppNode
+
+Uinstall DAppNode on your host machine by running the following command:
+
+```
+wget -qO - https://uninstaller.dappnode.io | sudo bash
+```
+
+# Repository file structure
+
+```
+|-.github
+|-build/
+| |-iso/ (stuff needed to create ISO)-
+| | |-boot/ (host boot files)
+| | |-preseeds/ (Debian specifications)
+| | |-scripts/ (Scripts to generate docker images and iso)
+| |
+| |-utils/
+| | |-extra/
+| | |-scripts/ (DAppNode installation scripts)
+| | |-sgx/
+|
+|-images/ (only generated after running `docker-compose up`)
+```
 
 ## Contributing
 
@@ -71,22 +101,14 @@ Please read [CONTRIBUTING.md](https://github.com/dappnode) for details on our co
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dappnode/DAppNode_Installer/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dappnode/DAppNode_Installer/tags).
 
 ## Authors
 
-* **Eduardo Antuña Díez** - *Initial work* - [eduadiez](https://github.com/eduadiez)
+- **Eduardo Antuña Díez** - _Initial work_ - [eduadiez](https://github.com/eduadiez)
 
 See also the list of [contributors](https://github.com/dappnode/DAppNode_Installer/contributors) who participated in this project.
 
 ## License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details
-
-## References
-
-[git](https://git-scm.com/)
-
-[docker](https://www.docker.com/)
-
-[docker-compose](https://docs.docker.com/compose/)
