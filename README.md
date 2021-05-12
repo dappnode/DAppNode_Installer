@@ -45,6 +45,8 @@ DAppNode iso will be generated inside images folder, to verify it:
 $ ls -lrt images/DappNode-ubuntu-*
 ```
 
+_Note_: ISO could be generated as unhattended/attended by editing the env var available in the docker-compose.yml file
+
 ### Install DAppNode from scripts
 
 Scripts available in: [latest DAppNode release](https://github.com/dappnode/DAppNode/releases)
