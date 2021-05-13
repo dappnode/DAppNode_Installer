@@ -1,4 +1,4 @@
-name: Main
+name: ISO
 on:
   workflow_dispatch:
   push:
