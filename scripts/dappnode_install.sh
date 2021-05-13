@@ -213,7 +213,7 @@ dappnode_start() {
 
 installExtraDpkg() {
     if [ -d "/usr/src/dappnode/extra_dpkg" ]; then
-        dpkg -i /usr/src/dappnode/extra_dpkg/*.deb 2>&1 | tee -a $LOGFILE
+        dpkg -i /usr/src/dappnode/iso/extra_dpkg/*.deb 2>&1 | tee -a $LOGFILE
     fi
 }
 
@@ -234,8 +234,8 @@ grabContentHashes() {
 installSgx() {
     if [ -d "/usr/src/dappnode/iso/sgx" ]; then
         # from sgx_linux_x64_driver_2.5.0_2605efa.bin
-        /usr/src/dappnode/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOGFILE
-        /usr/src/dappnode/sgx/enable_sgx 2>&1 | tee -a $LOGFILE
+        /usr/src/dappnode/iso/sgx/sgx_linux_x64_driver.bin 2>&1 | tee -a $LOGFILE
+        /usr/src/dappnode/iso/sgx/enable_sgx 2>&1 | tee -a $LOGFILE
     fi
 }
 

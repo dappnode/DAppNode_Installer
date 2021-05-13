@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sed '1,/^\#\!ISOBUILD/!d' ./.dappnode_profile >/tmp/vars.sh
+sed '1,/^\#\!ISOBUILD/!d' /usr/src/app/.dappnode_profile >/tmp/vars.sh
 source /tmp/vars.sh
 
 DAPPNODE_CORE_DIR="/images"
@@ -57,11 +57,11 @@ dappnode_core_download
 echo -e "\e[32mGrabbing latest content hashes...\e[0m"
 grabContentHashes
 
-mkdir -p dappnode/DNCORE
+mkdir -p /usr/src/app/dappnode/DNCORE
 
 echo -e "\e[32mCopying files...\e[0m"
-cp /images/*.txz dappnode/DNCORE
-cp /images/*.yml dappnode/DNCORE
-cp /images/*.json dappnode/DNCORE
-cp ${DAPPNODE_HASH_FILE} dappnode/DNCORE
-cp ./.dappnode_profile dappnode/DNCORE
+cp /images/*.txz /usr/src/app/dappnode/DNCORE
+cp /images/*.yml /usr/src/app/dappnode/DNCORE
+cp /images/*.json /usr/src/app/dappnode/DNCORE
+cp ${DAPPNODE_HASH_FILE} /usr/src/app/dappnode/DNCORE
+cp /usr/src/app/.dappnode_profile /usr/src/app/dappnode/DNCORE

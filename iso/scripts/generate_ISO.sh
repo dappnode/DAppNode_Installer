@@ -18,6 +18,7 @@ else
 fi
 
 #file generated to detectd ISO installation
-touch dappnode/iso_install.log
+mkdir -p /usr/src/app/dappnode
+touch /usr/src/app/dappnode/iso_install.log
 
 /usr/src/app/iso/scripts/generate_dappnode_iso_debian.sh
