@@ -32,6 +32,8 @@ mkdir -p $LOGS_DIR
 PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
 PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/.dappnode_profile"
 DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
+DAPPNODE_ACCESS_CREDENTIALS="${DAPPNODE_DIR}/scripts/dappnode_access_credentials.sh"
+ACCESS_CREDENTIALS_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/scripts/dappnode_access_credentials.sh"
 WGET="wget -q --show-progress --progress=bar:force"
 SWGET="wget -q -O-"
 IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
@@ -193,14 +195,9 @@ dappnode_start() {
 
     sed -i '/return/d' $DAPPNODE_PROFILE | tee -a $LOGFILE
 
-    if ! grep -q 'http://my.dappnode/' "$DAPPNODE_PROFILE"; then
-        echo "echo -e \"\nTo get a VPN profile file and connect to your DAppNode, run the following command:\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\n\e[32mdappnode_connect\e[0m\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nTo connect to your dappnode via Wifi use the following credentials:\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\n$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE')\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nOnce connected through the Wifi or VPN (OpenVPN) you can access to the admin UI by following this link:\"" >>$DAPPNODE_PROFILE
-        echo "echo -e \"\nhttp://my.dappnode/\n\"" >>$DAPPNODE_PROFILE
-        echo -e "return\n" >>$DAPPNODE_PROFILE
+    if ! grep -q "$DAPPNODE_ACCESS_CREDENTIALS" "$DAPPNODE_PROFILE"; then
+        [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${PROFILE_URL}
+        echo "/bin/bash ${DAPPNODE_ACCESS_CREDENTIALS}" >>$DAPPNODE_PROFILE
     fi
     # Show credentials at shell installation
     # [ ! -f "/usr/src/dappnode/logs/iso_install.log" ] && docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials
