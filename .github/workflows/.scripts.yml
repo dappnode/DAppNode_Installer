@@ -29,4 +29,4 @@ jobs:
           cat /usr/src/dappnode/logs/dappnode_install.log
       - name: Uninstall DAppNode
         run: |
-          sudo /bin/bash ./scripts/dappnode_uninstall_pre.sh
+          sudo /bin/bash ./scripts/dappnode_uninstall.sh
