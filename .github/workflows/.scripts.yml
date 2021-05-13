@@ -1,0 +1,28 @@
+name: Scripts
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  dappnode:
+    name: Install DAppNode
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.1
+      - name: install prerrequisites
+        run: |
+          /bin/bash ./scripts/dappnode_install_pre.sh
+      - name: Install DAppNode
+        run: |
+          /bin/bash ./scripts/dappnode_install.sh
+      - name: Test DAppNode installation
+        run: |
+          /bin/bash ./scripts/dappnode_test_install.sh
+      - name: Uninstall DAppNode
+        run: |
+          /bin/bash ./scripts/dappnode_uninstall_pre.sh
