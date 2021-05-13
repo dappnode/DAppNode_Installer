@@ -11,8 +11,8 @@
 mkdir -p /etc/network/
 echo "iface en.x inet dhcp" >> /etc/network/interfaces
 
-
 ##########################
 # dappnode_test_install.sh#
 ##########################
-apt install iputils-ping
+
+# Not able to do ping inside github host

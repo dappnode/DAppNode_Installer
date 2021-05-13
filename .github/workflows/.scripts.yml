@@ -23,9 +23,10 @@ jobs:
       - name: Install DAppNode
         run: |
           sudo /bin/bash ./scripts/dappnode_install.sh
-      - name: Test DAppNode installation
+      - name: Show installation logs
         run: |
-          sudo /bin/bash ./scripts/dappnode_test_install.sh
+          cat /usr/src/dappnode/logs/iso_install.log 
+          cat /usr/src/dappnode/logs/dappnode_install.log
       - name: Uninstall DAppNode
         run: |
           sudo /bin/bash ./scripts/dappnode_uninstall_pre.sh
