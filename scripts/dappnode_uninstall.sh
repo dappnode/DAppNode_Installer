@@ -2,6 +2,7 @@
 DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 PROFILE_FILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
+input=$1 # Allow to call script with argument (must be Y/N)
 
 [ -f $PROFILE_FILE ] || (
     echo "Error: DAppNode profile does not exist."
