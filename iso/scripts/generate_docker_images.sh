@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./.dappnode_profile
+source /usr/src/app/.dappnode_profile
 
 echo "Cleaning previous files"
 rm -rf ./DNP_*
@@ -26,6 +26,6 @@ docker-compose -f ./DNP_DAPPMANAGER/docker-compose-dappmanager.yml build
 docker save dappmanager.dnp.dappnode.eth:${DAPPMANAGER_VERSION} | xz -e9vT0 >/images/dappmanager.dnp.dappnode.eth_${DAPPMANAGER_VERSION}_linux-amd64.txz
 
 echo "Coping dappnode_all_docker_images_linux-amd64.txz to dappnode dir..."
-cp /images/* dappnode/
+cp /images/* /usr/src/app/dappnode/
 
 echo "Finished!"
