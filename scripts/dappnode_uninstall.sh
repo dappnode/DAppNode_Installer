@@ -35,8 +35,11 @@ uninstall() {
     echo "DAppNode uninstalled!"
 }
 
-read -r -p "WARNING: This script will uninstall and delete all DAppNode
+if [ $# -eq 0 ]; then
+    read -r -p "WARNING: This script will uninstall and delete all DAppNode
 containers and volumes. Are You Sure? [Y/n] " input <&2
+fi
+
 
 case $input in
 [yY][eE][sS] | [yY])
