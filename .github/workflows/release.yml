@@ -22,6 +22,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: test
           files: |
             ./images/DAppNode-debian-bullseye-amd64.iso
             ./scripts/dappnode_install.sh
