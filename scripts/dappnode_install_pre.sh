@@ -103,7 +103,7 @@ install_docker_compose() {
     # ----------------------------------------
 
     # Ensure paths exist
-    mkdir -p $(dirname "$DCMP_PATH") 2>&1 | tee -a $LOG_FILE
+    mkdir -p "$(dirname "$DCMP_PATH")" 2>&1 | tee -a $LOG_FILE
 
     # STEP 1: Download files
     # ----------------------------------------
@@ -156,7 +156,7 @@ detect_installation_type
 # Ensure paths exist
 mkdir -p $DAPPNODE_DIR
 mkdir -p $LOGS_DIR
-mkdir -p $(dirname "$DOCKER_PATH")
+mkdir -p "$(dirname "$DOCKER_PATH")"
 
 touch $LOG_FILE
 
@@ -191,7 +191,7 @@ fi
 
 ## Add missing interfaces
 if [ -f /usr/src/dappnode/hotplug ]; then
-    for IFACE in $(cat /usr/src/dappnode/hotplug | grep en.* ); do
+    for IFACE in $(cat /usr/src/dappnode/hotplug | grep "en.*" ); do
         if [[ $(grep -L "$IFACE" /etc/network/interfaces) ]]; then
             echo "# $IFACE"  >> /etc/network/interfaces;
 	        echo "allow-hotplug $IFACE"  >> /etc/network/interfaces;
