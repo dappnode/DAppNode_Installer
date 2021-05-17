@@ -9,6 +9,8 @@ jobs:
   release:
     name: create release
     runs-on: ubuntu-latest
+    # Only continue if branch that triggered the flow starts with v0...
+    if: startsWith(github.ref, 'refs/heads/v0')
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.1
