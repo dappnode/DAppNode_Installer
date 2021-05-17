@@ -38,6 +38,7 @@ WGET="wget -q --show-progress --progress=bar:force"
 SWGET="wget -q -O-"
 IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
 
+# TEMPORARY: think a way to integrate flags instead of use files to detect installation type
 detect_installation_type() {
     # Check for old and new location of iso_install.log
     if [ -f "${DAPPNODE_DIR}/iso_install.log" ] || [ -f "${DAPPNODE_DIR}/logs/iso_install.log" ]; then

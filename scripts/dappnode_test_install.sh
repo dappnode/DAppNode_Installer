@@ -13,7 +13,16 @@ date
 echo "Serial: ${SERIAL}"
 echo "################################"
 
+# TEMPORARY: think a way to integrate flags instead of use files to detect installation type
+detect_installation_type() {
+    # Check for old and new location of iso_install.log
+    if [ -f "${DAPPNODE_DIR}/iso_install.log" ] || [ -f "${DAPPNODE_DIR}/logs/iso_install.log" ]; then
+        components=(BIND IPFS WIREGUARD DAPPMANAGER WIFI HTTPS)
+    fi
+}
+
 components=(BIND IPFS VPN DAPPMANAGER WIFI)
+detect_installation_type
 if ping -c 1 -q google.com >&/dev/null; then
     echo -e "\e[32m Connectivity OK\n \e[0m"
 else
