@@ -1,13 +1,13 @@
-name: Release
+name: Pre-release
 
 on:
   push:
     branches:
-      - master
+      - "v*.*.*"
 
 jobs:
   release:
-    name: create release
+    name: create pre release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,8 +23,10 @@ jobs:
         uses: nelonoel/branch-name@v1.0.1
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: github.base_ref == 'refs/heads/master'
         with:
           tag_name: ${BRANCH_NAME}
+          prerelease: true
           files: |
             ./images/DAppNode-debian-bullseye-amd64.iso
             ./scripts/dappnode_install.sh
