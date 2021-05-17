@@ -9,8 +9,7 @@ jobs:
   release:
     name: create pre release
     runs-on: ubuntu-latest
-    # Only continue if branch that triggered the flow starts with v0...
-    if: startsWith(github.ref, 'refs/heads/v0')
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.1
@@ -21,12 +20,22 @@ jobs:
       - name: Check iso
         run: |
           ls -lrt images/DAppNode-debian-bullseye-amd64.iso
-      - name: Get branch name
-        uses: nelonoel/branch-name@v1.0.1
-      - name: Release
+      - name: get latest tag release
+        id: latest_release
+        uses: oprypin/find-latest-tag@v1
+        with:
+          repository: dappnode/DNP_CORE
+          releases-only: true
+      - name: Bump release version
+        id: bump_version
+        uses: christian-draeger/increment-semantic-version@1.0.2
+        with:
+          current-version: ${{ latest_release.tag.outputs.tag }}
+          version-fragment: "bug"
+      - name: Pre release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${BRANCH_NAME}
+          tag_name: ${{ steps.bump_version.outputs.next-version }}
           prerelease: true
           files: |
             ./images/DAppNode-debian-bullseye-amd64.iso
