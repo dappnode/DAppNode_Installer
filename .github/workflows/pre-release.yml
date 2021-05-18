@@ -23,8 +23,10 @@ jobs:
         id: bump_version
         uses: christian-draeger/increment-semantic-version@1.0.2
         with:
-          current-version: ${{ latest_release.tag.outputs.tag }}
+          current-version: ${{ steps.latest_release.outputs.tag }}
           version-fragment: "bug"
+        run: |
+          echo "Current DAppNode version is ${{ steps.latest_release.outputs.tag }}"
       - name: Build
         run: |
           docker-compose build
