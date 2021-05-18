@@ -15,4 +15,4 @@ echo "iface en.x inet dhcp" >> /etc/network/interfaces
 #dappnode_test_install.sh#
 ##########################
 
-# Not able to do ping inside github host
+## Not able to do ping inside github host
