@@ -22,7 +22,7 @@ jobs:
       - name: remove v from version
         id: remove_v
         run: |
-          version=$(${{ steps.latest_release.outputs.tag }} | cut -c2-)
+          version=$(echo ${{ steps.latest_release.outputs.tag }} | cut -c2-)
           echo "::set-output name=version::$version"
       - name: Bump release version
         id: bump_version
