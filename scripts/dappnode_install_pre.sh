@@ -103,7 +103,7 @@ install_docker_compose() {
     # ----------------------------------------
 
     # Ensure paths exist
-    mkdir -p $(dirname "$DCMP_PATH") 2>&1 | tee -a $LOG_FILE
+    mkdir -p "$(dirname "$DCMP_PATH")" 2>&1 | tee -a $LOG_FILE
 
     # STEP 1: Download files
     # ----------------------------------------
@@ -124,6 +124,27 @@ install_docker_compose() {
     fi
 }
 
+install_wireguard_dkms() {
+    ##############################################
+    ##############################################
+    ####        WIREGUARD INSTALLATION        ####
+    ##############################################
+    ##############################################
+    apt-get update -y
+    if [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
+        echo "deb http://deb.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/buster-backports.list
+        printf 'Package: *\nPin: release a=buster-backports\nPin-Priority: 90\n' > /etc/apt/preferences.d/limit-backports
+    fi
+
+    apt-get install wireguard-dkms -y | tee -a $LOG_FILE
+
+    if  modprobe wireguard >/dev/null 2>&1 ; then
+        echo -e "\e[32m \n\n Verified wiregurd-dkms installation \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+    else
+        echo -e "\e[31m \n\n WARNING: wireguard kernel module is not installed, Wireguard DAppNode package might not work! \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+    fi
+}
+
 ##############################################
 ##############################################
 ####             SCRIPT START             ####
@@ -135,7 +156,7 @@ detect_installation_type
 # Ensure paths exist
 mkdir -p $DAPPNODE_DIR
 mkdir -p $LOGS_DIR
-mkdir -p $(dirname "$DOCKER_PATH")
+mkdir -p "$(dirname "$DOCKER_PATH")"
 
 touch $LOG_FILE
 
@@ -153,6 +174,14 @@ else
     install_docker_compose 2>&1 | tee -a $LOG_FILE
 fi
 
+# Only install wireguard-dkms if needed
+
+if modprobe wireguard >/dev/null 2>&1 ; then
+    echo -e "\e[32m \n\n wireguard-dkms is already installed \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+else
+    install_wireguard_dkms 2>&1 | tee -a $LOG_FILE
+fi
+
 #Check connectivity
 cat /etc/network/interfaces 2>&1 | tee -a $LOG_FILE
 grep "iface en.* inet dhcp" /etc/network/interfaces
@@ -162,7 +191,7 @@ fi
 
 ## Add missing interfaces
 if [ -f /usr/src/dappnode/hotplug ]; then
-    for IFACE in $(cat /usr/src/dappnode/hotplug | grep en.* ); do
+    for IFACE in $(cat /usr/src/dappnode/hotplug | grep "en.*" ); do
         if [[ $(grep -L "$IFACE" /etc/network/interfaces) ]]; then
             echo "# $IFACE"  >> /etc/network/interfaces;
 	        echo "allow-hotplug $IFACE"  >> /etc/network/interfaces;

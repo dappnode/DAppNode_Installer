@@ -38,6 +38,15 @@ WGET="wget -q --show-progress --progress=bar:force"
 SWGET="wget -q -O-"
 IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
 
+# TEMPORARY: think a way to integrate flags instead of use files to detect installation type
+detect_installation_type() {
+    # Check for old and new location of iso_install.log
+    if [ -f "${DAPPNODE_DIR}/iso_install.log" ] || [ -f "${DAPPNODE_DIR}/logs/iso_install.log" ]; then
+        PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI HTTPS)
+        CRED_CMD="docker exec DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf"
+    fi
+}
+
 function valid_ip() {
     local ip=$1
     local stat=1
@@ -70,7 +79,8 @@ source "${DAPPNODE_PROFILE}"
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
 # you can also specify an IPFS version like /ipfs/QmWg8P2b9JKQ8thAVz49J8SbJbCoi2MwkHnUqMtpzDTtxR:0.2.7, it's important
-# to include the exact version also in the IPFS hash format since it's needed to be able to download it 
+# to include the exact version also in the IPFS hash format since it's needed to be able to download it
+detect_installation_type
 for comp in "${PKGS[@]}"; do
     ver="${comp}_VERSION"
     DOWNLOAD_URL="https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}"
