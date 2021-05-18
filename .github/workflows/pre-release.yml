@@ -1,17 +1,30 @@
-name: Release
+name: Pre-release
 
 on:
   push:
     branches:
-      - master
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
-  release:
-    name: create release
+  pre-release:
+    name: create pre release
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.1
+      - name: get latest tag release
+        id: latest_release
+        uses: oprypin/find-latest-tag@v1
+        with:
+          repository: dappnode/DNP_CORE
+          releases-only: true
+      - name: Bump release version
+        id: bump_version
+        uses: christian-draeger/increment-semantic-version@1.0.2
+        with:
+          current-version: ${{ latest_release.tag.outputs.tag }}
+          version-fragment: "bug"
       - name: Build
         run: |
           docker-compose build
@@ -19,10 +32,11 @@ jobs:
       - name: Check iso
         run: |
           ls -lrt images/DAppNode-debian-bullseye-amd64.iso
-      - name: Release
+      - name: Pre release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: test
+          tag_name: ${{ steps.bump_version.outputs.next-version }}
+          prerelease: true
           files: |
             ./images/DAppNode-debian-bullseye-amd64.iso
             ./scripts/dappnode_install.sh
