@@ -19,11 +19,16 @@ jobs:
         with:
           repository: dappnode/DNP_CORE
           releases-only: true
+      - name: remove v from version
+        id: remove_v
+        run: |
+          version=${${{ steps.latest_release.outputs.tag }}:1}
+          echo "::set-output name=version::$version"
       - name: Bump release version
         id: bump_version
         uses: christian-draeger/increment-semantic-version@1.0.2
         with:
-          current-version: ${{ steps.latest_release.outputs.tag }}
+          current-version: ${{ steps.remove_v.outputs.version }}
           version-fragment: "bug"
       - name: Build
         run: |
