@@ -30,6 +30,11 @@ jobs:
         with:
           current-version: ${{ steps.remove_v.outputs.version }}
           version-fragment: "bug"
+      - name: add v to version
+        id: add_v
+        run: |
+          version_final="v${{ steps.bump_version.outputs.next-version }}"
+          echo "::set-output name=version_final::$version_final"
       - name: Build
         run: |
           docker-compose build
@@ -40,7 +45,7 @@ jobs:
       - name: Pre release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.bump_version.outputs.next-version }}
+          tag_name: ${{ steps.add_v.outputs.version_final }}
           prerelease: true
           files: |
             ./images/DAppNode-debian-bullseye-amd64.iso
