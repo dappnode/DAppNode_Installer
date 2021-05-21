@@ -30,6 +30,6 @@ alias dappnode_wifi='cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep
 # Return remote wireguard credentials
 alias dappnode_wireguard='docker exec -i DAppNodeCore-wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf'
 # Return local wireguard credentiaks
-alias dappnode_wireguard_local='docker exec -i DAppNodeCore-wireguard.dnp.dappnode.eth getWireguardCredentials'
+alias dappnode_wireguard_local='docker exec -i DAppNodeCore-wireguard.dnp.dappnode.eth getWireguardCredentialsLocal'
 
 return
