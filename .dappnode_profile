@@ -28,10 +28,6 @@ alias dappnode_connect='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdmi
 # Return wifi credentials (ssid and password)
 alias dappnode_wifi='cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep "SSID\|WPA_PASSPHRASE"'
 # Return remote wireguard credentials in long format
-alias dappnode_wireguard='docker exec -i DAppNodeCore-wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf'
-# Return remote wireguard credentials in qr format
-alias dappnode_wireguard_remote='docker exec -i DAppNodeCore-wireguard.dnp.dappnode.eth getWireguardCredentialsRemote'
-# Return local wireguard credentials in qr format
-alias dappnode_wireguard_local='docker exec -i DAppNodeCore-wireguard.dnp.dappnode.eth getWireguardCredentialsLocal'
+alias dappnode_wireguard='docker exec -i DAppNodeCore-wireguard.dnp.dappnode.eth getWireguardCredentials'
 
 return
