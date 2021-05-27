@@ -50,6 +50,8 @@ function avahi_connection () {
   [ "$(docker ps -a | grep ${HTTPS_CONTAINER})" ] && \
   # Https container running
   [ "$(docker inspect -f '{{.State.Running}}' ${HTTPS_CONTAINER})" = "true" ] && \
+  # Https env variable LOCAL_PROXYING="true"
+  [ "$(docker exec -i ${HTTPS_CONTAINER} sh -c 'echo "$LOCAL_PROXYING"')" = "true" ] && \
   # avahi-daemon running => systemctl is-active avahi-daemon RETURNS "active" or "inactive"
   [ "$(systemctl is-active avahi-daemon)" = "active" ] && \
   echo -e "Connect to DAppNode through avahi-daemon.\n$2\nVisit \e[4m$DAPPNODE_ADMINUI_LOCAL_URL\e" && \
