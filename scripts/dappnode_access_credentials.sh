@@ -19,6 +19,7 @@ WIFI_GET_CREDS=$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml 2> /dev/nu
 # Endpoints
 DAPPNODE_ADMINUI_URL="http://my.dappnode"
 DAPPNODE_ADMINUI_LOCAL_URL="http://my.dappnode.local"
+DAPPNODE_WELCOME_URL="http://welcome.dappnode"
 
 #############
 #1.FUNCTIONS#
@@ -26,7 +27,7 @@ DAPPNODE_ADMINUI_LOCAL_URL="http://my.dappnode.local"
 
 # $1 Connection method $2 Credentials
 function create_connection_message () {
-  echo -e "\e[32mConnect to DAppNode through $1 using the following credentials:\e[0m\n$2\nVisit \e[4m$DAPPNODE_ADMINUI_URL\e"
+  echo -e "\e[32mConnect to DAppNode through $1 using the following credentials:\e[0m\n$2\nVisit \e[4m$DAPPNODE_ADMINUI_URL\e\nCheck out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e"
 }
 
 function wifi_connection () {
