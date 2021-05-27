@@ -30,10 +30,10 @@ mkdir -p "${DAPPNODE_DIR}/config"
 mkdir -p $LOGS_DIR
 
 PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
-PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/.dappnode_profile"
+PROFILE_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_profile"
 DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
 DAPPNODE_ACCESS_CREDENTIALS="${DAPPNODE_DIR}/scripts/dappnode_access_credentials.sh"
-ACCESS_CREDENTIALS_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/scripts/dappnode_access_credentials.sh"
+DAPPNODE_ACCESS_CREDENTIALS_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_access_credentials.sh"
 WGET="wget -q --show-progress --progress=bar:force"
 SWGET="wget -q -O-"
 IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
@@ -206,7 +206,7 @@ dappnode_start() {
     sed -i '/return/d' $DAPPNODE_PROFILE | tee -a $LOGFILE
 
     if ! grep -q "$DAPPNODE_ACCESS_CREDENTIALS" "$DAPPNODE_PROFILE"; then
-        [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${PROFILE_URL}
+        [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${DAPPNODE_ACCESS_CREDENTIALS_URL}
         echo "/bin/bash ${DAPPNODE_ACCESS_CREDENTIALS}" >>$DAPPNODE_PROFILE
     fi
     # Show credentials at shell installation
