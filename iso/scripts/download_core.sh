@@ -6,6 +6,7 @@ source /tmp/vars.sh
 DAPPNODE_CORE_DIR="/images"
 DAPPNODE_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
+IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
 
 SWGET="wget -q -O-"
 WGET="wget"
@@ -16,9 +17,14 @@ components=(BIND IPFS WIREGUARD DAPPMANAGER WIFI HTTPS)
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
 for comp in "${components[@]}"; do
     ver="${comp}_VERSION"
-    eval "${comp}_URL=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/${comp,,}.dnp.dappnode.eth_${!ver}_linux-amd64.txz\""
-    eval "${comp}_YML=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/docker-compose.yml\""
-    eval "${comp}_MANIFEST=\"https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}/dappnode_package.json\""
+    DOWNLOAD_URL="https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}"
+    if [[ ${!ver} == /ipfs/* ]]; then
+        DOWNLOAD_URL=${IPFS_ENDPOINT}/api/v0/cat?arg=${!ver%:*}
+    fi
+    
+    eval "${comp}_URL=\"${DOWNLOAD_URL}/${comp,,}.dnp.dappnode.eth_${!ver##*:}_linux-amd64.txz\""
+    eval "${comp}_YML=\"${DOWNLOAD_URL}/docker-compose.yml\""
+    eval "${comp}_MANIFEST=\"${DOWNLOAD_URL}/dappnode_package.json\""
     eval "${comp}_YML_FILE=\"${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml\""
     eval "${comp}_FILE=\"${DAPPNODE_CORE_DIR}/${comp,,}.dnp.dappnode.eth_${!ver##*:}_linux-amd64.txz\""
     eval "${comp}_MANIFEST_FILE=\"${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json\""
