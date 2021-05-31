@@ -25,6 +25,15 @@ DAPPNODE_WELCOME_URL="http://welcome.dappnode"
 #1.FUNCTIONS#
 #############
 
+# How to check dappnode was initialized successfully:
+# 1. docker service running
+# 2. Default timeout
+
+function dappnode_startup_delay () {
+  echo "Wait until DAppNode initializes..."
+  sleep 10
+}
+
 # $1 Connection method $2 Credentials
 function create_connection_message () {
   echo -e "\e[32mConnect to DAppNode through $1 using the following credentials:\e[0m\n$2\nVisit \e[4m$DAPPNODE_ADMINUI_URL\e\nCheck out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e"
@@ -80,6 +89,7 @@ function openvpn_connection () {
 #2.MAIN#
 ########
 
+dappnode_startup_delay
 wifi_connection
 avahi_connection
 wireguard_connection
