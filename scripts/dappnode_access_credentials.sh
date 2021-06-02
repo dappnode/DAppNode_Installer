@@ -18,7 +18,7 @@ OPENVPN_GET_CREDS="docker exec -i $OPENVPN_CONTAINER getAdminCredentials"
 WIFI_GET_CREDS=$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml 2> /dev/null | grep 'SSID\|WPA_PASSPHRASE')
 # Endpoints
 DAPPNODE_ADMINUI_URL="http://my.dappnode"
-DAPPNODE_ADMINUI_LOCAL_URL="http://my.dappnode.local"
+DAPPNODE_ADMINUI_LOCAL_URL="http://dappnode.local"
 DAPPNODE_WELCOME_URL="http://welcome.dappnode"
 
 #############
@@ -54,7 +54,7 @@ function wifi_connection () {
 
 function avahi_connection () {
   # Ping to avahi endpoint: -c: number of pings. -w: timeout
-  ping -c 2 -w 10 $DAPPNODE_ADMINUI_LOCAL_URL > /dev/null 2>&1 || { echo "Avahi-daemon not available" ; return ; }
+  ping -c 2 -w 10 dappnode.local > /dev/null 2>&1 || { echo "Avahi-daemon not available" ; return ; }
   # Https container exists
   [ "$(docker ps -a | grep ${HTTPS_CONTAINER})" ] && \
   # Https container running
