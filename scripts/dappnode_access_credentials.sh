@@ -9,11 +9,11 @@
 #############
 # Containers
 WIFI_CONTAINER="DAppNodeCore-wifi.dnp.dappnode.eth"
-WIREGUARD_CONTAINER="DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth"
+WIREGUARD_CONTAINER="DAppNodeCore-api.wireguard.dnp.dappnode.eth"
 OPENVPN_CONTAINER="DAppNodeCore-vpn.dnp.dappnode.eth"
 HTTPS_CONTAINER="DAppNodeCore-https.dnp.dappnode.eth"
 # Credentials
-WIREGUARD_GET_CREDS="docker exec $WIREGUARD_CONTAINER cat /config/peer_dappnode_admin/peer_dappnode_admin.conf"
+WIREGUARD_GET_CREDS="docker exec -i $WIREGUARD_CONTAINER getWireguardCredentials"
 OPENVPN_GET_CREDS="docker exec -i $OPENVPN_CONTAINER getAdminCredentials"
 WIFI_GET_CREDS=$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml 2> /dev/null | grep 'SSID\|WPA_PASSPHRASE')
 # Endpoints
@@ -37,7 +37,7 @@ function dappnode_startup_delay () {
 
 # $1 Connection method $2 Credentials
 function create_connection_message () {
-  echo -e "\e[32mConnect to DAppNode through $1 using the following credentials:\e[0m\n$2\nVisit \e[4m$DAPPNODE_ADMINUI_URL\e\n[0mCheck out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e"
+  echo -e "\n\e[32mConnect to DAppNode through $1 using the following credentials:\e[0m\n$2\n\nVisit \e[4m$DAPPNODE_ADMINUI_URL\e\n\n[0mCheck out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e\n"
 }
 
 function wifi_connection () {
