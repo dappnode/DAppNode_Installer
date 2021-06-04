@@ -8,8 +8,6 @@ MOTD_FILE="/etc/motd"
 PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
-CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
-WIFI_CREDENTIALS="cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE'"
 ARCH=$(dpkg --print-architecture)
 
 if [ "$UPDATE" = true ]; then
@@ -25,6 +23,7 @@ fi
 
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
+mkdir -p "$DAPPNODE_DIR/scripts"
 mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
 mkdir -p $LOGS_DIR
@@ -43,7 +42,6 @@ detect_installation_type() {
     # Check for old and new location of iso_install.log
     if [ -f "${DAPPNODE_DIR}/iso_install.log" ] || [ -f "${DAPPNODE_DIR}/logs/iso_install.log" ]; then
         PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI HTTPS)
-        CRED_CMD="docker exec DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf"
     fi
 }
 
