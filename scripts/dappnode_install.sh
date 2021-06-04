@@ -308,10 +308,7 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     exit 0
 fi
 
-# Show VPN credentials if installed from script
-[ ! -f "$LOGFILE" ] && eval ${CRED_CMD}
-
-# Show wifi credentials
-[ -f "/usr/src/dappnode/DNCORE/docker-compose-wifi.yml" ] && echo -e "\e[32mConnect to dappnode wifi. Credentials:\e[0m" && eval ${WIFI_CREDENTIALS}
+# Display credentials to the user
+[ -f $DAPPNODE_ACCESS_CREDENTIALS ] && /bin/bash $DAPPNODE_ACCESS_CREDENTIALS
 
 exit 0

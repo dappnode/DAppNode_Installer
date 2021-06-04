@@ -46,7 +46,7 @@ function wifi_connection () {
   # wifi container running
   [ "$(docker inspect -f '{{.State.Running}}' ${WIFI_CONTAINER} 2> /dev/null)" = "true" ] && \
   # Check interface variable is set
-  [ $(docker exec -it $WIFI_CONTAINER iw dev | grep 'Interface' | awk 'NR==1{print $2}') ] && \
+  [ ! -z $(docker exec -it $WIFI_CONTAINER iw dev | grep 'Interface' | awk 'NR==1{print $2}') ] && \
   create_connection_message "Wi-Fi" "$WIFI_GET_CREDS" && \
   exit 0 || echo "Wifi not available"
 }
