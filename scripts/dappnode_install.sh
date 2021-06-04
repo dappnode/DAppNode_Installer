@@ -30,7 +30,7 @@ mkdir -p "${DAPPNODE_DIR}/config"
 mkdir -p $LOGS_DIR
 
 PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
-PROFILE_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_profile"
+PROFILE_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_profile.sh"
 DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
 DAPPNODE_ACCESS_CREDENTIALS="${DAPPNODE_DIR}/scripts/dappnode_access_credentials.sh"
 DAPPNODE_ACCESS_CREDENTIALS_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_access_credentials.sh"
