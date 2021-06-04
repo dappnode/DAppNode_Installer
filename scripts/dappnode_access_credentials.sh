@@ -37,7 +37,7 @@ function dappnode_startup_delay () {
 
 # $1 Connection method $2 Credentials
 function create_connection_message () {
-  echo -e "\n\e[32mConnect to DAppNode through $1 using the following credentials:\e[0m\n$2\n\nVisit \e[4m$DAPPNODE_ADMINUI_URL\e\n\n[0mCheck out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e\n"
+  echo -e "\n\e[32mConnect to DAppNode through $1 using the following credentials:\e[0m\n$2\n\nVisit \e[4m$DAPPNODE_ADMINUI_URL\e\n\n[0mCheck out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e[0m\n"
 }
 
 function wifi_connection () {
