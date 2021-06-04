@@ -56,6 +56,6 @@ jobs:
             ./scripts/dappnode_install_pre.sh
             ./scripts/dappnode_uninstall.sh
             ./scripts/dappnode_access_credentials.sh
-            dappnode_profile.sh
+            .dappnode_profile.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
