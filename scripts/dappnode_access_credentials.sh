@@ -26,13 +26,9 @@ DAPPNODE_WELCOME_URL="http://welcome.dappnode"
 #1.FUNCTIONS#
 #############
 
-# How to check dappnode was initialized successfully:
-# 1. docker service running
-# 2. Default timeout
-
 function dappnode_startup_delay () {
   echo "Wait until DAppNode initializes..."
-  sleep 10
+  sleep 6
 }
 
 # $1 Connection method $2 Credentials

@@ -23,7 +23,7 @@ fi
 
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
-mkdir -p "$DAPPNODE_DIR/scripts"
+mkdir -p "${DAPPNODE_DIR}/scripts"
 mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
 mkdir -p $LOGS_DIR
