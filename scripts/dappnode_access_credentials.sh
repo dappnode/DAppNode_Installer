@@ -8,6 +8,7 @@
 #0.VARIABLES#
 #############
 # Containers
+DAPPMANAGER_CONTAINER="DAppNodeCore-dappmanager.dnp.dappnode.eth"
 WIFI_CONTAINER="DAppNodeCore-wifi.dnp.dappnode.eth"
 WIREGUARD_CONTAINER="DAppNodeCore-api.wireguard.dnp.dappnode.eth"
 OPENVPN_CONTAINER="DAppNodeCore-vpn.dnp.dappnode.eth"
@@ -26,9 +27,16 @@ DAPPNODE_WELCOME_URL="http://welcome.dappnode"
 #1.FUNCTIONS#
 #############
 
-function dappnode_startup_delay () {
-  echo "Wait until DAppNode initializes..."
-  sleep 6
+function dappnode_startup_check () {
+  echo "Wait until DAppNode initializes (press ctrl+c to stop)..."
+  n=0
+  until [ "$n" -ge 8 ]
+  do
+    [ "$(docker inspect -f '{{.State.Running}}' ${DAPPMANAGER_CONTAINER} 2> /dev/null)" = "true" ] && break
+    n=$((n+1))
+    echo "$n try"
+    sleep 8
+  done
 }
 
 # $1 Connection method $2 Credentials
