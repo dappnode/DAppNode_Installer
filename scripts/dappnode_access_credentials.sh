@@ -8,6 +8,7 @@
 #0.VARIABLES#
 #############
 # Containers
+DAPPMANAGER_CONTAINER="DAppNodeCore-dappmanager.dnp.dappnode.eth"
 WIFI_CONTAINER="DAppNodeCore-wifi.dnp.dappnode.eth"
 WIREGUARD_CONTAINER="DAppNodeCore-api.wireguard.dnp.dappnode.eth"
 OPENVPN_CONTAINER="DAppNodeCore-vpn.dnp.dappnode.eth"
@@ -26,9 +27,16 @@ DAPPNODE_WELCOME_URL="http://welcome.dappnode"
 #1.FUNCTIONS#
 #############
 
-function dappnode_startup_delay () {
-  echo "Wait until DAppNode initializes..."
-  sleep 6
+function dappnode_startup_check () {
+  echo -n "Wait until DAppNode initializes (press ctrl+c to stop) "
+  n=0
+  until [ "$n" -ge 8 ]
+  do
+    [ "$(docker inspect -f '{{.State.Running}}' ${DAPPMANAGER_CONTAINER} 2> /dev/null)" = "true" ] && break
+    n=$((n+1))
+    echo -n "."
+    sleep 8
+  done
 }
 
 # $1 Connection method $2 Credentials
@@ -44,12 +52,12 @@ function wifi_connection () {
   # Check interface variable is set
   [ ! -z $(docker exec -it $WIFI_CONTAINER iw dev | grep 'Interface' | awk 'NR==1{print $2}') ] && \
   create_connection_message "Wi-Fi" "$WIFI_GET_CREDS" && \
-  exit 0 || echo "Wifi not available"
+  exit 0 || echo "Wifi not detected"
 }
 
 function avahi_connection () {
   # Ping to avahi endpoint: -c: number of pings. -w: timeout
-  avahi-resolve -n $AVAHI_ENDPOINT > /dev/null 2>&1 || { echo "Avahi-daemon not available" ; return ; }
+  avahi-resolve -n $AVAHI_ENDPOINT > /dev/null 2>&1 || { echo "Avahi-daemon not detected" ; return ; }
   # Https container exists
   [ "$(docker ps -a | grep ${HTTPS_CONTAINER})" ] && \
   # Https container running
@@ -59,7 +67,7 @@ function avahi_connection () {
   # avahi-daemon running => systemctl is-active avahi-daemon RETURNS "active" or "inactive"
   [ "$(systemctl is-active avahi-daemon)" = "active" ] && \
   echo -e "\n\e[32mConnect to DAppNode through avahi-daemon.\e[0m\n\nVisit \e[4m$DAPPNODE_ADMINUI_LOCAL_URL\e\n\n[0mCheck out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e[0m\n" && \
-  exit 0 || echo "Avahi-daemon not available"
+  exit 0 || echo "Avahi-daemon not detected"
 }
 
 function wireguard_connection () {
@@ -68,7 +76,7 @@ function wireguard_connection () {
   # wireguard container running
   [ "$(docker inspect -f '{{.State.Running}}' ${WIREGUARD_CONTAINER})" = "true" ] && \
   create_connection_message "Wireguard" "$($WIREGUARD_GET_CREDS)" && \
-  exit 0 || echo "Wireguard not available"
+  exit 0 || echo "Wireguard not detected"
 }
 
 function openvpn_connection () {
@@ -77,18 +85,18 @@ function openvpn_connection () {
   # openvpn container running
   [ "$(docker inspect -f '{{.State.Running}}' ${OPENVPN_CONTAINER})" = "true" ] && \
   create_connection_message "Open-VPN" "$($OPENVPN_GET_CREDS)" && \
-  exit 0 || echo "Open-VPN not available"
+  exit 0 || echo "Open-VPN not detected"
 }
 
 ########
 #2.MAIN#
 ########
 
-dappnode_startup_delay
+dappnode_startup_check
 wifi_connection
 avahi_connection
 wireguard_connection
 openvpn_connection
 
-echo -e "\e[33mWARNING: no connection services available\e[0m"
+echo -e "\e[33mWARNING: no connection services detected\e[0m Check out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e[0m\n""
 exit 0
