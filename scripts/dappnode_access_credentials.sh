@@ -98,5 +98,5 @@ avahi_connection
 wireguard_connection
 openvpn_connection
 
-echo -e "\e[33mWARNING: no connection services detected\e[0m Check out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e[0m\n""
+echo -e "\e[33mWARNING: no connection services detected\e[0m Check out all the access methods available to connect to your DAppNode at \e[4m$DAPPNODE_WELCOME_URL\e[0m\n"
 exit 0
