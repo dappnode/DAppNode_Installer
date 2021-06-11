@@ -50,7 +50,7 @@ cd /images/bin/docker
 cd - # /usr/src/app/dappnode-iso
 
 echo "Creating necessary directories and copying files..."
-mkdir /usr/src/app/dappnode-iso/dappnode 
+mkdir -p /usr/src/app/dappnode-iso/dappnode 
 cp -r /usr/src/app/scripts /usr/src/app/dappnode-iso/dappnode
 cp -r /usr/src/app/dappnode/* /usr/src/app/dappnode-iso/dappnode
 cp -vr /images/bin /usr/src/app/dappnode-iso/dappnode/
