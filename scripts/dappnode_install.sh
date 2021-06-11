@@ -205,7 +205,7 @@ dappnode_start() {
 
     if ! grep -q "$DAPPNODE_ACCESS_CREDENTIALS" "$DAPPNODE_PROFILE"; then
         [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${DAPPNODE_ACCESS_CREDENTIALS_URL}
-        sed -i "/return/i /bin/bash $DAPPNODE_ACCESS_CREDENTIALS" $DAPPNODE_PROFILE | sed -i -e "/bin/bash $DAPPNODE_ACCESS_CREDENTIALS" $DAPPNODE_PROFILE
+        sed -i "/return/i /bin/bash $DAPPNODE_ACCESS_CREDENTIALS" $DAPPNODE_PROFILE | echo "/bin/bash $DAPPNODE_ACCESS_CREDENTIALS" >>$DAPPNODE_PROFILE
     fi
 
     # Delete dappnode_install.sh execution from rc.local if exists, and is not the unattended firstboot
