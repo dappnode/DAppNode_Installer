@@ -206,15 +206,15 @@ dappnode_start() {
     if ! grep -q "$DAPPNODE_ACCESS_CREDENTIALS" "$DAPPNODE_PROFILE"; then
         [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${DAPPNODE_ACCESS_CREDENTIALS_URL}
         sed -i "/return/i /bin/bash $DAPPNODE_ACCESS_CREDENTIALS" $DAPPNODE_PROFILE | sed -i -e "/bin/bash $DAPPNODE_ACCESS_CREDENTIALS" $DAPPNODE_PROFILE
-        #echo "/bin/bash ${DAPPNODE_ACCESS_CREDENTIALS}" >>$DAPPNODE_PROFILE
     fi
-    # Show credentials at shell installation
-    # [ ! -f "/usr/src/dappnode/logs/iso_install.log" ] && docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials
 
     # Delete dappnode_install.sh execution from rc.local if exists, and is not the unattended firstboot
     if [ -f "/etc/rc.local" ] && [ ! -f "/usr/src/dappnode/.firstboot" ]; then
         sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOGFILE
     fi
+
+    # Display credentials to the user
+    [ -f $DAPPNODE_ACCESS_CREDENTIALS ] && /bin/bash $DAPPNODE_ACCESS_CREDENTIALS
 }
 
 installExtraDpkg() {
@@ -306,8 +306,5 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     openvt -s -w -- sudo -u root /usr/src/dappnode/scripts/dappnode_test_install.sh
     exit 0
 fi
-
-# Display credentials to the user
-[ -f $DAPPNODE_ACCESS_CREDENTIALS ] && /bin/bash $DAPPNODE_ACCESS_CREDENTIALS
 
 exit 0
