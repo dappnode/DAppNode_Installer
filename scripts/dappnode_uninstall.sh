@@ -10,7 +10,7 @@ input=$1 # Allow to call script with argument (must be Y/N)
 )
 
 uninstall() {
-    source "${PROFILE_FILE}"
+    source "${PROFILE_FILE}" &>/dev/null
 
     # Remove DAppNodePackages
     find /var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data -name "*yml" -exec bash -c "docker-compose -f {} down  --rmi 'all' -v" \;
