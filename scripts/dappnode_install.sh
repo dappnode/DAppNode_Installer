@@ -141,11 +141,6 @@ dappnode_core_load() {
             eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOGFILE"
         fi
     done
-
-    for COMPOSE_PATH in ${DAPPNODE_CORE_DIR}/*.yml; do
-        # Remove the build property from the core docker-compose-*.yml
-       sed -i '/build:/,/image:/{//!d};/build:/d' $COMPOSE_PATH
-    done
 }
 
 customMotd() {
