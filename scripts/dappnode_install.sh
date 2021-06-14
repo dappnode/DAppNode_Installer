@@ -1,15 +1,31 @@
 #!/bin/bash
 
+#############
+# VARIABLES #
+#############
+# Dirs
 DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 LOGS_DIR="$DAPPNODE_DIR/logs"
+# Files
+CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 LOGFILE="${LOGS_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
-PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
+# Get URLs
+PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
+IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
+PROFILE_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_profile.sh"
+DAPPNODE_ACCESS_CREDENTIALS="${DAPPNODE_DIR}/scripts/dappnode_access_credentials.sh"
+DAPPNODE_ACCESS_CREDENTIALS_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_access_credentials.sh"
+WGET="wget -q --show-progress --progress=bar:force"
+SWGET="wget -q -O-"
+# Other
+PKGS=(HTTPS BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
-CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 ARCH=$(dpkg --print-architecture)
 
+# Clean if update
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
     rm -rf $LOGFILE
@@ -21,6 +37,7 @@ if [ "$UPDATE" = true ]; then
     rm -rf ${CONTENT_HASH_FILE}
 fi
 
+# Create necessary directories
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
 mkdir -p "${DAPPNODE_DIR}/scripts"
@@ -28,20 +45,31 @@ mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
 mkdir -p $LOGS_DIR
 
-PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
-PROFILE_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_profile.sh"
-DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
-DAPPNODE_ACCESS_CREDENTIALS="${DAPPNODE_DIR}/scripts/dappnode_access_credentials.sh"
-DAPPNODE_ACCESS_CREDENTIALS_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_access_credentials.sh"
-WGET="wget -q --show-progress --progress=bar:force"
-SWGET="wget -q -O-"
-IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
-
 # TEMPORARY: think a way to integrate flags instead of use files to detect installation type
-detect_installation_type() {
-    # Check for old and new location of iso_install.log
+is_iso_install() {
+    # Check old and new location of iso_install.log
     if [ -f "${DAPPNODE_DIR}/iso_install.log" ] || [ -f "${DAPPNODE_DIR}/logs/iso_install.log" ]; then
-        PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI HTTPS)
+        IS_ISO_INSTALL=true
+    else
+        IS_ISO_INSTALL=false
+    fi
+}
+
+# Check is port 80 in used (necessary for HTTPS)
+is_port_used() {
+   lsof -i -P -n | grep ":80 (LISTEN)" &>/dev/null && IS_PORT_USED=true || IS_PORT_USED=false
+}
+
+# Determine packages to be installed
+determine_packages() {
+    is_iso_install
+    if [ "$IS_ISO_INSTALL" == "false" ]; then
+        PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+    else
+        is_port_used
+        if [ "$IS_PORT_USED" == "true" ]; then
+            PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI)
+        fi
     fi
 }
 
@@ -70,15 +98,16 @@ if [[ ! -z $STATIC_IP ]]; then
     fi
 fi
 
+# Load profile
 [ -f $DAPPNODE_PROFILE ] || ${WGET} -O ${DAPPNODE_PROFILE} ${PROFILE_URL}
-
 source "${DAPPNODE_PROFILE}"
+
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
 # you can also specify an IPFS version like /ipfs/QmWg8P2b9JKQ8thAVz49J8SbJbCoi2MwkHnUqMtpzDTtxR:0.2.7, it's important
 # to include the exact version also in the IPFS hash format since it's needed to be able to download it
-detect_installation_type
+determine_packages
 for comp in "${PKGS[@]}"; do
     ver="${comp}_VERSION"
     DOWNLOAD_URL="https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}"
