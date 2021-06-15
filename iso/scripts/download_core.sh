@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Used for saving vars for the ISO build
+set -e
+
 sed '1,/^\#\!ISOBUILD/!d' /usr/src/app/.dappnode_profile >/tmp/vars.sh
 # shellcheck disable=SC1091
 source /tmp/vars.sh
