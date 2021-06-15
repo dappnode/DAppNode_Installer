@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 sed '1,/^\#\!ISOBUILD/!d' /usr/src/app/.dappnode_profile >/tmp/vars.sh
 source /tmp/vars.sh
 
