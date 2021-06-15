@@ -71,7 +71,7 @@ if [[ -n "$STATIC_IP" ]]; then
 fi
 
 [ -f $DAPPNODE_PROFILE ] || ${WGET} -O ${DAPPNODE_PROFILE} ${PROFILE_URL}
-# shellcheck disable=SC1091
+# shellcheck disable=SC1090
 source "${DAPPNODE_PROFILE}"
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
@@ -83,7 +83,7 @@ for comp in "${PKGS[@]}"; do
     ver="${comp}_VERSION"
     DOWNLOAD_URL="https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}"
     if [[ ${!ver} == /ipfs/* ]]; then
-        DOWNLOAD_URL="${IPFS_ENDPOINT}"/api/v0/cat?arg="${!ver%:*}"
+        DOWNLOAD_URL="${IPFS_ENDPOINT}/api/v0/cat?arg=${!ver%:*}"
     fi
     eval "${comp}_URL=\"${DOWNLOAD_URL}/${comp,,}.dnp.dappnode.eth_${!ver##*:}_linux-${ARCH}.txz\""
     eval "${comp}_YML=\"${DOWNLOAD_URL}/docker-compose.yml\""
@@ -176,7 +176,7 @@ addSwap() {
 
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
-    # shellcheck disable=SC1091
+    # shellcheck disable=SC1090
     source "${DAPPNODE_PROFILE}" >/dev/null 2>&1
 
     # Execute `compose-up` independently
@@ -200,6 +200,7 @@ dappnode_start() {
 
     if ! grep -q "$DAPPNODE_ACCESS_CREDENTIALS" "$DAPPNODE_PROFILE"; then
         [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${DAPPNODE_ACCESS_CREDENTIALS_URL}
+        # shellcheck disable=SC2216
         sed -i "/return/i /bin/bash $DAPPNODE_ACCESS_CREDENTIALS" $DAPPNODE_PROFILE | echo "/bin/bash $DAPPNODE_ACCESS_CREDENTIALS" >>$DAPPNODE_PROFILE
     fi
 
