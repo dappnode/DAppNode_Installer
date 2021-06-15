@@ -11,6 +11,6 @@ RUN addgroup -g 2999 docker
 
 # Create app directory
 WORKDIR /usr/src/app
-ADD . .
+COPY . .
 
 CMD ["/usr/src/app/iso/scripts/generate_ISO.sh"] 

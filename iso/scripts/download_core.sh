@@ -1,6 +1,8 @@
 #!/bin/bash
 
+# Used for saving vars for the ISO build
 sed '1,/^\#\!ISOBUILD/!d' /usr/src/app/.dappnode_profile >/tmp/vars.sh
+# shellcheck disable=SC1091
 source /tmp/vars.sh
 
 DAPPNODE_CORE_DIR="/images"
@@ -19,7 +21,7 @@ for comp in "${components[@]}"; do
     ver="${comp}_VERSION"
     DOWNLOAD_URL="https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}"
     if [[ ${!ver} == /ipfs/* ]]; then
-        DOWNLOAD_URL=${IPFS_ENDPOINT}/api/v0/cat?arg=${!ver%:*}
+        DOWNLOAD_URL="${IPFS_ENDPOINT}/api/v0/cat?arg=${!ver%:*}"
     fi
     
     eval "${comp}_URL=\"${DOWNLOAD_URL}/${comp,,}.dnp.dappnode.eth_${!ver##*:}_linux-amd64.txz\""
@@ -48,8 +50,8 @@ grabContentHashes() {
     rm -f $DAPPNODE_HASH_FILE
     for comp in "${CONTENT_HASH_PKGS[@]}"; do
         echo "Grabbing ${comp}"
-        CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
-        if [ -z $CONTENT_HASH ]; then
+        CONTENT_HASH=$(eval "${SWGET}" https://github.com/dappnode/DAppNodePackage-"${comp}"/releases/latest/download/content-hash)
+        if [ -z "$CONTENT_HASH" ]; then
             echo "ERROR! Failed to find content hash of ${comp}."
             exit 1
         fi
