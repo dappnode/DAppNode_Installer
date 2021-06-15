@@ -190,7 +190,7 @@ grep "iface en.* inet dhcp" /etc/network/interfaces || exit 1
 if [ -f /usr/src/dappnode/hotplug ]; then
     for IFACE in $(grep "en.*" /usr/src/dappnode/hotplug); do
         if [[ $(grep -L "$IFACE" /etc/network/interfaces) ]]; then
-            { echo "# $IFACE"; echo "allow-hotplug $IFACE"; echo "iface $IFACE inet dhcp" } >> /etc/network/interfaces
+            { echo "# $IFACE"; echo "allow-hotplug $IFACE"; echo "iface $IFACE inet dhcp"; } >> /etc/network/interfaces
         fi
     done
 fi
