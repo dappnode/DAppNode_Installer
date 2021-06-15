@@ -16,7 +16,7 @@ HTTPS_CONTAINER="DAppNodeCore-https.dnp.dappnode.eth"
 # Credentials
 WIREGUARD_GET_CREDS="docker exec -i $WIREGUARD_CONTAINER getWireguardCredentials"
 OPENVPN_GET_CREDS="docker exec -i $OPENVPN_CONTAINER getAdminCredentials"
-WIFI_GET_CREDS=$(cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml 2> /dev/null | grep 'SSID\|WPA_PASSPHRASE')
+WIFI_GET_CREDS=$(grep 'SSID\|WPA_PASSPHRASE' /usr/src/dappnode/DNCORE/docker-compose-wifi.yml)
 # Endpoints
 AVAHI_ENDPOINT="dappnode.local"
 DAPPNODE_ADMINUI_URL="http://my.dappnode"
@@ -50,15 +50,16 @@ function wifi_connection () {
   # wifi container running
   [ "$(docker inspect -f '{{.State.Running}}' ${WIFI_CONTAINER} 2> /dev/null)" = "true" ] && \
   # Check interface variable is set
-  [ ! -z $(docker exec -it $WIFI_CONTAINER iw dev | grep 'Interface' | awk 'NR==1{print $2}') ] && \
+  [ -n "$(docker exec -it $WIFI_CONTAINER iw dev | grep 'Interface' | awk 'NR==1{print $2}')" ] && \
   create_connection_message "Wi-Fi" "$WIFI_GET_CREDS" && \
-  exit 0 || echo "\nWifi not detected"
+  exit 0 || echo -e "\nWifi not detected"
 }
 
 function avahi_connection () {
   # Ping to avahi endpoint: -c: number of pings. -w: timeout
   avahi-resolve -n $AVAHI_ENDPOINT > /dev/null 2>&1 || { echo "Avahi-daemon not detected" ; return ; }
   # Https container exists
+  # shellcheck disable=SC2143
   [ "$(docker ps -a | grep ${HTTPS_CONTAINER})" ] && \
   # Https container running
   [ "$(docker inspect -f '{{.State.Running}}' ${HTTPS_CONTAINER})" = "true" ] && \
@@ -72,6 +73,7 @@ function avahi_connection () {
 
 function wireguard_connection () {
   # wireguard container exists
+  # shellcheck disable=SC2143
   [ "$(docker ps -a | grep ${WIREGUARD_CONTAINER})" ] && \
   # wireguard container running
   [ "$(docker inspect -f '{{.State.Running}}' ${WIREGUARD_CONTAINER})" = "true" ] && \
@@ -81,6 +83,7 @@ function wireguard_connection () {
 
 function openvpn_connection () {
   # openvpn container exists
+  # shellcheck disable=SC2143
   [ "$(docker ps -a | grep ${OPENVPN_CONTAINER})" ] && \
   # openvpn container running
   [ "$(docker inspect -f '{{.State.Running}}' ${OPENVPN_CONTAINER})" = "true" ] && \

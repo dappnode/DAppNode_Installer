@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 #echo "Downloading debian ISO image: debian-firmware-testing-amd64-netinst-2020-06-22.iso..."
@@ -40,13 +40,14 @@ cd /usr/src/app/dappnode-iso # /usr/src/app/dappnode-iso
 
 echo "Downloading third-party packages..."
 sed '1,/^\#\!ISOBUILD/!d' /usr/src/app/scripts/dappnode_install_pre.sh >/tmp/vars.sh
+# shellcheck disable=SC1091
 source /tmp/vars.sh
 mkdir -p /images/bin/docker
 cd /images/bin/docker
-[ -f ${DOCKER_PKG} ] || wget ${DOCKER_URL}
-[ -f ${DOCKER_CLI_PKG} ] || wget ${DOCKER_CLI_URL}
-[ -f ${CONTAINERD_PKG} ] || wget ${CONTAINERD_URL}
-[ -f docker-compose-Linux-x86_64 ] || wget ${DCMP_URL}
+[ -f "${DOCKER_PKG}" ] || wget "${DOCKER_URL}"
+[ -f "${DOCKER_CLI_PKG}" ] || wget "${DOCKER_CLI_URL}"
+[ -f "${CONTAINERD_PKG}" ] || wget "${CONTAINERD_URL}"
+[ -f docker-compose-Linux-x86_64 ] || wget "${DCMP_URL}"
 cd - # /usr/src/app/dappnode-iso
 
 echo "Creating necessary directories and copying files..."
@@ -67,6 +68,7 @@ fi
 cd /tmp/makeinitrd
 gunzip initrd.gz
 cpio -id -H newc <initrd
+# shellcheck disable=SC2002
 cat initrd | cpio -t >/tmp/list
 echo "preseed.cfg" >>/tmp/list
 rm initrd
@@ -85,6 +87,7 @@ cp /usr/src/app/iso/boot/txt.cfg isolinux/txt.cfg
 cp /usr/src/app/iso/boot/splash.png isolinux/splash.png
 
 echo "Fix md5 sum..."
+# shellcheck disable=SC2046
 md5sum $(find ! -name "md5sum.txt" ! -path "./isolinux/*" -type f) >md5sum.txt
 
 echo "Generating new iso..."
