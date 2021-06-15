@@ -59,8 +59,10 @@ function avahi_connection () {
   # Ping to avahi endpoint: -c: number of pings. -w: timeout
   avahi-resolve -n $AVAHI_ENDPOINT > /dev/null 2>&1 || { echo "Avahi-daemon not detected" ; return ; }
   # Https container exists
+  # shellcheck disable=SC2143
   [ "$(docker ps -a | grep ${HTTPS_CONTAINER})" ] && \
   # Https container running
+  # shellcheck disable=SC2143
   [ "$(docker inspect -f '{{.State.Running}}' ${HTTPS_CONTAINER})" = "true" ] && \
   # Https env variable LOCAL_PROXYING="true"
   [ "$(docker exec -i ${HTTPS_CONTAINER} sh -c 'echo "$LOCAL_PROXYING"')" = "true" ] && \
@@ -81,6 +83,7 @@ function wireguard_connection () {
 
 function openvpn_connection () {
   # openvpn container exists
+  # shellcheck disable=SC2143
   [ "$(docker ps -a | grep ${OPENVPN_CONTAINER})" ] && \
   # openvpn container running
   [ "$(docker inspect -f '{{.State.Running}}' ${OPENVPN_CONTAINER})" = "true" ] && \

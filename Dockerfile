@@ -1,7 +1,7 @@
 FROM docker:dind
 
 RUN apk update && \
-    apk add xorriso git xz curl ca-certificates iptables cpio bash \
+    apk add --no-cache xorriso git xz curl ca-certificates iptables cpio bash \
     docker-compose && \
     rm -rf /var/cache/apk/* 
 

@@ -68,6 +68,7 @@ fi
 cd /tmp/makeinitrd
 gunzip initrd.gz
 cpio -id -H newc <initrd
+# shellcheck disable=SC2002
 cat initrd | cpio -t >/tmp/list
 echo "preseed.cfg" >>/tmp/list
 rm initrd
