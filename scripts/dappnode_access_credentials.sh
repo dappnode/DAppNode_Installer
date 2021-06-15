@@ -62,7 +62,6 @@ function avahi_connection () {
   # shellcheck disable=SC2143
   [ "$(docker ps -a | grep ${HTTPS_CONTAINER})" ] && \
   # Https container running
-  # shellcheck disable=SC2143
   [ "$(docker inspect -f '{{.State.Running}}' ${HTTPS_CONTAINER})" = "true" ] && \
   # Https env variable LOCAL_PROXYING="true"
   [ "$(docker exec -i ${HTTPS_CONTAINER} sh -c 'echo "$LOCAL_PROXYING"')" = "true" ] && \
