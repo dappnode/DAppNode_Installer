@@ -71,7 +71,7 @@ if [[ -n "$STATIC_IP" ]]; then
 fi
 
 [ -f $DAPPNODE_PROFILE ] || ${WGET} -O ${DAPPNODE_PROFILE} ${PROFILE_URL}
-# shellcheck source=/usr/src/dappnode/DNCORE/.dappnode_profile
+# shellcheck disable=SC1091
 source "${DAPPNODE_PROFILE}"
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
@@ -176,7 +176,7 @@ addSwap() {
 
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
-    # shellcheck source=/usr/src/dappnode/DNCORE/.dappnode_profile
+    # shellcheck disable=SC1091
     source "${DAPPNODE_PROFILE}" >/dev/null 2>&1
 
     # Execute `compose-up` independently
@@ -221,7 +221,7 @@ installExtraDpkg() {
 grabContentHashes() {
     if [ ! -f "${CONTENT_HASH_FILE}" ]; then
         for comp in "${CONTENT_HASH_PKGS[@]}"; do
-            CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
+            CONTENT_HASH=$(eval "${SWGET}" https://github.com/dappnode/DAppNodePackage-"${comp}"/releases/latest/download/content-hash)
             if [ -z "$CONTENT_HASH" ]; then
                 echo "ERROR! Failed to find content hash of ${comp}." 2>&1 | tee -a $LOGFILE
                 exit 1
