@@ -31,9 +31,7 @@ detect_installation_type() {
 
 install_docker() {
     ##############################################
-    ##############################################
     ####          DOCKER INSTALLATION         ####
-    ##############################################
     ##############################################
 
     # STEP 0: Detect if it's a Debian 9 (stretch) or Debian 10 (Buster) installation
@@ -94,9 +92,7 @@ install_docker() {
 
 install_docker_compose() {
     ##############################################
-    ##############################################
     ####      DOCKER COMPOSE INSTALLATION     ####
-    ##############################################
     ##############################################
 
     # STEP 0: Declare paths and directories
@@ -126,9 +122,7 @@ install_docker_compose() {
 
 install_wireguard_dkms() {
     ##############################################
-    ##############################################
     ####        WIREGUARD INSTALLATION        ####
-    ##############################################
     ##############################################
     apt-get update -y
     if [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
@@ -145,10 +139,21 @@ install_wireguard_dkms() {
     fi
 }
 
-##############################################
+install_lsof() {
+    ##############################################
+    ####        LSOF INSTALLATION        ####
+    ##############################################
+    apt-get update -y
+    apt-get install lsof -y | tee -a $LOG_FILE
+    if  lsof -v >/dev/null 2>&1 ; then
+        echo -e "\e[32m \n\n Verified lsof installation \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+    else
+        echo -e "\e[31m \n\n WARNING: lsof not installed, HTTPS DAppNode package might not be installed! \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+    fi
+}
+
 ##############################################
 ####             SCRIPT START             ####
-##############################################
 ##############################################
 
 detect_installation_type
@@ -175,11 +180,17 @@ else
 fi
 
 # Only install wireguard-dkms if needed
-
 if modprobe wireguard >/dev/null 2>&1 ; then
     echo -e "\e[32m \n\n wireguard-dkms is already installed \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
 else
     install_wireguard_dkms 2>&1 | tee -a $LOG_FILE
+fi
+
+# Only install lsof if needed
+if lsof -v >/dev/null 2>&1; then
+    echo -e "\e[32m \n\n lsof is already installed \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+else
+    install_lsof 2>&1 | tee -a $LOG_FILE
 fi
 
 #Check connectivity
