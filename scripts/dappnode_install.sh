@@ -21,7 +21,6 @@ DAPPNODE_ACCESS_CREDENTIALS_URL="https://github.com/dappnode/DAppNode/releases/l
 WGET="wget -q --show-progress --progress=bar:force"
 SWGET="wget -q -O-"
 # Other
-PKGS=(HTTPS BIND IPFS VPN DAPPMANAGER WIFI)
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
 ARCH=$(dpkg --print-architecture)
 
@@ -63,14 +62,21 @@ is_port_used() {
 # Determine packages to be installed
 determine_packages() {
     is_iso_install
+    is_port_used
     if [ "$IS_ISO_INSTALL" == "false" ]; then
-        PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+        if [ "$IS_PORT_USED" == "true" ]; then
+            PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+        else
+            PKGS=(HTTPS BIND IPFS VPN DAPPMANAGER WIFI)
+        fi
     else
-        is_port_used
         if [ "$IS_PORT_USED" == "true" ]; then
             PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI)
+        else
+            PKGS=(HTTPS BIND IPFS WIREGUARD DAPPMANAGER WIFI)
         fi
     fi
+    echo -e "\e[32mPackages to be installed: ${PKGS[*]}\e[0m" 2>&1 | tee -a $LOGFILE
 }
 
 function valid_ip() {
@@ -101,7 +107,6 @@ fi
 # Load profile
 [ -f $DAPPNODE_PROFILE ] || ${WGET} -O ${DAPPNODE_PROFILE} ${PROFILE_URL}
 source "${DAPPNODE_PROFILE}"
-
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
@@ -277,15 +282,11 @@ installExtraDpkg() {
 }
 
 ##############################################
-##############################################
 ####             SCRIPT START             ####
-##############################################
 ##############################################
 
 echo -e "\e[32m\n##############################################\e[0m" 2>&1 | tee -a $LOGFILE
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 echo -e "\e[32m####          DAPPNODE INSTALLER          ####\e[0m" 2>&1 | tee -a $LOGFILE
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 
 echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOGFILE
