@@ -194,8 +194,7 @@ else
 fi
 
 #Check connectivity
-[ -f /etc/network/interfaces ] || exit 1
-grep "iface en.* inet dhcp" /etc/network/interfaces || exit 1
+[ -f /etc/network/interfaces ] && grep "iface en.* inet dhcp" /etc/network/interfaces || { echo "Interfaces not found"; exit 1; }
 
 ## Add missing interfaces
 if [ -f /usr/src/dappnode/hotplug ]; then
