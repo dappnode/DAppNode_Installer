@@ -87,7 +87,7 @@ cp /usr/src/app/iso/boot/txt.cfg isolinux/txt.cfg
 cp /usr/src/app/iso/boot/splash.png isolinux/splash.png
 
 echo "Fix md5 sum..."
-md5sum "$(find ! -name "md5sum.txt" ! -path "./isolinux/*" -type f)" >md5sum.txt
+md5sum $(find ! -name "md5sum.txt" ! -path "./isolinux/*" -type f) >md5sum.txt
 
 echo "Generating new iso..."
 xorriso -as mkisofs -isohybrid-mbr isolinux/isohdpfx.bin \
