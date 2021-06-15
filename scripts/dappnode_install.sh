@@ -52,7 +52,7 @@ function valid_ip() {
     if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
         OIFS=$IFS
         IFS='.'
-        ip=($ip)
+        ip=("$ip")
         IFS=$OIFS
         [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 && \
         ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
@@ -61,9 +61,9 @@ function valid_ip() {
     return $stat
 }
 
-if [[ ! -z $STATIC_IP ]]; then
-    if valid_ip $STATIC_IP; then
-        echo $STATIC_IP >${DAPPNODE_DIR}/config/static_ip
+if [[ -n "$STATIC_IP" ]]; then
+    if valid_ip "$STATIC_IP"; then
+        echo "$STATIC_IP" >${DAPPNODE_DIR}/config/static_ip
     else
         echo "The static IP provided: ${STATIC_IP} is not valid."
         exit 1
@@ -71,7 +71,7 @@ if [[ ! -z $STATIC_IP ]]; then
 fi
 
 [ -f $DAPPNODE_PROFILE ] || ${WGET} -O ${DAPPNODE_PROFILE} ${PROFILE_URL}
-
+# shellcheck source=/usr/src/dappnode/DNCORE/.dappnode_profile
 source "${DAPPNODE_PROFILE}"
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
@@ -83,7 +83,7 @@ for comp in "${PKGS[@]}"; do
     ver="${comp}_VERSION"
     DOWNLOAD_URL="https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}"
     if [[ ${!ver} == /ipfs/* ]]; then
-        DOWNLOAD_URL=${IPFS_ENDPOINT}/api/v0/cat?arg=${!ver%:*}
+        DOWNLOAD_URL="${IPFS_ENDPOINT}"/api/v0/cat?arg="${!ver%:*}"
     fi
     eval "${comp}_URL=\"${DOWNLOAD_URL}/${comp,,}.dnp.dappnode.eth_${!ver##*:}_linux-${ARCH}.txz\""
     eval "${comp}_YML=\"${DOWNLOAD_URL}/docker-compose.yml\""
@@ -96,23 +96,22 @@ done
 dappnode_core_build() {
     for comp in "${PKGS[@]}"; do
         ver="${comp}_VERSION"
-        file="${comp}_FILE"
         if [[ ${!ver} == dev:* ]]; then
             echo "Cloning & building DNP_${comp}..."
             if ! dpkg -s git >/dev/null 2>&1; then
                 apt-get install -y git
             fi
             TMPDIR=$(mktemp -d)
-            pushd $TMPDIR
-            git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_${comp}
+            pushd "$TMPDIR" || { echo "Error on pushd"; exit 1 }
+            git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_"${comp}"
             # Change version in YAML to the custom one
             DOCKER_VER=$(echo "${!ver##*:}" | sed 's/\//_/g')
-            sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${DOCKER_VER}~" DNP_${comp}/docker-compose.yml
-            docker-compose -f ./DNP_${comp}/docker-compose.yml build
-            cp ./DNP_${comp}/docker-compose.yml ${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml
-            cp ./DNP_${comp}/dappnode_package.json ${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json
-            rm -r ./DNP_${comp}
-            popd
+            sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${DOCKER_VER}~" DNP_"${comp}"/docker-compose.yml
+            docker-compose -f ./DNP_"${comp}"/docker-compose.yml build
+            cp ./DNP_"${comp}"/docker-compose.yml "${DAPPNODE_CORE_DIR}"/docker-compose-"${comp,,}".yml
+            cp ./DNP_"${comp}"/dappnode_package.json "${DAPPNODE_CORE_DIR}"/dappnode_package-"${comp,,}".json
+            rm -r ./DNP_"${comp}"
+            popd || { echo "Error on popd"; exit 1 }
         fi
     done
 }
@@ -160,7 +159,7 @@ addSwap() {
     IS_SWAP=$(swapon --show | wc -l)
 
     # if not then create it
-    if [ $IS_SWAP -eq 0 ]; then
+    if [ "$IS_SWAP" -eq 0 ]; then
         echo -e '\e[32mSwap not found. Adding swapfile.\e[0m'
         #RAM=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
         #SWAP=$(($RAM * 2))
@@ -177,19 +176,20 @@ addSwap() {
 
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
+    # shellcheck source=/usr/src/dappnode/DNCORE/.dappnode_profile
     source "${DAPPNODE_PROFILE}" >/dev/null 2>&1
 
     # Execute `compose-up` independently
     # To execute `compose-up` against more than 1 compose, composes files must share compose file version (e.g 3.5)
     for comp in "${DNCORE_YMLS_ARRAY[@]}"; do
-        docker-compose -f $comp up -d 2>&1 | tee -a $LOGFILE
+        docker-compose -f "$comp" up -d 2>&1 | tee -a $LOGFILE
         echo "${comp} started" 2>&1 | tee -a $LOGFILE
     done
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOGFILE
 
     # Show credentials to the user on login
-    USER=$(cat /etc/passwd | grep 1000 | cut -f 1 -d:)
-    [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
+    USER=$(grep 1000 /etc/passwd | cut -f 1 -d:)
+    [ -n "$USER" ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
     if ! grep -q "${DAPPNODE_PROFILE}" "$PROFILE"; then
         echo "########          DAPPNODE PROFILE          ########" >>$PROFILE
@@ -222,7 +222,7 @@ grabContentHashes() {
     if [ ! -f "${CONTENT_HASH_FILE}" ]; then
         for comp in "${CONTENT_HASH_PKGS[@]}"; do
             CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
-            if [ -z $CONTENT_HASH ]; then
+            if [ -z "$CONTENT_HASH" ]; then
                 echo "ERROR! Failed to find content hash of ${comp}." 2>&1 | tee -a $LOGFILE
                 exit 1
             fi
@@ -271,7 +271,7 @@ installExtraDpkg
 echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
 
-if [ $ARCH == "amd64" ]; then 
+if [ "$ARCH" == "amd64" ]; then 
     echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOGFILE
     installSgx
 

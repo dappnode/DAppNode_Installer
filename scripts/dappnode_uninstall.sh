@@ -10,6 +10,7 @@ input=$1 # Allow to call script with argument (must be Y/N)
 )
 
 uninstall() {
+    # shellcheck source=/usr/src/dappnode/DNCORE/.dappnode_profile
     source "${PROFILE_FILE}" &>/dev/null
 
     # Remove DAppNodePackages
@@ -19,7 +20,7 @@ uninstall() {
     docker container ls -a -q -f name=DAppNode* | xargs -I {} docker network disconnect dncore_network {}
 
     # Remove containers, volumes and images
-    docker-compose $DNCORE_YMLS down --rmi 'all' -v
+    docker-compose "$DNCORE_YMLS" down --rmi 'all' -v
 
     # Remove dncore_network
     docker network remove dncore_network || echo "dncore_network already removed"
@@ -28,7 +29,7 @@ uninstall() {
     rm -rf /usr/src/dappnode
 
     # Remove profile file
-    USER=$(cat /etc/passwd | grep 1000 | cut -f 1 -d:)
+    USER=$(grep 1000 /etc/passwd | cut -f 1 -d:)
     [ -n "$USER" ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
     sed -i '/########          DAPPNODE PROFILE          ########/g' $PROFILE
     sed -i '/.*dappnode_profile/g' $PROFILE
