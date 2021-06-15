@@ -73,6 +73,7 @@ function avahi_connection () {
 
 function wireguard_connection () {
   # wireguard container exists
+  # shellcheck disable=SC2143
   [ "$(docker ps -a | grep ${WIREGUARD_CONTAINER})" ] && \
   # wireguard container running
   [ "$(docker inspect -f '{{.State.Running}}' ${WIREGUARD_CONTAINER})" = "true" ] && \
