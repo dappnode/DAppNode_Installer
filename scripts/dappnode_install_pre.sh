@@ -183,19 +183,14 @@ else
 fi
 
 #Check connectivity
-cat /etc/network/interfaces 2>&1 | tee -a $LOG_FILE
-grep "iface en.* inet dhcp" /etc/network/interfaces
-if [ $? -ne 0 ]; then
-    exit 1
-fi
+[ -f /etc/network/interfaces ] || exit 1
+grep "iface en.* inet dhcp" /etc/network/interfaces || exit 1
 
 ## Add missing interfaces
 if [ -f /usr/src/dappnode/hotplug ]; then
-    for IFACE in $(cat /usr/src/dappnode/hotplug | grep "en.*" ); do
+    for IFACE in $(grep "en.*" /usr/src/dappnode/hotplug); do
         if [[ $(grep -L "$IFACE" /etc/network/interfaces) ]]; then
-            echo "# $IFACE"  >> /etc/network/interfaces;
-	        echo "allow-hotplug $IFACE"  >> /etc/network/interfaces;
-            echo "iface $IFACE inet dhcp"  >> /etc/network/interfaces;
+            { echo "# $IFACE"; echo "allow-hotplug $IFACE"; echo "iface $IFACE inet dhcp" } >> /etc/network/interfaces
         fi
     done
 fi

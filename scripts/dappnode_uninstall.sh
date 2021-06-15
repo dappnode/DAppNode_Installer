@@ -10,7 +10,7 @@ input=$1 # Allow to call script with argument (must be Y/N)
 )
 
 uninstall() {
-    # shellcheck source=/usr/src/dappnode/DNCORE/.dappnode_profile
+    # shellcheck disable=SC1090
     source "${PROFILE_FILE}" &>/dev/null
 
     # Remove DAppNodePackages
