@@ -14,6 +14,7 @@ uninstall() {
     source "${PROFILE_FILE}" &>/dev/null
 
     # Remove DAppNodePackages
+    # shellcheck disable=SC2156
     find /var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data -name "*yml" -exec bash -c "docker-compose -f {} down  --rmi 'all' -v" \;
 
     # Disconnect all packages from the network
