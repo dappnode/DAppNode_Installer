@@ -102,7 +102,7 @@ dappnode_core_build() {
                 apt-get install -y git
             fi
             TMPDIR=$(mktemp -d)
-            pushd "$TMPDIR" || { echo "Error on pushd"; exit 1 }
+            pushd "$TMPDIR" || { echo "Error on pushd"; exit 1; }
             git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_"${comp}"
             # Change version in YAML to the custom one
             DOCKER_VER=$(echo "${!ver##*:}" | sed 's/\//_/g')
@@ -111,7 +111,7 @@ dappnode_core_build() {
             cp ./DNP_"${comp}"/docker-compose.yml "${DAPPNODE_CORE_DIR}"/docker-compose-"${comp,,}".yml
             cp ./DNP_"${comp}"/dappnode_package.json "${DAPPNODE_CORE_DIR}"/dappnode_package-"${comp,,}".json
             rm -r ./DNP_"${comp}"
-            popd || { echo "Error on popd"; exit 1 }
+            popd || { echo "Error on popd"; exit 1; }
         fi
     done
 }
