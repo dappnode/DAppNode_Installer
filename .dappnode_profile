@@ -14,7 +14,7 @@ export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 #!ISOBUILD Do not modify, variables above imported for ISO build
 DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")
 # shellcheck disable=SC2034
-DNCORE_YMLS_ARRAY=("$(find /usr/src/dappnode/DNCORE -name "docker-compose-*.yml" | sort)")
+DNCORE_YMLS_ARRAY=($(find /usr/src/dappnode/DNCORE -name "docker-compose-*.yml" | sort))
 
 # Returns docker core containers status
 alias dappnode_status='docker-compose $DNCORE_YMLS ps'
