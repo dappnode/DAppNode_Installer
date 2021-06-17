@@ -14,13 +14,13 @@ uninstall() {
     source "${PROFILE_FILE}" &>/dev/null
 
     # Stop DAppNode containers
-    docker container stop $(docker ps --format '{{.Names}}' | grep DAppNode)
+    docker container stop "$(docker ps --format '{{.Names}}' | grep DAppNode)"
     # Remove DAppNode containers
-    docker container rm $(docker ps -a --format '{{.Names}}' | grep DAppNode)
+    docker container rm "$(docker ps -a --format '{{.Names}}' | grep DAppNode)"
     # Remove DAppNode images
-    docker image rm $(docker image ls -a | grep "dappnode")
+    docker image rm "$(docker image ls -a | grep "dappnode")"
     # Remove DAppNode volumes
-    docker volume rm $(docker volume ls | grep "dappnode\|dncore")
+    docker volume rm "$(docker volume ls | grep "dappnode\|dncore")"
 
     # Remove containers, volumes and images
     docker-compose "$DNCORE_YMLS" down --rmi 'all' -v || echo "packages already removed"
