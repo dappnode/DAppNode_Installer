@@ -29,6 +29,7 @@ DAPPNODE_WELCOME_URL="http://welcome.dappnode"
 
 function dappnode_startup_check () {
   echo -n "Wait until DAppNode initializes (press ctrl+c to stop) "
+  sleep 5
   n=0
   until [ "$n" -ge 8 ]
   do
