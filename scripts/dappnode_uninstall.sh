@@ -23,7 +23,7 @@ uninstall() {
     docker volume rm $(docker volume ls | grep "dappnode\|dncore")
 
     # Remove containers, volumes and images
-    docker-compose "$DNCORE_YMLS" down --rmi 'all' -v
+    docker-compose "$DNCORE_YMLS" down --rmi 'all' -v || echo "packages already removed"
 
     # Remove dncore_network
     docker network remove dncore_network || echo "dncore_network already removed"
