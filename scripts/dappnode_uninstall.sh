@@ -20,7 +20,7 @@ uninstall() {
     # Remove DAppNode images
     docker image rm $(docker image ls -a | grep "dappnode")
     # Remove DAppNode volumes
-    docker volume rm $(docker volume ls -a | grep "dappnode\|dncore")
+    docker volume rm $(docker volume ls | grep "dappnode\|dncore")
 
     # Remove containers, volumes and images
     docker-compose "$DNCORE_YMLS" down --rmi 'all' -v
