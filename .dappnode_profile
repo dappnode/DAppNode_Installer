@@ -3,16 +3,18 @@
 export BIND_VERSION="${BIND_VERSION:-0.2.6}"
 export IPFS_VERSION="${IPFS_VERSION:-0.2.14}"
 export VPN_VERSION="${VPN_VERSION:-0.2.8}"
-export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.40}"
-export WIFI_VERSION="${WIFI_VERSION:-0.2.6}"
+export DAPPMANAGER_VERSION="${DAPPMANAGER_VERSION:-0.2.41}"
+export WIFI_VERSION="${WIFI_VERSION:-0.2.7}"
 export WIREGUARD_VERSION="${WIREGUARD_VERSION:-0.1.0}"
-export HTTPS_VERSION="${HTTPS:-0.1.0}"
+export HTTPS_VERSION="${HTTPS:-0.1.1}"
 
 export DAPPNODE_DIR="/usr/src/dappnode"
 export DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 
 #!ISOBUILD Do not modify, variables above imported for ISO build
 DNCORE_YMLS=$(find $DAPPNODE_CORE_DIR -name "docker-compose-*.yml" -printf "-f %p ")
+# shellcheck disable=SC2207
+# shellcheck disable=SC2034
 DNCORE_YMLS_ARRAY=($(find /usr/src/dappnode/DNCORE -name "docker-compose-*.yml" | sort))
 
 # Returns docker core containers status
@@ -27,7 +29,8 @@ alias dappnode_get='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth vpncli get'
 alias dappnode_connect='docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials'
 # Return wifi credentials (ssid and password)
 alias dappnode_wifi='cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep "SSID\|WPA_PASSPHRASE"'
-# Return wireguard credentials
-alias dappnode_wireguard='docker exec DAppNodeCore-wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf'
+# Return remote credentials in plain text. OPTIONS:
+# --qr (QR format). --local (local creds for NAT loopback issues)
+alias dappnode_wireguard='docker exec -i DAppNodeCore-api.wireguard.dnp.dappnode.eth getWireguardCredentials'
 
 return

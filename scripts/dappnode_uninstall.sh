@@ -10,16 +10,20 @@ input=$1 # Allow to call script with argument (must be Y/N)
 )
 
 uninstall() {
-    source "${PROFILE_FILE}"
+    # shellcheck disable=SC1090
+    source "${PROFILE_FILE}" &>/dev/null
 
-    # Remove DAppNodePackages
-    find /var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data -name "*yml" -exec bash -c "docker-compose -f {} down  --rmi 'all' -v" \;
-
-    # Disconnect all packages from the network
-    docker container ls -a -q -f name=DAppNode* | xargs -I {} docker network disconnect dncore_network {}
+    # Stop DAppNode containers
+    docker container stop "$(docker ps --format '{{.Names}}' | grep DAppNode)" || echo "containers already stopped"
+    # Remove DAppNode containers
+    docker container rm "$(docker ps -a --format '{{.Names}}' | grep DAppNode)" || echo "containers already removed"
+    # Remove DAppNode images
+    docker image rm "$(docker image ls -a | grep "dappnode")" || echo "images already removed"
+    # Remove DAppNode volumes
+    docker volume rm "$(docker volume ls | grep "dappnode\|dncore")" || echo "packages already removed"
 
     # Remove containers, volumes and images
-    docker-compose $DNCORE_YMLS down --rmi 'all' -v
+    docker-compose "$DNCORE_YMLS" down --rmi 'all' -v || echo "packages already removed"
 
     # Remove dncore_network
     docker network remove dncore_network || echo "dncore_network already removed"
@@ -28,7 +32,7 @@ uninstall() {
     rm -rf /usr/src/dappnode
 
     # Remove profile file
-    USER=$(cat /etc/passwd | grep 1000 | cut -f 1 -d:)
+    USER=$(grep 1000 /etc/passwd | cut -f 1 -d:)
     [ -n "$USER" ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
     sed -i '/########          DAPPNODE PROFILE          ########/g' $PROFILE
     sed -i '/.*dappnode_profile/g' $PROFILE

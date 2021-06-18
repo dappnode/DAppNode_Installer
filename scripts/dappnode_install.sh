@@ -1,17 +1,30 @@
 #!/bin/bash
 
+#############
+# VARIABLES #
+#############
+# Dirs
 DAPPNODE_DIR="/usr/src/dappnode"
 DAPPNODE_CORE_DIR="${DAPPNODE_DIR}/DNCORE"
 LOGS_DIR="$DAPPNODE_DIR/logs"
+# Files
+CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
 LOGFILE="${LOGS_DIR}/dappnode_install.log"
 MOTD_FILE="/etc/motd"
-PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
+# Get URLs
+PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
+IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
+PROFILE_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_profile.sh"
+DAPPNODE_ACCESS_CREDENTIALS="${DAPPNODE_DIR}/scripts/dappnode_access_credentials.sh"
+DAPPNODE_ACCESS_CREDENTIALS_URL="https://github.com/dappnode/DAppNode/releases/latest/download/dappnode_access_credentials.sh"
+WGET="wget -q --show-progress --progress=bar:force"
+SWGET="wget -q -O-"
+# Other
 CONTENT_HASH_PKGS=(geth openethereum nethermind)
-CONTENT_HASH_FILE="${DAPPNODE_CORE_DIR}/packages-content-hash.csv"
-CRED_CMD="docker exec -i DAppNodeCore-vpn.dnp.dappnode.eth getAdminCredentials"
-WIFI_CREDENTIALS="cat /usr/src/dappnode/DNCORE/docker-compose-wifi.yml | grep 'SSID\|WPA_PASSPHRASE'"
 ARCH=$(dpkg --print-architecture)
 
+# Clean if update
 if [ "$UPDATE" = true ]; then
     echo "Cleaning for update..."
     rm -rf $LOGFILE
@@ -23,28 +36,47 @@ if [ "$UPDATE" = true ]; then
     rm -rf ${CONTENT_HASH_FILE}
 fi
 
+# Create necessary directories
 mkdir -p $DAPPNODE_DIR
 mkdir -p $DAPPNODE_CORE_DIR
+mkdir -p "${DAPPNODE_DIR}/scripts"
 mkdir -p "${DAPPNODE_CORE_DIR}/scripts"
 mkdir -p "${DAPPNODE_DIR}/config"
 mkdir -p $LOGS_DIR
 
-PROFILE_BRANCH=${PROFILE_BRANCH:-"master"}
-PROFILE_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/.dappnode_profile"
-DAPPNODE_PROFILE="${DAPPNODE_CORE_DIR}/.dappnode_profile"
-DAPPNODE_ACCESS_CREDENTIALS="${DAPPNODE_DIR}/scripts/dappnode_access_credentials.sh"
-ACCESS_CREDENTIALS_URL="https://raw.githubusercontent.com/dappnode/DAppNode_Installer/${PROFILE_BRANCH}/scripts/dappnode_access_credentials.sh"
-WGET="wget -q --show-progress --progress=bar:force"
-SWGET="wget -q -O-"
-IPFS_ENDPOINT=${IPFS_ENDPOINT:-"http://ipfs.io"}
-
 # TEMPORARY: think a way to integrate flags instead of use files to detect installation type
-detect_installation_type() {
-    # Check for old and new location of iso_install.log
+is_iso_install() {
+    # Check old and new location of iso_install.log
     if [ -f "${DAPPNODE_DIR}/iso_install.log" ] || [ -f "${DAPPNODE_DIR}/logs/iso_install.log" ]; then
-        PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI HTTPS)
-        CRED_CMD="docker exec DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth cat /config/peer_dappnode_admin/peer_dappnode_admin.conf"
+        IS_ISO_INSTALL=true
+    else
+        IS_ISO_INSTALL=false
     fi
+}
+
+# Check is port 80 in used (necessary for HTTPS)
+is_port_used() {
+   lsof -i -P -n | grep ":80 (LISTEN)" &>/dev/null && IS_PORT_USED=true || IS_PORT_USED=false
+}
+
+# Determine packages to be installed
+determine_packages() {
+    is_iso_install
+    is_port_used
+    if [ "$IS_ISO_INSTALL" == "false" ]; then
+        if [ "$IS_PORT_USED" == "true" ]; then
+            PKGS=(BIND IPFS VPN DAPPMANAGER WIFI)
+        else
+            PKGS=(HTTPS BIND IPFS VPN DAPPMANAGER WIFI)
+        fi
+    else
+        if [ "$IS_PORT_USED" == "true" ]; then
+            PKGS=(BIND IPFS WIREGUARD DAPPMANAGER WIFI)
+        else
+            PKGS=(HTTPS BIND IPFS WIREGUARD DAPPMANAGER WIFI)
+        fi
+    fi
+    echo -e "\e[32mPackages to be installed: ${PKGS[*]}\e[0m" 2>&1 | tee -a $LOGFILE
 }
 
 function valid_ip() {
@@ -54,7 +86,7 @@ function valid_ip() {
     if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
         OIFS=$IFS
         IFS='.'
-        ip=($ip)
+        ip=("$ip")
         IFS=$OIFS
         [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 && \
         ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
@@ -63,29 +95,30 @@ function valid_ip() {
     return $stat
 }
 
-if [[ ! -z $STATIC_IP ]]; then
-    if valid_ip $STATIC_IP; then
-        echo $STATIC_IP >${DAPPNODE_DIR}/config/static_ip
+if [[ -n "$STATIC_IP" ]]; then
+    if valid_ip "$STATIC_IP"; then
+        echo "$STATIC_IP" >${DAPPNODE_DIR}/config/static_ip
     else
         echo "The static IP provided: ${STATIC_IP} is not valid."
         exit 1
     fi
 fi
 
+# Load profile
 [ -f $DAPPNODE_PROFILE ] || ${WGET} -O ${DAPPNODE_PROFILE} ${PROFILE_URL}
-
+# shellcheck disable=SC1090
 source "${DAPPNODE_PROFILE}"
 
 # The indirect variable expansion used in ${!ver##*:} allows us to use versions like 'dev:development'
 # If such variable with 'dev:'' suffix is used, then the component is built from specified branch or commit.
 # you can also specify an IPFS version like /ipfs/QmWg8P2b9JKQ8thAVz49J8SbJbCoi2MwkHnUqMtpzDTtxR:0.2.7, it's important
 # to include the exact version also in the IPFS hash format since it's needed to be able to download it
-detect_installation_type
+determine_packages
 for comp in "${PKGS[@]}"; do
     ver="${comp}_VERSION"
     DOWNLOAD_URL="https://github.com/dappnode/DNP_${comp}/releases/download/v${!ver}"
     if [[ ${!ver} == /ipfs/* ]]; then
-        DOWNLOAD_URL=${IPFS_ENDPOINT}/api/v0/cat?arg=${!ver%:*}
+        DOWNLOAD_URL="${IPFS_ENDPOINT}/api/v0/cat?arg=${!ver%:*}"
     fi
     eval "${comp}_URL=\"${DOWNLOAD_URL}/${comp,,}.dnp.dappnode.eth_${!ver##*:}_linux-${ARCH}.txz\""
     eval "${comp}_YML=\"${DOWNLOAD_URL}/docker-compose.yml\""
@@ -98,23 +131,22 @@ done
 dappnode_core_build() {
     for comp in "${PKGS[@]}"; do
         ver="${comp}_VERSION"
-        file="${comp}_FILE"
         if [[ ${!ver} == dev:* ]]; then
             echo "Cloning & building DNP_${comp}..."
             if ! dpkg -s git >/dev/null 2>&1; then
                 apt-get install -y git
             fi
             TMPDIR=$(mktemp -d)
-            pushd $TMPDIR
-            git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_${comp}
+            pushd "$TMPDIR" || { echo "Error on pushd"; exit 1; }
+            git clone -b "${!ver##*:}" https://github.com/dappnode/DNP_"${comp}"
             # Change version in YAML to the custom one
             DOCKER_VER=$(echo "${!ver##*:}" | sed 's/\//_/g')
-            sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${DOCKER_VER}~" DNP_${comp}/docker-compose.yml
-            docker-compose -f ./DNP_${comp}/docker-compose.yml build
-            cp ./DNP_${comp}/docker-compose.yml ${DAPPNODE_CORE_DIR}/docker-compose-${comp,,}.yml
-            cp ./DNP_${comp}/dappnode_package.json ${DAPPNODE_CORE_DIR}/dappnode_package-${comp,,}.json
-            rm -r ./DNP_${comp}
-            popd
+            sed -i "s~^\(\s*image\s*:\s*\).*~\1${comp,,}.dnp.dappnode.eth:${DOCKER_VER}~" DNP_"${comp}"/docker-compose.yml
+            docker-compose -f ./DNP_"${comp}"/docker-compose.yml build
+            cp ./DNP_"${comp}"/docker-compose.yml "${DAPPNODE_CORE_DIR}"/docker-compose-"${comp,,}".yml
+            cp ./DNP_"${comp}"/dappnode_package.json "${DAPPNODE_CORE_DIR}"/dappnode_package-"${comp,,}".json
+            rm -r ./DNP_"${comp}"
+            popd || { echo "Error on popd"; exit 1; }
         fi
     done
 }
@@ -143,11 +175,6 @@ dappnode_core_load() {
             eval "[ ! -z \$(docker images -q ${comp,,}.dnp.dappnode.eth:${!ver##*:}) ] || docker load -i \$${comp}_FILE 2>&1 | tee -a \$LOGFILE"
         fi
     done
-
-    for COMPOSE_PATH in ${DAPPNODE_CORE_DIR}/*.yml; do
-        # Remove the build property from the core docker-compose-*.yml
-       sed -i '/build:/,/image:/{//!d};/build:/d' $COMPOSE_PATH
-    done
 }
 
 customMotd() {
@@ -167,7 +194,7 @@ addSwap() {
     IS_SWAP=$(swapon --show | wc -l)
 
     # if not then create it
-    if [ $IS_SWAP -eq 0 ]; then
+    if [ "$IS_SWAP" -eq 0 ]; then
         echo -e '\e[32mSwap not found. Adding swapfile.\e[0m'
         #RAM=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
         #SWAP=$(($RAM * 2))
@@ -184,19 +211,20 @@ addSwap() {
 
 dappnode_start() {
     echo -e "\e[32mDAppNode starting...\e[0m" 2>&1 | tee -a $LOGFILE
+    # shellcheck disable=SC1090
     source "${DAPPNODE_PROFILE}" >/dev/null 2>&1
 
     # Execute `compose-up` independently
     # To execute `compose-up` against more than 1 compose, composes files must share compose file version (e.g 3.5)
     for comp in "${DNCORE_YMLS_ARRAY[@]}"; do
-        docker-compose -f $comp up -d 2>&1 | tee -a $LOGFILE
+        docker-compose -f "$comp" up -d 2>&1 | tee -a $LOGFILE
         echo "${comp} started" 2>&1 | tee -a $LOGFILE
     done
     echo -e "\e[32mDAppNode started\e[0m" 2>&1 | tee -a $LOGFILE
 
     # Show credentials to the user on login
-    USER=$(cat /etc/passwd | grep 1000 | cut -f 1 -d:)
-    [ ! -z $USER ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
+    USER=$(grep 1000 /etc/passwd | cut -f 1 -d:)
+    [ -n "$USER" ] && PROFILE=/home/$USER/.profile || PROFILE=/root/.profile
 
     if ! grep -q "${DAPPNODE_PROFILE}" "$PROFILE"; then
         echo "########          DAPPNODE PROFILE          ########" >>$PROFILE
@@ -206,16 +234,18 @@ dappnode_start() {
     sed -i '/return/d' $DAPPNODE_PROFILE | tee -a $LOGFILE
 
     if ! grep -q "$DAPPNODE_ACCESS_CREDENTIALS" "$DAPPNODE_PROFILE"; then
-        [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${PROFILE_URL}
-        echo "/bin/bash ${DAPPNODE_ACCESS_CREDENTIALS}" >>$DAPPNODE_PROFILE
+        [ -f $DAPPNODE_ACCESS_CREDENTIALS ] || ${WGET} -O ${DAPPNODE_ACCESS_CREDENTIALS} ${DAPPNODE_ACCESS_CREDENTIALS_URL}
+        # shellcheck disable=SC2216
+        sed -i "/return/i /bin/bash $DAPPNODE_ACCESS_CREDENTIALS" $DAPPNODE_PROFILE | echo "/bin/bash $DAPPNODE_ACCESS_CREDENTIALS" >>$DAPPNODE_PROFILE
     fi
-    # Show credentials at shell installation
-    # [ ! -f "/usr/src/dappnode/logs/iso_install.log" ] && docker run --rm -v dncore_vpndnpdappnodeeth_data:/usr/src/app/secrets $(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth --format '{{.Config.Image}}') getAdminCredentials
 
     # Delete dappnode_install.sh execution from rc.local if exists, and is not the unattended firstboot
     if [ -f "/etc/rc.local" ] && [ ! -f "/usr/src/dappnode/.firstboot" ]; then
         sed -i '/\/usr\/src\/dappnode\/scripts\/dappnode_install.sh/d' /etc/rc.local 2>&1 | tee -a $LOGFILE
     fi
+
+    # Display credentials to the user
+    [ -f $DAPPNODE_ACCESS_CREDENTIALS ] && /bin/bash $DAPPNODE_ACCESS_CREDENTIALS
 }
 
 installExtraDpkg() {
@@ -227,8 +257,8 @@ installExtraDpkg() {
 grabContentHashes() {
     if [ ! -f "${CONTENT_HASH_FILE}" ]; then
         for comp in "${CONTENT_HASH_PKGS[@]}"; do
-            CONTENT_HASH=$(eval ${SWGET} https://github.com/dappnode/DAppNodePackage-${comp}/releases/latest/download/content-hash)
-            if [ -z $CONTENT_HASH ]; then
+            CONTENT_HASH=$(eval "${SWGET}" https://github.com/dappnode/DAppNodePackage-"${comp}"/releases/latest/download/content-hash)
+            if [ -z "$CONTENT_HASH" ]; then
                 echo "ERROR! Failed to find content hash of ${comp}." 2>&1 | tee -a $LOGFILE
                 exit 1
             fi
@@ -254,15 +284,11 @@ installExtraDpkg() {
 }
 
 ##############################################
-##############################################
 ####             SCRIPT START             ####
-##############################################
 ##############################################
 
 echo -e "\e[32m\n##############################################\e[0m" 2>&1 | tee -a $LOGFILE
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 echo -e "\e[32m####          DAPPNODE INSTALLER          ####\e[0m" 2>&1 | tee -a $LOGFILE
-echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 
 echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOGFILE
@@ -277,7 +303,7 @@ installExtraDpkg
 echo -e "\e[32mGrabbing latest content hashes...\e[0m" 2>&1 | tee -a $LOGFILE
 grabContentHashes
 
-if [ $ARCH == "amd64" ]; then 
+if [ "$ARCH" == "amd64" ]; then 
     echo -e "\e[32mInstalling SGX modules...\e[0m" 2>&1 | tee -a $LOGFILE
     installSgx
 
@@ -307,11 +333,5 @@ if [ -f "/usr/src/dappnode/.firstboot" ]; then
     openvt -s -w -- sudo -u root /usr/src/dappnode/scripts/dappnode_test_install.sh
     exit 0
 fi
-
-# Show VPN credentials if installed from script
-[ ! -f "$LOGFILE" ] && eval ${CRED_CMD}
-
-# Show wifi credentials
-[ -f "/usr/src/dappnode/DNCORE/docker-compose-wifi.yml" ] && echo -e "\e[32mConnect to dappnode wifi. Credentials:\e[0m" && eval ${WIFI_CREDENTIALS}
 
 exit 0
