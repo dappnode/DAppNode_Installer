@@ -1,40 +1,63 @@
 name: Pre-release
-
 on:
-  push:
-    branches:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      core:
+        description: "Version of the core. Must go with v (e.g v0.2.47)"
+        required: true
+      dappmanager:
+        description: "Version of the dappmanager. Only numbers"
+        required: true
+      wifi:
+        description: "Version of the wifi. Only numbers"
+        required: true
+      bind:
+        description: "Version of the bind. Only numbers"
+        required: true
+      ipfs:
+        description: "Version of the ipfs. Only numbers"
+        required: true
+      https:
+        description: "Version of the https. Only numbers"
+        required: true
+      wireguard:
+        description: "Version of the wireguard. Only numbers"
+        required: true
+      vpn:
+        description: "Version of the vpn. Only numbers"
+        required: true
 
 jobs:
   pre-release:
     name: create pre release
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.1
-      - name: get latest tag release
-        id: latest_release
-        uses: oprypin/find-latest-tag@v1
+      - name: Check out installer
+        uses: actions/checkout@master
         with:
-          repository: dappnode/DNP_CORE
-          releases-only: true
-      - name: remove v from version
-        id: remove_v
+          repository: dappnode/DAppNode_Installer
+      - name: Set new versions
         run: |
-          version=$(echo ${{ steps.latest_release.outputs.tag }} | cut -c2-)
-          echo "::set-output name=version::$version"
-      - name: Bump release version
-        id: bump_version
-        uses: christian-draeger/increment-semantic-version@1.0.2
-        with:
-          current-version: ${{ steps.remove_v.outputs.version }}
-          version-fragment: "bug"
-      - name: add v to version
-        id: add_v
-        run: |
-          version_final="v${{ steps.bump_version.outputs.next-version }}"
-          echo "::set-output name=version_final::$version_final"
+          sed -i -e "/BIND_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${BIND_VERSION}"/" .dappnode_profile
+          sed -i -e "/IPFS_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${IPFS_VERSION}"/" .dappnode_profile
+          sed -i -e "/VPN_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${VPN_VERSION}"/" .dappnode_profile
+          sed -i -e "/DAPPMANAGER_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${DAPPMANAGER_VERSION}"/" .dappnode_profile
+          sed -i -e "/WIFI_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${WIFI_VERSION}"/" .dappnode_profile
+          sed -i -e "/WIREGUARD_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${WIREGUARD_VERSION}"/" .dappnode_profile
+          sed -i -e "/HTTPS_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${HTTPS_VERSION}"/" .dappnode_profile
+          cat .dappnode_profile
+        env:
+          BIND_VERSION: ${{ github.event.inputs.bind }}
+          IPFS_VERSION: ${{ github.event.inputs.ipfs }}
+          DAPPMANAGER_VERSION: ${{ github.event.inputs.dappmanager }}
+          WIFI_VERSION: ${{ github.event.inputs.wifi }}
+          WIREGUARD_VERSION: ${{ github.event.inputs.wireguard }}
+          HTTPS_VERSION: ${{ github.event.inputs.https }}
+          VPN_VERSION: ${{ github.event.inputs.vpn }}
       - name: Build
         run: |
           docker-compose build
@@ -42,20 +65,14 @@ jobs:
       - name: Check iso
         run: |
           ls -lrt images/DAppNode-debian-bullseye-amd64.iso
+
       - name: Create dappnode_profile.sh
         run: |
           cp .dappnode_profile dappnode_profile.sh
-      - name: delete current pre-release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.0
-        with:
-          delete_release: true
-          tag_name: ${{ steps.add_v.outputs.version_final }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Pre release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.add_v.outputs.version_final }}
+          tag_name: ${{ github.event.inputs.core }}
           prerelease: true
           files: |
             ./images/DAppNode-debian-bullseye-amd64.iso
