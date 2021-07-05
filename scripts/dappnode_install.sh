@@ -289,7 +289,7 @@ updateUpgrade() {
     export NEEDRESTART_SUSPEND=true # If set to a non-empty value the apt-get(8) hook will not run needrestart after installing or updating packages.
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -y 2>&1 | tee -a $LOGFILE
-    apt-get upgrade -y2>&1 | tee -a $LOGFILE
+    apt-get upgrade -y 2>&1 | tee -a $LOGFILE
 }
 
 ##############################################
