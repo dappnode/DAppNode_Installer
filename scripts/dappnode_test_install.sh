@@ -1,6 +1,7 @@
 #!/bin/bash
 
 HOME=${HOME:-/home/dappnode}
+DAPPNODE_DIR="/usr/src/dappnode"
 
 error_exit() {
     echo -e "\e[31m Error on installation!!! \n \e[0m"
