@@ -27,6 +27,16 @@ on:
         description: "Version of the vpn. Only numbers"
         required: true
 
+env:
+  BIND_VERSION: ${{ github.event.inputs.bind }}
+  IPFS_VERSION: ${{ github.event.inputs.ipfs }}
+  DAPPMANAGER_VERSION: ${{ github.event.inputs.dappmanager }}
+  WIFI_VERSION: ${{ github.event.inputs.wifi }}
+  WIREGUARD_VERSION: ${{ github.event.inputs.wireguard }}
+  HTTPS_VERSION: ${{ github.event.inputs.https }}
+  VPN_VERSION: ${{ github.event.inputs.vpn }}
+  CORE_VERSION: ${{ github.event.inputs.core }}
+
 jobs:
   pre-release:
     name: create pre release
@@ -36,10 +46,16 @@ jobs:
         shell: bash
 
     steps:
+      # Regex for versions introduced
+      - name: Check versions regex
+        run: |
+          [[ $BIND_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ $IPFS_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ $DAPPMANAGER_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && \
+            [[ $WIFI_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ $WIREGUARD_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ $HTTPS_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && \
+            [[ $VPN_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ $CORE_VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "versions introduced in wrong format"; exit 1; }
       - name: Check out installer
-        uses: actions/checkout@master
-        with:
-          repository: dappnode/DAppNode_Installer
+        uses: actions/checkout@v2
+
+      # Edit the profile with the new versions introduced
       - name: Set new versions
         run: |
           sed -i -e "/BIND_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${BIND_VERSION}"/" .dappnode_profile
@@ -50,36 +66,81 @@ jobs:
           sed -i -e "/WIREGUARD_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${WIREGUARD_VERSION}"/" .dappnode_profile
           sed -i -e "/HTTPS_VERSION/s/[0-9]*\.[0-9]*\.[0-9]*/"${HTTPS_VERSION}"/" .dappnode_profile
           cat .dappnode_profile
-        env:
-          BIND_VERSION: ${{ github.event.inputs.bind }}
-          IPFS_VERSION: ${{ github.event.inputs.ipfs }}
-          DAPPMANAGER_VERSION: ${{ github.event.inputs.dappmanager }}
-          WIFI_VERSION: ${{ github.event.inputs.wifi }}
-          WIREGUARD_VERSION: ${{ github.event.inputs.wireguard }}
-          HTTPS_VERSION: ${{ github.event.inputs.https }}
-          VPN_VERSION: ${{ github.event.inputs.vpn }}
-      - name: Build
+      # ISO ATTENDED
+      - name: Build attended
         run: |
+          sed -i -e "/UNATTENDED/s/true/false/" docker-compose.yml 
           docker-compose build
           docker-compose up
-      - name: Check iso
+      # Verify ISO attended created
+      - name: Check iso attended
         run: |
           ls -lrt images/DAppNode-debian-bullseye-amd64.iso
-
+      # Set new name for the release asset
+      - name: Set DAppNode attended ISO name
+        run: |
+          cp ./images/DAppNode-debian-bullseye-amd64.iso DAppNode-${CORE_VERSION}-debian-bullseye-amd64.iso
+      # ISO UNATTENDED
+      - name: Build unattended
+        run: |
+          sed -i -e "/UNATTENDED/s/false/true/" docker-compose.yml
+          docker-compose build
+          docker-compose up
+      # Verify ISO unattended was created
+      - name: Check iso unattended
+        run: |
+          ls -lrt images/DAppNode-debian-bullseye-amd64.iso
+      # Set new name for the release asset
+      - name: Set DAppNode unttended ISO name
+        run: |
+          cp ./images/DAppNode-debian-bullseye-amd64.iso DAppNode-${CORE_VERSION}-debian-bullseye-amd64-unattended.iso
+      # Create profile.sh script (not able to set dot (.) before the name in the gh release asset)
       - name: Create dappnode_profile.sh
         run: |
           cp .dappnode_profile dappnode_profile.sh
+      # SHASUMs
+      - name: Get SHA-256 attended
+        id: shasum-attended
+        run: |
+          SHASUM_ATTENDED=$(shasum -a 256 DAppNode-${CORE_VERSION}-debian-bullseye-amd64.iso)
+          echo "::set-output name=SHASUM_ATTENDED::$SHASUM_ATTENDED"
+      - name: Get SHA-256 unattended
+        id: shasum-unattended
+        run: |
+          SHASUM_UNATTENDED=$(shasum -a 256 DAppNode-${CORE_VERSION}-debian-bullseye-amd64-unattended.iso)
+          echo "::set-output name=SHASUM_UNATTENDED::$SHASUM_UNATTENDED"
+      # Release body
+      - name: Write release content
+        run: |
+          echo -en "This is a release for testing purposes# Versions\n|  Package  | Version  |\n|---|---|\nbind.dnp.dappnode.eth|${BIND_VERSION}|\n|ipfs.dnp.dappnode.eth|${IPFS_VERSION}|\n|vpn.dnp.dappnode.eth |${VPN_VERSION}|\n|dappmanager.dnp.dappnode.eth|${DAPPMANAGER_VERSION}|\n|wifi.dnp.dappnode.eth|${WIFI_VERSION}|\n|https.dnp.dappnode.eth|${HTTPS_VERSION}|\n|wireguard.dnp.dappnode.eth|${WIREGUARD_VERSION}|\n# Changes\nChanges implemented in release ${CORE_VERSION}\n# Attended version\nInstall and customize DAppNode using the attended ISO: **DAppNode-${CORE_VERSION}-debian-bullseye-amd64.iso**\n\n## ISO SHA-256 Checksum\n\`\`\`\nshasum -a 256 DAppNode-${CORE_VERSION}-debian-bullseye-amd64.iso\n${SHASUM_ATTENDED}\n\`\`\`\n# Unattended version\nInstall DAppNode easily using the unattended ISO: **DAppNode-${CORE_VERSION}-debian-bullseye-amd64-unattended.iso**\nDo a reboot right after the installation\n:warning: **Warning**: This ISO will install dappnode automatically, deleting all existing partitions in the disk\n\ndefault login data:\n - **__user__**: dappnode\n - **__password__**: dappnode.s0\n## ISO SHA-256 Checksum\n\`\`\`\nshasum -a 256 DAppNode-${CORE_VERSION}-debian-bullseye-amd64-unattended.iso\n${SHASUM_UNATTENDED}\n\`\`\`\n# DAppNode for Raspberry Pi 4 64bit\n[Instructions](https://github.com/dappnode/DAppNode/wiki/DAppNodeARM-Installation-Guide)\n\ndefault login data:\n - **__user__**: dappnode\n - **__password__**: dappnodepi" > CHANGELOG.md
+          cat CHANGELOG.md
+        env:
+          SHASUM_ATTENDED: ${{ steps.shasum-attended.outputs.SHASUM_ATTENDED }}
+          SHASUM_UNATTENDED: ${{ steps.shasum-unattended.outputs.SHASUM_UNATTENDED }}
+
+      # Delete dev release and update it
+      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: dev
+          repo: dappnode/DAppNode_Installer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # PRE-RELEASE ASSETS
       - name: Pre release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.core }}
+          tag_name: dev
           prerelease: true
           files: |
-            ./images/DAppNode-debian-bullseye-amd64.iso
+            ./DAppNode-*-amd64.iso
+            ./DAppNode-*-amd64-unattended.iso
             ./scripts/dappnode_install.sh
             ./scripts/dappnode_install_pre.sh
             ./scripts/dappnode_uninstall.sh
             ./scripts/dappnode_access_credentials.sh
             dappnode_profile.sh
+          body_path: CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
