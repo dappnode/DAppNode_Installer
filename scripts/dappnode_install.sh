@@ -283,6 +283,15 @@ installExtraDpkg() {
     fi
 }
 
+# Update and upgrade host
+updateUpgrade() {
+    # Prevent needrestart interactive mode and debian frontend during upgrade: https://manpages.debian.org/testing/needrestart/needrestart.1.en.html
+    export NEEDRESTART_SUSPEND=true # If set to a non-empty value the apt-get(8) hook will not run needrestart after installing or updating packages.
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -y 2>&1 | tee -a $LOGFILE
+    apt-get upgrade -y2>&1 | tee -a $LOGFILE
+}
+
 ##############################################
 ####             SCRIPT START             ####
 ##############################################
@@ -290,6 +299,9 @@ installExtraDpkg() {
 echo -e "\e[32m\n##############################################\e[0m" 2>&1 | tee -a $LOGFILE
 echo -e "\e[32m####          DAPPNODE INSTALLER          ####\e[0m" 2>&1 | tee -a $LOGFILE
 echo -e "\e[32m##############################################\e[0m" 2>&1 | tee -a $LOGFILE
+
+echo -e "\e[32mUpdating host...\e[0m" 2>&1 | tee -a $LOGFILE
+updateUpgrade
 
 echo -e "\e[32mCreating swap memory...\e[0m" 2>&1 | tee -a $LOGFILE
 addSwap
