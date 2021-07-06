@@ -164,7 +164,7 @@ mkdir -p "$(dirname "$DOCKER_PATH")"
 touch $LOG_FILE
 
 # Only update && upgrade host if needed
-if [ $1 == "UPDATE" ]; then
+if [ "$1" == "UPDATE" ]; then
     echo -e "\e[32m \n\n Updating && upgrading host \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
     host_update 2>&1 | tee -a $LOG_FILE
 fi
