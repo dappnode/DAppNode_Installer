@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Execute script with flag UPDATE to update the host: ./dappnode_install_pre.sh UPDATE
+
 DAPPNODE_DIR="/usr/src/dappnode"
 LOGS_DIR="$DAPPNODE_DIR/logs"
 DOCKER_PKG="docker-ce_20.10.6~3-0~debian-bullseye_amd64.deb"
@@ -29,11 +31,8 @@ detect_installation_type() {
     fi
 }
 
+# DOCKER INSTALLATION
 install_docker() {
-    ##############################################
-    ####          DOCKER INSTALLATION         ####
-    ##############################################
-
     # STEP 0: Detect if it's a Debian 9 (stretch) or Debian 10 (Buster) installation
     # ----------------------------------------
     if [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
@@ -90,11 +89,8 @@ install_docker() {
     fi
 }
 
+# DOCKER COMPOSE INSTALLATION
 install_docker_compose() {
-    ##############################################
-    ####      DOCKER COMPOSE INSTALLATION     ####
-    ##############################################
-
     # STEP 0: Declare paths and directories
     # ----------------------------------------
 
@@ -120,10 +116,8 @@ install_docker_compose() {
     fi
 }
 
+# WIREGUARD INSTALLATION 
 install_wireguard_dkms() {
-    ##############################################
-    ####        WIREGUARD INSTALLATION        ####
-    ##############################################
     apt-get update -y
     if [ -f "/etc/os-release" ] && grep -q "buster" "/etc/os-release"; then
         echo "deb http://deb.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/buster-backports.list
@@ -139,10 +133,8 @@ install_wireguard_dkms() {
     fi
 }
 
+# LSOF INSTALLATION   
 install_lsof() {
-    ##############################################
-    ####        LSOF INSTALLATION        ####
-    ##############################################
     apt-get update -y
     apt-get install lsof -y | tee -a $LOG_FILE
     if  lsof -v >/dev/null 2>&1 ; then
@@ -150,6 +142,12 @@ install_lsof() {
     else
         echo -e "\e[31m \n\n WARNING: lsof not installed, HTTPS DAppNode package might not be installed! \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
     fi
+}
+
+# HOST UPDATE
+host_update () {
+    apt-get update 2>&1 | tee -a $LOG_FILE
+    apt-get -y upgrade 2>&1 | tee -a $LOG_FILE
 }
 
 ##############################################
@@ -164,6 +162,12 @@ mkdir -p $LOGS_DIR
 mkdir -p "$(dirname "$DOCKER_PATH")"
 
 touch $LOG_FILE
+
+# Only update && upgrade host if needed
+if [ $1 == "UPDATE" ]; then
+    echo -e "\e[32m \n\n Updating && upgrading host \n\n \e[0m" 2>&1 | tee -a $LOG_FILE
+    host_update 2>&1 | tee -a $LOG_FILE
+fi
 
 # Only install docker if needed
 if docker -v >/dev/null 2>&1; then
