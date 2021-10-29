@@ -245,7 +245,9 @@ dappnode_start() {
     fi
 
     # Display credentials to the user
-    [ -f $DAPPNODE_ACCESS_CREDENTIALS ] && /bin/bash $DAPPNODE_ACCESS_CREDENTIALS
+    if [ -f $DAPPNODE_ACCESS_CREDENTIALS ] && [ ! -f "/usr/src/dappnode/.nocreds" ]; then
+    /bin/bash $DAPPNODE_ACCESS_CREDENTIALS
+    fi
 }
 
 installExtraDpkg() {
